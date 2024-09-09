@@ -396,3 +396,4 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+/UF5423_Aguas/UF5423_Aguas/appsettings.json

@@ -30,6 +30,8 @@ namespace UF5423_Aguas
                 cfg.UseSqlServer(this.Configuration.GetConnectionString("LocalConnectionString"));
             });
 
+            services.AddTransient<SeedDb>();
+
             services.AddControllersWithViews();
         }
 

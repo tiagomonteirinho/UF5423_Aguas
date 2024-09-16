@@ -10,6 +10,8 @@ namespace UF5423_Aguas.Data.Entities
 
         public DateTime Date { get; set; }
 
+        public int MeterId { get; set; }
+
         public Meter Meter { get; set; }
     }
 }

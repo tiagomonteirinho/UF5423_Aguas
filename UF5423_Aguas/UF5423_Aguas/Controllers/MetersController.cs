@@ -12,17 +12,17 @@ namespace UF5423_Aguas.Controllers
 {
     public class MetersController : Controller
     {
-        private readonly DataContext _context;
+        private readonly IMeterRepository _meterRepository;
 
-        public MetersController(DataContext context)
+        public MetersController(IMeterRepository meterRepository)
         {
-            _context = context;
+            _meterRepository = meterRepository;
         }
 
         // GET: Meters
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Meters.ToListAsync());
+            return View(_meterRepository.GetAll().OrderBy(m => m.Name));
         }
 
         // GET: Meters/Details/5
@@ -33,8 +33,7 @@ namespace UF5423_Aguas.Controllers
                 return NotFound();
             }
 
-            var meter = await _context.Meters
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var meter = await _meterRepository.GetByIdAsync(id.Value);
             if (meter == null)
             {
                 return NotFound();
@@ -58,10 +57,10 @@ namespace UF5423_Aguas.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(meter);
-                await _context.SaveChangesAsync();
+                await _meterRepository.CreateAsync(meter);
                 return RedirectToAction(nameof(Index));
             }
+
             return View(meter);
         }
 
@@ -73,11 +72,12 @@ namespace UF5423_Aguas.Controllers
                 return NotFound();
             }
 
-            var meter = await _context.Meters.FindAsync(id);
+            var meter = await _meterRepository.GetByIdAsync(id.Value);
             if (meter == null)
             {
                 return NotFound();
             }
+
             return View(meter);
         }
 
@@ -97,12 +97,11 @@ namespace UF5423_Aguas.Controllers
             {
                 try
                 {
-                    _context.Update(meter);
-                    await _context.SaveChangesAsync();
+                    await _meterRepository.UpdateAsync(meter);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!MeterExists(meter.Id))
+                    if (!await _meterRepository.ExistsAsync(meter.Id))
                     {
                         return NotFound();
                     }
@@ -111,8 +110,10 @@ namespace UF5423_Aguas.Controllers
                         throw;
                     }
                 }
+
                 return RedirectToAction(nameof(Index));
             }
+
             return View(meter);
         }
 
@@ -124,8 +125,7 @@ namespace UF5423_Aguas.Controllers
                 return NotFound();
             }
 
-            var meter = await _context.Meters
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var meter = await _meterRepository.GetByIdAsync(id.Value);
             if (meter == null)
             {
                 return NotFound();
@@ -139,15 +139,9 @@ namespace UF5423_Aguas.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var meter = await _context.Meters.FindAsync(id);
-            _context.Meters.Remove(meter);
-            await _context.SaveChangesAsync();
+            var meter = await _meterRepository.GetByIdAsync(id);
+            await _meterRepository.DeleteAsync(meter);
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool MeterExists(int id)
-        {
-            return _context.Meters.Any(e => e.Id == id);
         }
     }
 }

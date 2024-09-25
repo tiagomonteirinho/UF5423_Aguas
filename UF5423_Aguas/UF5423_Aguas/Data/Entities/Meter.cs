@@ -11,6 +11,9 @@ namespace UF5423_Aguas.Data.Entities
         public string Name { get; set; }
 
         [Required]
+        [MaxLength(99)]
         public string Address { get; set; }
+
+        public User User { get; set; }
     }
 }

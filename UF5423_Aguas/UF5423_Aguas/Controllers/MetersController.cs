@@ -7,20 +7,23 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using UF5423_Aguas.Data;
 using UF5423_Aguas.Data.Entities;
+using UF5423_Aguas.Helpers;
 
 namespace UF5423_Aguas.Controllers
 {
     public class MetersController : Controller
     {
         private readonly IMeterRepository _meterRepository;
+        private readonly IUserHelper _userHelper;
 
-        public MetersController(IMeterRepository meterRepository)
+        public MetersController(IMeterRepository meterRepository, IUserHelper userHelper)
         {
             _meterRepository = meterRepository;
+            _userHelper = userHelper;
         }
 
         // GET: Meters
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
             return View(_meterRepository.GetAll().OrderBy(m => m.Name));
         }
@@ -57,6 +60,8 @@ namespace UF5423_Aguas.Controllers
         {
             if (ModelState.IsValid)
             {
+                //meter.User = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
+                meter.User = await _userHelper.GetUserByEmailAsync("admin@mail.com");
                 await _meterRepository.CreateAsync(meter);
                 return RedirectToAction(nameof(Index));
             }
@@ -97,6 +102,8 @@ namespace UF5423_Aguas.Controllers
             {
                 try
                 {
+                    //meter.User = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
+                    meter.User = await _userHelper.GetUserByEmailAsync("admin@mail.com");
                     await _meterRepository.UpdateAsync(meter);
                 }
                 catch (DbUpdateConcurrencyException)

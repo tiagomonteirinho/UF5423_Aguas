@@ -62,8 +62,7 @@ namespace UF5423_Aguas.Controllers
         {
             if (ModelState.IsValid)
             {
-                //meter.User = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
-                meter.User = await _userHelper.GetUserByEmailAsync("admin@mail.com");
+                meter.User = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
                 await _meterRepository.CreateAsync(meter);
                 return RedirectToAction(nameof(Index));
             }
@@ -105,8 +104,7 @@ namespace UF5423_Aguas.Controllers
             {
                 try
                 {
-                    //meter.User = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
-                    meter.User = await _userHelper.GetUserByEmailAsync("admin@mail.com");
+                    meter.User = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
                     await _meterRepository.UpdateAsync(meter);
                 }
                 catch (DbUpdateConcurrencyException)

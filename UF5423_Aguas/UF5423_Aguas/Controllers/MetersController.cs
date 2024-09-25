@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -46,6 +47,7 @@ namespace UF5423_Aguas.Controllers
         }
 
         // GET: Meters/Create
+        [Authorize]
         public IActionResult Create()
         {
             return View();
@@ -70,6 +72,7 @@ namespace UF5423_Aguas.Controllers
         }
 
         // GET: Meters/Edit/5
+        [Authorize]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -125,6 +128,7 @@ namespace UF5423_Aguas.Controllers
         }
 
         // GET: Meters/Delete/5
+        [Authorize]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)

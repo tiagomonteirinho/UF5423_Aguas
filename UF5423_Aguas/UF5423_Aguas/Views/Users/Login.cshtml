@@ -21,10 +21,10 @@
             </div>
             <div class="form-group">
                 <div class="form-check">
-                    <input asp-for="RememberMe" type="checkbox" class="form-check-input" />
-                    <label asp-for="RememberMe" class="form-check-label">Remember me</label>
+                    <input asp-for="StaySignedIn" type="checkbox" class="form-check-input" />
+                    <label asp-for="StaySignedIn" class="form-check-label">Stay signed in</label>
                 </div>
-                <span asp-validation-for="RememberMe" class="text-warning"></span>
+                <span asp-validation-for="StaySignedIn" class="text-warning"></span>
             </div>
             <input type="submit" value="Login" class="btn btn-success" />
             <br /><br />Don't have an account? <a asp-action="Register">Register one</a>.

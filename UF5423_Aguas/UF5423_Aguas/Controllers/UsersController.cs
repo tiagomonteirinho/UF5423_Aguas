@@ -86,7 +86,7 @@ namespace UF5423_Aguas.Controllers
                     {
                         Email = model.Email,
                         Password = model.Password,
-                        RememberMe = false,
+                        StaySignedIn = false,
                     };
 
                     var result2 = await _userHelper.LoginAsync(loginViewModel);
@@ -102,6 +102,73 @@ namespace UF5423_Aguas.Controllers
             }
 
             return View(model);
+        }
+
+        public async Task<IActionResult> ChangeUserInfo()
+        {
+            var user = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
+            var model = new ChangeUserInfoViewModel();
+            if (user != null)
+            {
+                model.FullName = user.FullName;
+            }
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ChangeUserInfo(ChangeUserInfoViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
+                if (user != null)
+                {
+                    user.FullName = model.FullName;
+                    var response = await _userHelper.ChangeUserInfoAsync(user);
+                    if (response.Succeeded)
+                    {
+                        ViewBag.UserMessage = "User info updated successfully";
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, response.Errors.FirstOrDefault().Description);
+                    }
+                }
+            }
+
+            return View(model);
+        }
+
+        public IActionResult ChangePassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
+                if (user != null)
+                {
+                    var result = await _userHelper.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
+                    if (result.Succeeded)
+                    {
+                        return this.RedirectToAction("ChangeUserInfo");
+                    }
+                    else
+                    {
+                        this.ModelState.AddModelError(string.Empty, result.Errors.FirstOrDefault().Description);
+                    }
+                }
+                else
+                {
+                    this.ModelState.AddModelError(string.Empty, "User not found.");
+                }
+            }
+            return this.View(model);
         }
     }
 }

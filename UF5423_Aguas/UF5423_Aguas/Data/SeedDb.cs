@@ -17,7 +17,6 @@ namespace UF5423_Aguas.Data
         {
             _context = context;
             _userHelper = userHelper;
-            //_random = new Random();
         }
 
         public async Task SeedAsync()
@@ -36,9 +35,8 @@ namespace UF5423_Aguas.Data
                 var result = await _userHelper.AddUserAsync(user, "123456");
                 if (result != IdentityResult.Success)
                 {
-                    //throw new InvalidOperationException($"Could not create seed user account. \n Errors: {result.Errors.ToString()}");
                     var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-                    throw new InvalidOperationException($"Could not create seed user account. Errors: {errors}");
+                    throw new InvalidOperationException($"Could not create seed user.");
                 }
             }
 

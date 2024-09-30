@@ -1,26 +1,33 @@
-﻿@model UF5423_Aguas.Models.ChangeUserInfoViewModel
+﻿@model UF5423_Aguas.Models.ChangeUserInfoViewModel 
 @{
-    ViewData["Title"] = "ChangeUserInfo";
+    ViewData["Title"] = "Edit";
 }
 
 <h2>Edit user info</h2>
 
 <div class="row">
     <div class="col-md-4 offset-md-4">
-        <form method="post">
+        <form method="post" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly"></div>
 
             <div class="form-group">
-                <label asp-for="FullName">Full Name</label>
+                <label asp-for="FullName">Full name</label>
                 <input asp-for="FullName" class="form-control" />
                 <span asp-validation-for="FullName" class="text-warning"></span>
             </div>
 
-@*             <div class="form-group">
-                <label asp-for="LastName">Last Name</label>
-                <input asp-for="LastName" class="form-control" />
-                <span asp-validation-for="LastName" class="text-warning"></span>
-            </div> *@
+            <div class="form-group">
+                <label asp-for="ImageFile">New Image</label>
+                <input asp-for="ImageFile" class="form-control" type="file" />
+                <span asp-validation-for="ImageFile" class="text-warning"></span>
+            </div>
+
+            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+            {
+                <div class="form-group">
+                    <img src="@Url.Content(Model.ImageUrl)" alt="User Image" width="150" />
+                </div>
+            }
 
             <div class="form-group">
                 <input type="submit" value="Update user" class="btn btn-primary" />

@@ -48,6 +48,8 @@ namespace UF5423_Aguas
             services.AddScoped<IUserHelper, UserHelper>();
 
             services.AddScoped<IMeterRepository, MeterRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
+
 
             services.AddControllersWithViews();
         }

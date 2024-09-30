@@ -22,14 +22,14 @@ namespace UF5423_Aguas.Data
         public async Task SeedAsync()
         {
             await _context.Database.EnsureCreatedAsync();
-            var user = await _userHelper.GetUserByEmailAsync("admin@mail.com");
+            var user = await _userHelper.GetUserByEmailAsync("admin.5423@yopmail.com");
             if (user == null)
             {
                 user = new User
                 {
-                    FullName = "Tiago Monteirinho",
-                    Email = "admin@mail.com",
-                    UserName = "admin@mail.com",
+                    FullName = "Admin",
+                    Email = "admin.5423@yopmail.com",
+                    UserName = "admin.5423@yopmail.com",
                 };
 
                 var result = await _userHelper.AddUserAsync(user, "123456");

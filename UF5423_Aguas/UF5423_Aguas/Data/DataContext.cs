@@ -9,6 +9,8 @@ namespace UF5423_Aguas.Data
     {
         public DbSet<Meter> Meters { get; set; }
 
+        //public DbSet<User> Users { get; set; }
+
         public DataContext(DbContextOptions<DataContext> options) : base(options) 
         {
 

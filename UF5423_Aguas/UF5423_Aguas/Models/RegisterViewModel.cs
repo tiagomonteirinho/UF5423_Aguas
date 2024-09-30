@@ -1,18 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Http;
+using System.ComponentModel.DataAnnotations;
+using UF5423_Aguas.Data.Entities;
 
 namespace UF5423_Aguas.Models
 {
-    public class RegisterViewModel
+    public class RegisterViewModel : User
     {
-        [Required]
-        [Display(Name = "Full name")]
-        public string FullName { get; set; }
-
-        [Required]
-        [DataType(DataType.EmailAddress)]
-        [Display(Name = "Email")]
-        public string Email { get; set; }
-
         [Required]
         [MinLength(6)]
         [Display(Name = "Password")]
@@ -22,5 +15,8 @@ namespace UF5423_Aguas.Models
         [Compare("Password")]
         [Display(Name = "Confirm password")]
         public string ConfirmPassword { get; set; }
+
+        [Display(Name = "Image")]
+        public IFormFile ImageFile { get; set; }
     }
 }

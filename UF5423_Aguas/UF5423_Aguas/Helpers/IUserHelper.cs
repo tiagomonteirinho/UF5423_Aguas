@@ -18,6 +18,5 @@ namespace UF5423_Aguas.Helpers
         Task<IdentityResult> ChangeUserInfoAsync(User user);
 
         Task<IdentityResult> ChangePasswordAsync(User user, string oldPassword, string newPassword);
-
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -70,7 +71,6 @@ public class AccountController : Controller
     {
         if (ModelState.IsValid)
         {
-
             var user = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
             if (user != null)
             {
@@ -79,10 +79,13 @@ public class AccountController : Controller
 
                 if (model.ImageFile != null && model.ImageFile.Length > 0)
                 {
+                    var guid = Guid.NewGuid().ToString();
+                    string fileName = $"{guid}.jpg";
+
                     path = Path.Combine(
                         Directory.GetCurrentDirectory(),
                         "wwwroot\\images\\users",
-                        model.ImageFile.FileName
+                        fileName
                     );
 
                     using (var stream = new FileStream(path, FileMode.Create))
@@ -90,7 +93,7 @@ public class AccountController : Controller
                         await model.ImageFile.CopyToAsync(stream);
                     }
 
-                    user.ImageUrl = $"~/images/users/{model.ImageFile.FileName}";
+                    user.ImageUrl = $"~/images/users/{fileName}";
                 }
 
                 var response = await _userHelper.EditUserAsync(user);

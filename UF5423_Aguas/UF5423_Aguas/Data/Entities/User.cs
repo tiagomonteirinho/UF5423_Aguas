@@ -12,5 +12,18 @@ namespace UF5423_Aguas.Data.Entities
 
         [Display(Name = "Image")]
         public string ImageUrl { get; set; }
+
+        public string ImageFullPath
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(ImageUrl))
+                {
+                    return $"https://localhost:44377{ImageUrl.Substring(1)}";
+                }
+
+                return $"https://localhost:44377//images/image_unavailable.jpg";
+            }
+        }
     }
 }

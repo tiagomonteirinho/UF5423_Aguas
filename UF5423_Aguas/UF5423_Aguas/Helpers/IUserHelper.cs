@@ -18,5 +18,11 @@ namespace UF5423_Aguas.Helpers
         Task<IdentityResult> EditUserAsync(User user);
 
         Task<IdentityResult> ChangePasswordAsync(User user, string oldPassword, string newPassword);
+
+        Task EnsureCreatedRoleAsync(string role);
+
+        Task AddUserToRoleAsync(User user, string role);
+
+        Task<bool> IsUserInRoleAsync(User user, string role);
     }
 }

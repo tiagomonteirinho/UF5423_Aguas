@@ -12,7 +12,7 @@ using UF5423_Aguas.Models;
 
 namespace UF5423_Aguas.Controllers
 {
-    //[Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin")]
     public class UsersController : Controller
     {
         private readonly IUserHelper _userHelper;
@@ -33,7 +33,8 @@ namespace UF5423_Aguas.Controllers
 
         public IActionResult Register()
         {
-            return View();
+            var model = new RegisterViewModel();
+            return View(model);
         }
 
         [HttpPost]
@@ -41,56 +42,55 @@ namespace UF5423_Aguas.Controllers
         {
             if (ModelState.IsValid)
             {
-                var path = string.Empty;
-                if(model.ImageFile != null && model.ImageFile.Length > 0)
-                {
-                    path = Path.Combine(
-                        Directory.GetCurrentDirectory(),
-                        "wwwroot\\images\\users",
-                        model.ImageFile.FileName
-                        );
-
-                    using(var stream = new FileStream(path, FileMode.Create))
-                    {
-                        await model.ImageFile.CopyToAsync(stream);
-                    }
-
-                    path = $"~/images/users/{model.ImageFile.FileName}";
-                }
-                else
-                {
-                    path = "~/images/users/default.png";
-                }
-
-                var user = this.ConvertToUser(model, path);
-
-                user = await _userHelper.GetUserByEmailAsync(model.Email);
+                var user = await _userHelper.GetUserByEmailAsync(model.Email);
                 if (user == null)
                 {
+                    var path = string.Empty;
+                    if (model.ImageFile != null && model.ImageFile.Length > 0)
+                    {
+                        var guid = Guid.NewGuid().ToString();
+                        string fileName = $"{guid}.jpg";
+
+                        path = Path.Combine(
+                            Directory.GetCurrentDirectory(),
+                            "wwwroot\\images\\users",
+                            fileName
+                        );
+
+                        using (var stream = new FileStream(path, FileMode.Create))
+                        {
+                            await model.ImageFile.CopyToAsync(stream);
+                        }
+
+                        path = $"~/images/users/{fileName}";
+                    }
+                    else
+                    {
+                        path = "~/images/users/default.png";
+                    }
+
+                    user = this.ConvertToUser(model, path);
+
                     var result = await _userHelper.RegisterUserAsync(user, model.Password);
                     if (result != IdentityResult.Success)
                     {
                         ModelState.AddModelError(string.Empty, "Could not register user account.");
-                        return View(model);
                     }
 
-                    var loginViewModel = new LoginViewModel
+                    await _userHelper.AddUserToRoleAsync(user, "Customer");
+                    var isInRole = await _userHelper.IsUserInRoleAsync(user, "Customer");
+                    if (!isInRole)
                     {
-                        Email = model.Email,
-                        Password = model.Password,
-                        StaySignedIn = false,
-                    };
-
-                    var result2 = await _userHelper.LoginAsync(loginViewModel);
-                    if (result2.Succeeded)
-                    {
-                        return RedirectToAction("Index", "Home");
+                        ModelState.AddModelError(string.Empty, "Could not register user account.");
                     }
 
-                    ModelState.AddModelError(string.Empty, "Could not log in.");
+                    //TODO: Replace by ViewBag;
+                    ModelState.AddModelError(string.Empty, "User successfully registered.");
                 }
-
-                ModelState.AddModelError(string.Empty, "A user already exists with that email address.");
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "A user already exists with that email address.");
+                }
             }
 
             return View(model);
@@ -100,11 +100,10 @@ namespace UF5423_Aguas.Controllers
         {
             return new User
             {
-                Id = model.Id,
                 Email = model.Email,
-                UserName = model.UserName,
+                UserName = model.Email,
                 FullName = model.FullName,
-                ImageUrl = model.ImageUrl,
+                ImageUrl = path,
             };
         }
 
@@ -118,16 +117,6 @@ namespace UF5423_Aguas.Controllers
 
             var viewModel = this.ConvertToUserViewModel(user);
             return View(viewModel);
-        }
-
-        private EditUserViewModel ConvertToUserViewModel(User user)
-        {
-            return new EditUserViewModel
-            {
-                Id = user.Id,
-                Email = user.Email,
-                FullName = user.FullName,
-            };
         }
 
         [HttpPost]
@@ -153,6 +142,16 @@ namespace UF5423_Aguas.Controllers
             }
 
             return View(model);
+        }
+
+        private EditUserViewModel ConvertToUserViewModel(User user)
+        {
+            return new EditUserViewModel
+            {
+                Id = user.Id,
+                Email = user.Email,
+                FullName = user.FullName,
+            };
         }
     }
 }

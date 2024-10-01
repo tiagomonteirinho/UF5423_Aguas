@@ -17,17 +17,16 @@
             </div>
 
             <div class="form-group">
-                <label asp-for="ImageFile">New Image</label>
+                <label asp-for="ImageFile">Image</label>
+                @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                {
+                    <div class="form-group">
+                        <img src="@Url.Content(Model.ImageUrl)" width="150" />
+                    </div>
+                }
                 <input asp-for="ImageFile" class="form-control" type="file" />
                 <span asp-validation-for="ImageFile" class="text-warning"></span>
             </div>
-
-            @if (!string.IsNullOrEmpty(Model.ImageUrl))
-            {
-                <div class="form-group">
-                    <img src="@Url.Content(Model.ImageUrl)" alt="User Image" width="150" />
-                </div>
-            }
 
             <div class="form-group">
                 <input type="submit" value="Update user" class="btn btn-primary" />

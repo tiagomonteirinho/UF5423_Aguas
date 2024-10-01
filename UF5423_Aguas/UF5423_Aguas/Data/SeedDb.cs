@@ -22,22 +22,32 @@ namespace UF5423_Aguas.Data
         public async Task SeedAsync()
         {
             await _context.Database.EnsureCreatedAsync();
-            var user = await _userHelper.GetUserByEmailAsync("admin.5423@yopmail.com");
+            await _userHelper.EnsureCreatedRoleAsync("Admin");
+            await _userHelper.EnsureCreatedRoleAsync("Employee");
+            await _userHelper.EnsureCreatedRoleAsync("Customer");
+            var user = await _userHelper.GetUserByEmailAsync("admin@mail");
             if (user == null)
             {
                 user = new User
                 {
                     FullName = "Admin",
-                    Email = "admin.5423@yopmail.com",
-                    UserName = "admin.5423@yopmail.com",
+                    Email = "admin@mail",
+                    UserName = "admin@mail",
                 };
 
                 var result = await _userHelper.RegisterUserAsync(user, "123456");
                 if (result != IdentityResult.Success)
                 {
-                    var errors = string.Join(", ", result.Errors.Select(e => e.Description));
                     throw new InvalidOperationException($"Could not create seed user.");
                 }
+
+                await _userHelper.AddUserToRoleAsync(user, "Admin");
+            }
+
+            var isInRole = await _userHelper.IsUserInRoleAsync(user, "Admin");
+            if (!isInRole)
+            {
+                await _userHelper.AddUserToRoleAsync(user, "Admin");
             }
 
             if (!_context.Meters.Any())

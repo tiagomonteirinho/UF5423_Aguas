@@ -4,8 +4,20 @@ using UF5423_Aguas.Data.Entities;
 
 namespace UF5423_Aguas.Models
 {
-    public class RegisterViewModel : User
+    public class RegisterViewModel
     {
+        [Required]
+        [Display(Name = "Full name")]
+        [MaxLength(99)]
+        public string FullName { get; set; }
+
+        [Display(Name = "Image")]
+        public string ImageUrl { get; set; }
+
+        [Required]
+        [DataType(DataType.EmailAddress)]
+        public string Email { get; set; }
+
         [Required]
         [MinLength(6)]
         [Display(Name = "Password")]

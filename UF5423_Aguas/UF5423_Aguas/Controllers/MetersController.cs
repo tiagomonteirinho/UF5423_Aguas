@@ -12,6 +12,7 @@ using UF5423_Aguas.Helpers;
 
 namespace UF5423_Aguas.Controllers
 {
+    [Authorize]
     public class MetersController : Controller
     {
         private readonly IMeterRepository _meterRepository;

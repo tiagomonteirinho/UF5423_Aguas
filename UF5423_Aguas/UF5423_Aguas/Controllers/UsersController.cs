@@ -12,6 +12,7 @@ using UF5423_Aguas.Models;
 
 namespace UF5423_Aguas.Controllers
 {
+    //[Authorize(Roles = "Admin")]
     public class UsersController : Controller
     {
         private readonly IUserHelper _userHelper;
@@ -25,45 +26,9 @@ namespace UF5423_Aguas.Controllers
 
         public async Task<IActionResult> Index()
         {
+            //TODO: add to generic repository to have GetAll().OrderBy().
             var users = await _userRepository.GetAllUsersAsync();
             return View(users);
-        }
-
-        public IActionResult Login()
-        {
-            if (User.Identity.IsAuthenticated)
-            {
-                return RedirectToAction("Index", "Home");
-            }
-
-            return View();
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Login(LoginViewModel model)
-        {
-            if (ModelState.IsValid)
-            {
-                var result = await _userHelper.LoginAsync(model);
-                if (result.Succeeded)
-                {
-                    if (this.Request.Query.Keys.Contains("ReturnUrl"))
-                    {
-                        return Redirect(this.Request.Query["ReturnUrl"].First());
-                    }
-
-                    return this.RedirectToAction("Index", "Home");
-                }
-            }
-
-            this.ModelState.AddModelError(string.Empty, "Could not login.");
-            return View(model);
-        }
-
-        public async Task<IActionResult> Logout()
-        {
-            await _userHelper.LogoutAsync();
-            return RedirectToAction("Index", "Home");
         }
 
         public IActionResult Register()
@@ -94,8 +59,7 @@ namespace UF5423_Aguas.Controllers
                 }
                 else
                 {
-                    // Set a default image if no image is uploaded
-                    path = "~/images/users/default.png"; // Ensure this default image exists
+                    path = "~/images/users/default.png";
                 }
 
                 var user = this.ConvertToUser(model, path);
@@ -103,15 +67,7 @@ namespace UF5423_Aguas.Controllers
                 user = await _userHelper.GetUserByEmailAsync(model.Email);
                 if (user == null)
                 {
-                    user = new User
-                    {
-                        FullName = model.FullName,
-                        Email = model.Email,
-                        UserName = model.Email,
-                        ImageUrl = path
-                    };
-
-                    var result = await _userHelper.AddUserAsync(user, model.Password);
+                    var result = await _userHelper.RegisterUserAsync(user, model.Password);
                     if (result != IdentityResult.Success)
                     {
                         ModelState.AddModelError(string.Empty, "Could not register user account.");
@@ -152,86 +108,47 @@ namespace UF5423_Aguas.Controllers
             };
         }
 
-        public async Task<IActionResult> ChangeUserInfo()
+        public async Task<IActionResult> Edit(string id)
         {
-            var user = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
-            var model = new ChangeUserInfoViewModel
+            var user = await _userRepository.GetUserByIdAsync(id);
+            if (user == null)
             {
-                FullName = user.FullName,
-                ImageUrl = user.ImageUrl
-            };
-
-            return View(model);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> ChangeUserInfo(ChangeUserInfoViewModel model)
-        {
-            if (ModelState.IsValid)
-            {
-                var user = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
-                if (user != null)
-                {
-                    user.FullName = model.FullName;
-
-                    // If a new image is uploaded
-                    if (model.ImageFile != null && model.ImageFile.Length > 0)
-                    {
-                        var path = Path.Combine(
-                            Directory.GetCurrentDirectory(),
-                            "wwwroot\\images\\users",
-                            model.ImageFile.FileName
-                        );
-
-                        using (var stream = new FileStream(path, FileMode.Create))
-                        {
-                            await model.ImageFile.CopyToAsync(stream);
-                        }
-
-                        user.ImageUrl = $"~/images/users/{model.ImageFile.FileName}";
-                    }
-
-                    var response = await _userHelper.ChangeUserInfoAsync(user);
-                    if (response.Succeeded)
-                    {
-                        ViewBag.UserMessage = "User info updated successfully";
-                    }
-                    else
-                    {
-                        ModelState.AddModelError(string.Empty, response.Errors.FirstOrDefault().Description);
-                    }
-                }
+                return NotFound();
             }
 
-            return View(model);
+            var viewModel = this.ConvertToUserViewModel(user);
+            return View(viewModel);
         }
 
-        public IActionResult ChangePassword()
+        private EditUserViewModel ConvertToUserViewModel(User user)
         {
-            return View();
+            return new EditUserViewModel
+            {
+                Id = user.Id,
+                Email = user.Email,
+                FullName = user.FullName,
+            };
         }
 
         [HttpPost]
-        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+        public async Task<IActionResult> Edit(EditUserViewModel model)
         {
             if (ModelState.IsValid)
             {
-                var user = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
-                if (user != null)
+                var user = await _userRepository.GetUserByIdAsync(model.Id);
+                if (user == null)
                 {
-                    var result = await _userHelper.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
-                    if (result.Succeeded)
-                    {
-                        return RedirectToAction("ChangeUserInfo");
-                    }
-                    else
-                    {
-                        ModelState.AddModelError(string.Empty, result.Errors.FirstOrDefault().Description);
-                    }
+                    return NotFound();
                 }
-                else
+
+                user.Email = model.Email;
+                user.UserName = model.Email;
+                user.FullName = model.FullName;
+
+                var result = await _userHelper.EditUserAsync(user);
+                if (result.Succeeded)
                 {
-                    ModelState.AddModelError(string.Empty, "User not found.");
+                    return RedirectToAction("Index");
                 }
             }
 

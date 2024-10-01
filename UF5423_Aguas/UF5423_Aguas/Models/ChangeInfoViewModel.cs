@@ -3,16 +3,17 @@ using System.ComponentModel.DataAnnotations;
 
 namespace UF5423_Aguas.Models
 {
-    public class ChangeUserInfoViewModel
+    public class ChangeInfoViewModel
     {
         [Required]
-        [Display(Name = "Full Name")]
+        [MaxLength(99)]
+        [Display(Name = "Full name")]
         public string FullName { get; set; }
 
-        [Display(Name = "Current Image")]
+        [Display(Name = "Image")]
         public string ImageUrl { get; set; }
 
-        [Display(Name = "New Image")]
+        [Display(Name = "New image")]
         public IFormFile ImageFile { get; set; }
     }
 }

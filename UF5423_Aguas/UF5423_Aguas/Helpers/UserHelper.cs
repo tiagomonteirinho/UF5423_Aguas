@@ -21,7 +21,7 @@ namespace UF5423_Aguas.Helpers
             return await _userManager.FindByEmailAsync(email);
         }
 
-        public async Task<IdentityResult> AddUserAsync(User user, string password)
+        public async Task<IdentityResult> RegisterUserAsync(User user, string password)
         {
             return await _userManager.CreateAsync(user, password);
         }
@@ -36,7 +36,7 @@ namespace UF5423_Aguas.Helpers
             await _signInManager.SignOutAsync();
         }
 
-        public async Task<IdentityResult> ChangeUserInfoAsync(User user)
+        public async Task<IdentityResult> EditUserAsync(User user)
         {
             return await _userManager.UpdateAsync(user);
         }

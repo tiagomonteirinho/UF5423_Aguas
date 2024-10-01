@@ -9,13 +9,13 @@ namespace UF5423_Aguas.Helpers
     {
         Task<User> GetUserByEmailAsync(string email);
 
-        Task<IdentityResult> AddUserAsync(User user, string password);
+        Task<IdentityResult> RegisterUserAsync(User user, string password);
 
         Task<SignInResult> LoginAsync(LoginViewModel model);
 
         Task LogoutAsync();
 
-        Task<IdentityResult> ChangeUserInfoAsync(User user);
+        Task<IdentityResult> EditUserAsync(User user);
 
         Task<IdentityResult> ChangePasswordAsync(User user, string oldPassword, string newPassword);
     }

@@ -32,7 +32,7 @@ namespace UF5423_Aguas.Data
                     UserName = "admin.5423@yopmail.com",
                 };
 
-                var result = await _userHelper.AddUserAsync(user, "123456");
+                var result = await _userHelper.RegisterUserAsync(user, "123456");
                 if (result != IdentityResult.Success)
                 {
                     var errors = string.Join(", ", result.Errors.Select(e => e.Description));

@@ -17,12 +17,12 @@ namespace UF5423_Aguas.Data.Entities
         {
             get
             {
-                if (!string.IsNullOrEmpty(ImageUrl))
+                if (string.IsNullOrEmpty(ImageUrl))
                 {
-                    return $"https://localhost:44377{ImageUrl.Substring(1)}";
+                    return $"https://localhost:44377/images/default_profile_picture.jpg";
                 }
 
-                return $"https://localhost:44377//images/image_unavailable.jpg";
+                return $"https://localhost:44377{ImageUrl.Substring(1)}";
             }
         }
     }

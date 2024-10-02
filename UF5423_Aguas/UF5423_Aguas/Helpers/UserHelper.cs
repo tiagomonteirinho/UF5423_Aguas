@@ -51,7 +51,6 @@ namespace UF5423_Aguas.Helpers
         public async Task EnsureCreatedRoleAsync(string role)
         {
             var roleExists = await _roleManager.RoleExistsAsync(role);
-            //if(!await _roleManager.RoleExistsAsync(role))
             if (!roleExists)
             {
                 await _roleManager.CreateAsync(new IdentityRole { Name = role });

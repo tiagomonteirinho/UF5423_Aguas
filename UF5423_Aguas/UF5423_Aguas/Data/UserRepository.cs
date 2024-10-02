@@ -17,7 +17,7 @@ namespace UF5423_Aguas.Data
 
         public async Task<IEnumerable<User>> GetAllUsersAsync()
         {
-            return await _context.Users.ToListAsync();
+            return await _context.Users.OrderBy(u => u.FullName).ToListAsync();
         }
 
         public async Task<User> GetUserByIdAsync(string userId)

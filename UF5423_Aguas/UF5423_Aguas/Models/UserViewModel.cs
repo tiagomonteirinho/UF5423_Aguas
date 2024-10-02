@@ -4,15 +4,12 @@ using UF5423_Aguas.Data.Entities;
 
 namespace UF5423_Aguas.Models
 {
-    public class RegisterViewModel
+    public class UserViewModel
     {
         [Required]
         [Display(Name = "Full name")]
         [MaxLength(99)]
         public string FullName { get; set; }
-
-        [Display(Name = "Image")]
-        public string ImageUrl { get; set; }
 
         [Required]
         [DataType(DataType.EmailAddress)]
@@ -27,8 +24,5 @@ namespace UF5423_Aguas.Models
         [Compare("Password")]
         [Display(Name = "Confirm password")]
         public string ConfirmPassword { get; set; }
-
-        [Display(Name = "Image")]
-        public IFormFile ImageFile { get; set; }
     }
 }

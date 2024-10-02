@@ -26,85 +26,57 @@ namespace UF5423_Aguas.Controllers
 
         public async Task<IActionResult> Index()
         {
-            //TODO: add to generic repository to have GetAll().OrderBy().
             var users = await _userRepository.GetAllUsersAsync();
             return View(users);
         }
 
-        public IActionResult Register()
+        public IActionResult Create()
         {
-            var model = new RegisterViewModel();
+            var model = new UserViewModel();
             return View(model);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Register(RegisterViewModel model)
+        public async Task<IActionResult> Create(UserViewModel model)
         {
             if (ModelState.IsValid)
             {
                 var user = await _userHelper.GetUserByEmailAsync(model.Email);
-                if (user == null)
+                if (user != null)
                 {
-                    var path = string.Empty;
-                    if (model.ImageFile != null && model.ImageFile.Length > 0)
+                    ViewBag.ErrorMessage = "That email is already being used.";
+                    return View(model);
+                }
+                else
+                {
+                    user = new User
                     {
-                        var guid = Guid.NewGuid().ToString();
-                        string fileName = $"{guid}.jpg";
-
-                        path = Path.Combine(
-                            Directory.GetCurrentDirectory(),
-                            "wwwroot\\images\\users",
-                            fileName
-                        );
-
-                        using (var stream = new FileStream(path, FileMode.Create))
-                        {
-                            await model.ImageFile.CopyToAsync(stream);
-                        }
-
-                        path = $"~/images/users/{fileName}";
-                    }
-                    else
-                    {
-                        path = "~/images/users/default.png";
-                    }
-
-                    user = this.ConvertToUser(model, path);
+                        Email = model.Email,
+                        UserName = model.Email,
+                        FullName = model.FullName,
+                        ImageUrl = $"~/images/default_profile_picture.jpg",
+                    };
 
                     var result = await _userHelper.RegisterUserAsync(user, model.Password);
                     if (result != IdentityResult.Success)
                     {
-                        ModelState.AddModelError(string.Empty, "Could not register user account.");
+                        ViewBag.ErrorMessage = "Could not create user.";
                     }
 
                     await _userHelper.AddUserToRoleAsync(user, "Customer");
                     var isInRole = await _userHelper.IsUserInRoleAsync(user, "Customer");
                     if (!isInRole)
                     {
-                        ModelState.AddModelError(string.Empty, "Could not register user account.");
+                        ViewBag.ErrorMessage = "Could not add user to role.";
                     }
 
-                    //TODO: Replace by ViewBag;
-                    ModelState.AddModelError(string.Empty, "User successfully registered.");
-                }
-                else
-                {
-                    ModelState.AddModelError(string.Empty, "A user already exists with that email address.");
+                    ViewBag.SuccessMessage = "User created successfully.";
+                    ModelState.Clear(); // Clear form.
+                    return View();
                 }
             }
 
             return View(model);
-        }
-
-        private User ConvertToUser(RegisterViewModel model, string path)
-        {
-            return new User
-            {
-                Email = model.Email,
-                UserName = model.Email,
-                FullName = model.FullName,
-                ImageUrl = path,
-            };
         }
 
         public async Task<IActionResult> Edit(string id)
@@ -115,8 +87,14 @@ namespace UF5423_Aguas.Controllers
                 return NotFound();
             }
 
-            var viewModel = this.ConvertToUserViewModel(user);
-            return View(viewModel);
+            var model = new EditUserViewModel
+            {
+                Id = user.Id,
+                Email = user.Email,
+                FullName = user.FullName,
+            };
+
+            return View(model);
         }
 
         [HttpPost]
@@ -142,16 +120,6 @@ namespace UF5423_Aguas.Controllers
             }
 
             return View(model);
-        }
-
-        private EditUserViewModel ConvertToUserViewModel(User user)
-        {
-            return new EditUserViewModel
-            {
-                Id = user.Id,
-                Email = user.Email,
-                FullName = user.FullName,
-            };
         }
     }
 }

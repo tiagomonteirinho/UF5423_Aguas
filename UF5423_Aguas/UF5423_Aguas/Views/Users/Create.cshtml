@@ -1,14 +1,28 @@
-﻿@model UF5423_Aguas.Models.RegisterViewModel;
+﻿@model UF5423_Aguas.Models.UserViewModel;
 @{
-    ViewData["Title"] = "Register";
+    ViewData["Title"] = "Create";
 }
 
-<h2>Register</h2>
+<h2>Create new user</h2>
 
 <div class="row">
     <div class="col-md-4 offset-md-4">
-        <form method="post" enctype="multipart/form-data">
+        <form method="post">
             <div asp-validation-summary="ModelOnly"></div>
+
+            @if (ViewBag.SuccessMessage != null)
+            {
+                <div class="alert alert-success">
+                    @ViewBag.SuccessMessage
+                </div>
+            }
+            @if (ViewBag.ErrorMessage != null)
+            {
+                <div class="alert alert-danger">
+                    @ViewBag.ErrorMessage
+                </div>
+            }
+
             <div class="form-group">
                 <label asp-for="FullName">Full name</label>
                 <input asp-for="FullName" class="form-control" />
@@ -20,11 +34,6 @@
                 <span asp-validation-for="Email" class="text-warning"></span>
             </div>
             <div class="form-group">
-                <label asp-for="ImageFile">Image</label>
-                <input asp-for="ImageFile" class="form-control" type="file"/>
-                <span asp-validation-for="ImageFile" class="text-warning"></span>
-            </div>
-            <div class="form-group">
                 <label asp-for="Password">Password</label>
                 <input asp-for="Password" class="form-control" />
                 <span asp-validation-for="Password" class="text-warning"></span>
@@ -34,8 +43,9 @@
                 <input asp-for="ConfirmPassword" class="form-control" />
                 <span asp-validation-for="ConfirmPassword" class="text-warning"></span>
             </div>
+
             <div class="form-group">
-                <input type="submit" value="Register account" class="btn btn-primary" />
+                <input type="submit" value="Create" class="btn btn-primary" />
             </div>
         </form>
         <div>

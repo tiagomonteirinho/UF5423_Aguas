@@ -15,29 +15,17 @@ namespace UF5423_Aguas.Data
             _context = context;
         }
 
-        public async Task<IEnumerable<User>> GetAllUsersAsync()
+        public async Task<IEnumerable<User>> GetAllAsync()
         {
             return await _context.Users.OrderBy(u => u.FullName).ToListAsync();
         }
 
-        public async Task<User> GetUserByIdAsync(string userId)
+        public async Task<User> GetByIdAsync(string userId)
         {
             return await _context.Users.FindAsync(userId);
         }
 
-        public async Task AddUserAsync(User user)
-        {
-            await _context.Users.AddAsync(user);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task UpdateUserAsync(User user)
-        {
-            _context.Users.Update(user);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task DeleteUserAsync(string userId)
+        public async Task DeleteAsync(string userId)
         {
             var user = await _context.Users.FindAsync(userId);
             if (user != null)

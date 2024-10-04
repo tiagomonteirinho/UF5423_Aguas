@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UF5423_Aguas.Data.Entities;
@@ -11,7 +12,6 @@ namespace UF5423_Aguas.Data
     {
         private readonly DataContext _context;
         private readonly IUserHelper _userHelper;
-        private Random _random;
 
         public SeedDb(DataContext context, IUserHelper userHelper)
         {
@@ -25,14 +25,41 @@ namespace UF5423_Aguas.Data
             await _userHelper.EnsureCreatedRoleAsync("Admin");
             await _userHelper.EnsureCreatedRoleAsync("Employee");
             await _userHelper.EnsureCreatedRoleAsync("Customer");
-            var user = await _userHelper.GetUserByEmailAsync("admin@mail");
+
+            var users = new List<User>();
+            var usersToAdd = new List<(string fullName, string email, string role)>
+            {
+                ("Admin", "admin@mail", "Admin"),
+                ("Joaquim", "joaquim@mail", "Employee"),
+                ("João", "joao@mail", "Customer"),
+                ("Joana", "joana@mail", "Customer"),
+                ("Tiago", "tiago@mail", "Customer"),
+            };
+
+            foreach (var (fullName, email, role) in usersToAdd)
+            {
+                var user = await CreateUser(fullName, email, role);
+                users.Add(user);
+            }
+
+            if (!_context.Meters.Any())
+            {
+                CreateMeter($"DAE AS320U-150P Water Meter with Pulse Output", "Rua das Flores", users[1]);
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        private async Task<User> CreateUser(string fullName, string email, string role)
+        {
+            var user = await _userHelper.GetUserByEmailAsync(email);
             if (user == null)
             {
                 user = new User
                 {
-                    FullName = "Admin",
-                    Email = "admin@mail",
-                    UserName = "admin@mail",
+                    FullName = fullName,
+                    Email = email,
+                    UserName = email,
+                    EmailConfirmed = true,
                 };
 
                 var result = await _userHelper.RegisterUserAsync(user, "123456");
@@ -41,23 +68,18 @@ namespace UF5423_Aguas.Data
                     throw new InvalidOperationException($"Could not create seed user.");
                 }
 
-                await _userHelper.AddUserToRoleAsync(user, "Admin");
+                await _userHelper.AddUserToRoleAsync(user, role);
             }
 
-            var isInRole = await _userHelper.IsUserInRoleAsync(user, "Admin");
-            if (!isInRole)
+            if (!await _userHelper.IsUserInRoleAsync(user, role))
             {
-                await _userHelper.AddUserToRoleAsync(user, "Admin");
+                await _userHelper.AddUserToRoleAsync(user, role);
             }
 
-            if (!_context.Meters.Any())
-            {
-                AddMeter($"DAE AS320U-150P Water Meter with Pulse Output", "Rua das Flores", user);
-                await _context.SaveChangesAsync();
-            }
+            return user;
         }
 
-        private void AddMeter(string name, string address, User user)
+        private void CreateMeter(string name, string address, User user)
         {
             _context.Meters.Add(new Meter
             {

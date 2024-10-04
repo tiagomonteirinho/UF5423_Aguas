@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using UF5423_Aguas.Data.Entities;
 using UF5423_Aguas.Models;
@@ -24,5 +26,11 @@ namespace UF5423_Aguas.Helpers
         Task AddUserToRoleAsync(User user, string role);
 
         Task<bool> IsUserInRoleAsync(User user, string role);
+
+        Task<List<IdentityRole>> GetAllRolesAsync();
+
+        Task<IList<string>> GetUserRolesAsync(User user);
+
+        IEnumerable<SelectListItem> GetComboRoles();
     }
 }

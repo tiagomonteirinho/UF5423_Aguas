@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.IO;
+using Microsoft.EntityFrameworkCore;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using UF5423_Aguas.Data;
@@ -15,8 +15,8 @@ namespace UF5423_Aguas.Controllers
     [Authorize(Roles = "Admin")]
     public class UsersController : Controller
     {
-        private readonly IUserHelper _userHelper;
         private readonly IUserRepository _userRepository;
+        private readonly IUserHelper _userHelper;
 
         public UsersController(IUserHelper userHelper, IUserRepository userRepository)
         {
@@ -26,19 +26,28 @@ namespace UF5423_Aguas.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var users = await _userRepository.GetAllUsersAsync();
+            var users = await _userRepository.GetAllAsync(); 
+            foreach (var user in users)
+            {
+                user.RoleName = (await _userHelper.GetUserRolesAsync(user)).FirstOrDefault(); // Fetch the role for each user
+            }
             return View(users);
         }
 
         public IActionResult Create()
         {
-            var model = new UserViewModel();
+            var model = new UserViewModel
+            {
+                Roles = _userHelper.GetComboRoles()
+            };
+
             return View(model);
         }
 
         [HttpPost]
         public async Task<IActionResult> Create(UserViewModel model)
         {
+            model.Roles = _userHelper.GetComboRoles(); // Repopulate roles.
             if (ModelState.IsValid)
             {
                 var user = await _userHelper.GetUserByEmailAsync(model.Email);
@@ -61,65 +70,62 @@ namespace UF5423_Aguas.Controllers
                     if (result != IdentityResult.Success)
                     {
                         ViewBag.ErrorMessage = "Could not create user.";
+                        return View(model);
                     }
 
-                    await _userHelper.AddUserToRoleAsync(user, "Customer");
-                    var isInRole = await _userHelper.IsUserInRoleAsync(user, "Customer");
+                    await _userHelper.AddUserToRoleAsync(user, model.RoleName);
+                    var isInRole = await _userHelper.IsUserInRoleAsync(user, model.RoleName);
                     if (!isInRole)
                     {
                         ViewBag.ErrorMessage = "Could not add user to role.";
+                        return View(model);
                     }
 
                     ViewBag.SuccessMessage = "User created successfully.";
+                    var newModel = new UserViewModel
+                    {
+                        Roles = _userHelper.GetComboRoles()
+                    };
+
                     ModelState.Clear(); // Clear form.
-                    return View();
+                    return View(newModel); // Keep roles.
                 }
             }
 
             return View(model);
         }
 
-        public async Task<IActionResult> Edit(string id)
+        public async Task<IActionResult> Delete(string id)
         {
-            var user = await _userRepository.GetUserByIdAsync(id);
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var user = await _userRepository.GetByIdAsync(id);
             if (user == null)
             {
                 return NotFound();
             }
 
-            var model = new EditUserViewModel
+            try
             {
-                Id = user.Id,
-                Email = user.Email,
-                FullName = user.FullName,
-            };
-
-            return View(model);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Edit(EditUserViewModel model)
-        {
-            if (ModelState.IsValid)
-            {
-                var user = await _userRepository.GetUserByIdAsync(model.Id);
-                if (user == null)
-                {
-                    return NotFound();
-                }
-
-                user.Email = model.Email;
-                user.UserName = model.Email;
-                user.FullName = model.FullName;
-
-                var result = await _userHelper.EditUserAsync(user);
-                if (result.Succeeded)
-                {
-                    return RedirectToAction("Index");
-                }
+                await _userRepository.DeleteAsync(id);
+                return RedirectToAction("Index");
             }
+            catch (DbUpdateException ex)
+            {
+                if (ex.InnerException != null && ex.InnerException.Message.Contains("DELETE"))
+                {
+                    ViewBag.ErrorTitle = $"Unable to delete user.";
+                    ViewBag.ErrorMessage = $"Product {user.FullName} could not be deleted. Please ensure that the user is not being used by other enities.</br></br>";
+                }
 
-            return View(model);
+                //TODO: Add view Error
+                return View("Error");
+            }
         }
+
+        //TODO: Add IActionResult UserNotFound
     }
 }

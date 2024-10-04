@@ -10,6 +10,9 @@ namespace UF5423_Aguas.Data.Entities
         [MaxLength(99)]
         public string FullName { get; set; }
 
+        [Display(Name = "Role")]
+        public string RoleName { get; set; }
+
         [Display(Name = "Image")]
         public string ImageUrl { get; set; }
 

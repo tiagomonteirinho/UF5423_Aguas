@@ -8,14 +8,10 @@ namespace UF5423_Aguas.Data
 {
     public interface IUserRepository
     {
-        Task<IEnumerable<User>> GetAllUsersAsync();
+        Task<IEnumerable<User>> GetAllAsync();
 
-        Task<User> GetUserByIdAsync(string userId);
+        Task<User> GetByIdAsync(string userId);
 
-        Task AddUserAsync(User user);
-
-        Task UpdateUserAsync(User user);
-
-        Task DeleteUserAsync(string userId);
+        Task DeleteAsync(string userId);
     }
 }

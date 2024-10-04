@@ -1,4 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using UF5423_Aguas.Data.Entities;
 using UF5423_Aguas.Models;
@@ -60,11 +64,58 @@ namespace UF5423_Aguas.Helpers
         public async Task AddUserToRoleAsync(User user, string role)
         {
             await _userManager.AddToRoleAsync(user, role);
+            user.RoleName = role;
         }
 
         public async Task<bool> IsUserInRoleAsync(User user, string role)
         {
             return await _userManager.IsInRoleAsync(user, role);
         }
+
+        public async Task<List<IdentityRole>> GetAllRolesAsync()
+        {
+            return await _roleManager.Roles.ToListAsync();
+        }
+
+        public async Task<IList<string>> GetUserRolesAsync(User user)
+        {
+            var list = await _userManager.GetRolesAsync(user);
+            return list;
+        }
+
+        public IEnumerable<SelectListItem> GetComboRoles()
+        {
+            var list = _roleManager.Roles.Select(r => new SelectListItem
+            {
+                Text = r.Name,
+                Value = r.Name,
+            }).OrderBy(i => i.Text).ToList();
+
+            list.Insert(0, new SelectListItem
+            {
+                Text = "(Select a role...)",
+                Value = string.Empty,
+            });
+
+            return list;
+        }
+
+        //public async Task<IEnumerable<SelectListItem>> GetComboRolesAsync()
+        //{
+        //    var roles = await _roleManager.Roles.ToListAsync();
+        //    var list = roles.Select(r => new SelectListItem
+        //    {
+        //        Text = r.Name,
+        //        Value = r.Name,
+        //    }).ToList();
+
+        //    list.Insert(0, new SelectListItem
+        //    {
+        //        Text = "(Select a role...)",
+        //        Value = "0"
+        //    });
+
+        //    return list;
+        //}
     }
 }

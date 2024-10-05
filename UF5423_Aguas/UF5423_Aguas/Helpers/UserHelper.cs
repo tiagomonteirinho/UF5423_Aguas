@@ -22,6 +22,12 @@ namespace UF5423_Aguas.Helpers
             _roleManager = roleManager;
         }
 
+        public async Task<List<User>> GetAllUsersAsync()
+        {
+            var list = await _userManager.Users.OrderBy(u => u.FullName).ToListAsync();
+            return list;
+        }
+
         public async Task<User> GetUserByEmailAsync(string email)
         {
             return await _userManager.FindByEmailAsync(email);

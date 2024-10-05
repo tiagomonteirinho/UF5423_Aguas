@@ -9,6 +9,8 @@ namespace UF5423_Aguas.Helpers
 {
     public interface IUserHelper
     {
+        Task<List<User>> GetAllUsersAsync();
+
         Task<User> GetUserByEmailAsync(string email);
 
         Task<IdentityResult> RegisterUserAsync(User user, string password);

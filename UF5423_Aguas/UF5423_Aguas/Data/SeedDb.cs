@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,30 +22,35 @@ namespace UF5423_Aguas.Data
 
         public async Task SeedAsync()
         {
-            await _context.Database.EnsureCreatedAsync();
+            await _context.Database.MigrateAsync();
+
             await _userHelper.EnsureCreatedRoleAsync("Admin");
             await _userHelper.EnsureCreatedRoleAsync("Employee");
             await _userHelper.EnsureCreatedRoleAsync("Customer");
 
-            var users = new List<User>();
-            var usersToAdd = new List<(string fullName, string email, string role)>
+            var users = await _userHelper.GetAllUsersAsync();
+            if (users == null || users.Count <= 1)
             {
-                ("Admin", "admin@mail", "Admin"),
-                ("Joaquim", "joaquim@mail", "Employee"),
-                ("João", "joao@mail", "Customer"),
-                ("Joana", "joana@mail", "Customer"),
-                ("Tiago", "tiago@mail", "Customer"),
-            };
+                var usersToAdd = new List<(string fullName, string email, string role)>
+                {
+                    ("Tiago", "admin@mail", "Admin"),
+                    ("Joaquim", "employee@mail", "Employee"),
+                    ("Joana", "customer@mail", "Customer"),
+                    ("Bruno", "customer2@mail", "Customer"),
+                };
 
-            foreach (var (fullName, email, role) in usersToAdd)
-            {
-                var user = await CreateUser(fullName, email, role);
-                users.Add(user);
+                foreach (var (fullName, email, role) in usersToAdd)
+                {
+                    var user = await CreateUser(fullName, email, role);
+                    users.Add(user);
+                }
             }
 
             if (!_context.Meters.Any())
             {
-                CreateMeter($"DAE AS320U-150P Water Meter with Pulse Output", "Rua das Flores", users[1]);
+                CreateMeter($"DAE AS320U-150P Water Meter with Pulse Output", "Rua das Flores", users[2]);
+                CreateMeter($"DAE AS320U-150P Water Meter with Pulse Output", "Rua das Cores", users[2]);
+                CreateMeter($"DAE AS320U-150P Water Meter with Pulse Output", "Rua dos Amores", users[3]);
                 await _context.SaveChangesAsync();
             }
         }

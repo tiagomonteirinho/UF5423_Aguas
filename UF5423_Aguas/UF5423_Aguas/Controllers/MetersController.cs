@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using UF5423_Aguas.Data;
 using UF5423_Aguas.Data.Entities;
@@ -12,7 +9,7 @@ using UF5423_Aguas.Helpers;
 
 namespace UF5423_Aguas.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Employee, Customer")]
     public class MetersController : Controller
     {
         private readonly IMeterRepository _meterRepository;
@@ -24,39 +21,35 @@ namespace UF5423_Aguas.Controllers
             _userHelper = userHelper;
         }
 
-        // GET: Meters
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View(_meterRepository.GetAll().OrderBy(m => m.Name));
+            var model = await _meterRepository.GetMetersAsync(this.User.Identity.Name);
+            return View(model);
+            //TODO: Fix user not showing in view.
         }
 
-        // GET: Meters/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
             {
-                return NotFound();
+                return RedirectToAction("NotFound404", "Errors", new {entityName = "Meter"});
             }
 
             var meter = await _meterRepository.GetByIdAsync(id.Value);
             if (meter == null)
             {
-                return NotFound();
+                return RedirectToAction("NotFound404", "Errors", new { entityName = "Meter" });
             }
 
             return View(meter);
         }
 
-        // GET: Meters/Create
-        [Authorize]
+        [Authorize(Roles = "Employee")]
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Meters/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Meter meter)
@@ -71,34 +64,30 @@ namespace UF5423_Aguas.Controllers
             return View(meter);
         }
 
-        // GET: Meters/Edit/5
-        [Authorize]
+        [Authorize(Roles = "Employee")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
             {
-                return NotFound();
+                return RedirectToAction("NotFound404", "Errors", new { entityName = "Meter" });
             }
 
             var meter = await _meterRepository.GetByIdAsync(id.Value);
             if (meter == null)
             {
-                return NotFound();
+                return RedirectToAction("NotFound404", "Errors", new { entityName = "Meter" });
             }
 
             return View(meter);
         }
 
-        // POST: Meters/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Meter meter)
         {
             if (id != meter.Id)
             {
-                return NotFound();
+                return RedirectToAction("NotFound404", "Errors", new { entityName = "Meter" });
             }
 
             if (ModelState.IsValid)
@@ -112,7 +101,7 @@ namespace UF5423_Aguas.Controllers
                 {
                     if (!await _meterRepository.ExistsAsync(meter.Id))
                     {
-                        return NotFound();
+                        return RedirectToAction("NotFound404", "Errors", new { entityName = "Meter" });
                     }
                     else
                     {
@@ -126,25 +115,23 @@ namespace UF5423_Aguas.Controllers
             return View(meter);
         }
 
-        // GET: Meters/Delete/5
-        [Authorize]
+        [Authorize(Roles = "Employee")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
             {
-                return NotFound();
+                return RedirectToAction("NotFound404", "Errors", new { entityName = "Meter" });
             }
 
             var meter = await _meterRepository.GetByIdAsync(id.Value);
             if (meter == null)
             {
-                return NotFound();
+                return RedirectToAction("NotFound404", "Errors", new { entityName = "Meter" });
             }
 
             return View(meter);
         }
 
-        // POST: Meters/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

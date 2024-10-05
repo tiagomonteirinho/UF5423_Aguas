@@ -50,6 +50,11 @@ namespace UF5423_Aguas
             services.AddScoped<IMeterRepository, MeterRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
 
+            services.ConfigureApplicationCookie(cfg =>
+            {
+                cfg.LoginPath = "/Errors/Unauthorized401";
+                cfg.AccessDeniedPath = "/Errors/Unauthorized401"; //TODO: Add Forbidden view.
+            });
 
             services.AddControllersWithViews();
         }
@@ -67,6 +72,9 @@ namespace UF5423_Aguas
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
+            app.UseStatusCodePagesWithReExecute("/NotFound404"); // Page not found error view.
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 

@@ -4,13 +4,26 @@
     ViewData["Title"] = "Index";
 }
 
-<h2>Meters</h2>
+@if (this.User.IsInRole("Employee"))
+{
+    <h2>All meters</h2>
+}
+else
+{
+    <h2>My meters</h2>
+}
 <p>
     <a asp-action="Create" class="btn btn-primary">Add new meter</a>
 </p>
 <table class="table">
     <thead>
         <tr>
+            @if (this.User.IsInRole("Employee"))
+            {
+                <th>
+                    User 
+                </th>
+            }
             <th>
                 @Html.DisplayNameFor(model => model.Name)
             </th>
@@ -23,6 +36,12 @@
     <tbody>
         @foreach (var item in Model) {
             <tr>
+                @if (this.User.IsInRole("Employee"))
+                {
+                    <td>
+                        @Html.DisplayFor(modelItem => item.User.FullName)
+                    </td>
+                }
                 <td>
                     @Html.DisplayFor(modelItem => item.Name)
                 </td>

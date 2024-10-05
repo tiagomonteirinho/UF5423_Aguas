@@ -35,11 +35,6 @@ public class AccountController : Controller
             var result = await _userHelper.LoginAsync(model);
             if (result.Succeeded)
             {
-                if (this.Request.Query.Keys.Contains("ReturnUrl"))
-                {
-                    return Redirect(this.Request.Query["ReturnUrl"].First());
-                }
-
                 return this.RedirectToAction("Index", "Home");
             }
         }

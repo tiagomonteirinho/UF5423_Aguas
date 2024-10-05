@@ -118,14 +118,12 @@ namespace UF5423_Aguas.Controllers
                 if (ex.InnerException != null && ex.InnerException.Message.Contains("DELETE"))
                 {
                     ViewBag.ErrorTitle = $"Unable to delete user.";
-                    ViewBag.ErrorMessage = $"Product {user.FullName} could not be deleted. Please ensure that the user is not being used by other enities.</br></br>";
+                    ViewBag.ErrorMessage = $"The user {user.FullName} could not be deleted. Please ensure that the user is not being used by other enities.</br></br>";
                 }
 
-                //TODO: Add view Error
+                //TODO: Add DeletionError view and prevent cascade deletion.
                 return View("Error");
             }
         }
-
-        //TODO: Add IActionResult UserNotFound
     }
 }

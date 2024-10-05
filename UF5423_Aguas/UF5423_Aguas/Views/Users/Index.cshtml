@@ -45,9 +45,16 @@
                 <td>
                     @Html.DisplayFor(modelItem => item.EmailConfirmed)
                 </td>
-                <td>
-                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                </td>
+                @if (item.Email != "admin@mail")
+                {
+                    <td>
+                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    </td>
+                }
+                else
+                {
+                    <td></td>
+                }
             </tr>
         }
     </tbody>

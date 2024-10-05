@@ -1,0 +1,14 @@
+﻿@model string
+@{
+    ViewData["Title"] = "404 Not Found";
+}
+@if (Model != null)
+{
+    <h1>@Model not found!</h1>
+}
+else
+{
+    <h1>Page not found!</h1>
+}
+<br />
+<h5>HTTP Error 404 - Not Found</h5>

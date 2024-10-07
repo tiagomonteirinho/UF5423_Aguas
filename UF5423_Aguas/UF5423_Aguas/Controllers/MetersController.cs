@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using UF5423_Aguas.Data;
 using UF5423_Aguas.Data.Entities;
 using UF5423_Aguas.Helpers;
+using UF5423_Aguas.Models;
 
 namespace UF5423_Aguas.Controllers
 {
@@ -58,7 +59,12 @@ namespace UF5423_Aguas.Controllers
             {
                 meter.User = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
                 await _meterRepository.CreateAsync(meter);
-                return RedirectToAction("Index");
+                ViewBag.SuccessMessage = "Meter created successfully!";
+                ModelState.Clear(); // Clear form.
+                //return View(new UserViewModel
+                //{
+                //    Roles = _userHelper.GetComboRoles() // Keep users.
+                //});
             }
 
             return View(meter);

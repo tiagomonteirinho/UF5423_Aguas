@@ -19,7 +19,7 @@ namespace UF5423_Aguas.Helpers
 
         Task LogoutAsync();
 
-        Task<IdentityResult> EditUserAsync(User user);
+        Task<IdentityResult> ChangeInfoAsync(User user);
 
         Task<IdentityResult> ChangePasswordAsync(User user, string oldPassword, string newPassword);
 

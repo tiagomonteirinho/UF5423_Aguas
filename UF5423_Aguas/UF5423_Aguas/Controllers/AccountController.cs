@@ -39,7 +39,7 @@ public class AccountController : Controller
             }
         }
 
-        this.ModelState.AddModelError(string.Empty, "Could not login.");
+        ViewBag.ErrorMessage = "Could not login.";
         return View(model);
     }
 
@@ -69,6 +69,15 @@ public class AccountController : Controller
             var user = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
             if (user != null)
             {
+                if (model.FullName == user.FullName && model.ImageFile == null)
+                {
+                    ViewBag.ErrorMessage = "No changes detected. No updates were made.";
+                    return View(new ChangeInfoViewModel
+                    {
+                        ImageUrl = user.ImageUrl, // Keep image.
+                    });
+                }
+
                 user.FullName = model.FullName;
                 var path = model.ImageUrl;
 
@@ -91,18 +100,22 @@ public class AccountController : Controller
                     user.ImageUrl = $"~/images/users/{fileName}";
                 }
 
-                var response = await _userHelper.EditUserAsync(user);
+                var response = await _userHelper.ChangeInfoAsync(user);
                 if (response.Succeeded)
                 {
-                    ViewBag.UserMessage = "User info updated successfully";
+                    ViewBag.SuccessMessage = "User info updated successfully!";
+                    return View(new ChangeInfoViewModel
+                    {
+                        ImageUrl = user.ImageUrl, // Update image.
+                    });
                 }
-                else
-                {
-                    ModelState.AddModelError(string.Empty, response.Errors.FirstOrDefault().Description);
-                }
+
+                ViewBag.ErrorMessage = "Could not update user info.";
+                return View(model);
             }
         }
 
+        ViewBag.ErrorMessage = "Could not update user info.";
         return View(model);
     }
 
@@ -117,24 +130,22 @@ public class AccountController : Controller
         if (ModelState.IsValid)
         {
             var user = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
-            if (user != null)
+
+            if (user == null)
             {
-                var result = await _userHelper.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
-                if (result.Succeeded)
-                {
-                    return RedirectToAction("ChangeInfo");
-                }
-                else
-                {
-                    ModelState.AddModelError(string.Empty, result.Errors.FirstOrDefault().Description);
-                }
+                return RedirectToAction("NotFound404", "Errors", new { entityName = "User" });
             }
-            else
+
+            var result = await _userHelper.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
+            if (result.Succeeded)
             {
-                ModelState.AddModelError(string.Empty, "User not found.");
+                ViewBag.SuccessMessage = "Password updated successfully!";
+                return View();
             }
+
+            ViewBag.ErrorMessage = result.Errors.FirstOrDefault().Description;
         }
 
-        return View(model);
+        return View();
     }
 }

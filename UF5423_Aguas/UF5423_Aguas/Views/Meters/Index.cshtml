@@ -21,7 +21,7 @@ else
             @if (this.User.IsInRole("Employee"))
             {
                 <th>
-                    User 
+                    @Html.DisplayNameFor(model => model.User)
                 </th>
             }
             <th>
@@ -39,8 +39,12 @@ else
                 @if (this.User.IsInRole("Employee"))
                 {
                     <td>
-                        @Html.DisplayFor(modelItem => item.User.FullName)
-                        <img src="@Url.Content(item.User.ImageFullPath)" width="65" />
+                        <div>
+                            @Html.DisplayFor(modelItem => item.User.FullName)
+                        </div>
+                        <div>
+                            <img src="@Url.Content(item.User.ImageFullPath)" width="65" />
+                        </div>
                     </td>
                 }
                 <td>
@@ -49,11 +53,18 @@ else
                 <td>
                     @Html.DisplayFor(modelItem => item.Address)
                 </td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Remove</a>
-                </td>
+                @if (this.User.IsInRole("Employee"))
+                {
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                        <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                        <a asp-action="Delete" asp-route-id="@item.Id">Remove</a>
+                    </td>
+                }
+                else
+                {
+                    <td></td>
+                }
             </tr>
         }
     </tbody>

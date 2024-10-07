@@ -48,7 +48,7 @@ namespace UF5423_Aguas.Helpers
             await _signInManager.SignOutAsync();
         }
 
-        public async Task<IdentityResult> EditUserAsync(User user)
+        public async Task<IdentityResult> ChangeInfoAsync(User user)
         {
             return await _userManager.UpdateAsync(user);
         }
@@ -105,23 +105,5 @@ namespace UF5423_Aguas.Helpers
 
             return list;
         }
-
-        //public async Task<IEnumerable<SelectListItem>> GetComboRolesAsync()
-        //{
-        //    var roles = await _roleManager.Roles.ToListAsync();
-        //    var list = roles.Select(r => new SelectListItem
-        //    {
-        //        Text = r.Name,
-        //        Value = r.Name,
-        //    }).ToList();
-
-        //    list.Insert(0, new SelectListItem
-        //    {
-        //        Text = "(Select a role...)",
-        //        Value = "0"
-        //    });
-
-        //    return list;
-        //}
     }
 }

@@ -31,17 +31,16 @@ namespace UF5423_Aguas.Controllers
             {
                 user.RoleName = (await _userHelper.GetUserRolesAsync(user)).FirstOrDefault();
             }
+
             return View(users);
         }
 
         public IActionResult Create()
         {
-            var model = new UserViewModel
+            return View(new UserViewModel
             {
                 Roles = _userHelper.GetComboRoles()
-            };
-
-            return View(model);
+            });
         }
 
         [HttpPost]
@@ -81,17 +80,17 @@ namespace UF5423_Aguas.Controllers
                         return View(model);
                     }
 
-                    ViewBag.SuccessMessage = "User created successfully.";
-                    var newModel = new UserViewModel
-                    {
-                        Roles = _userHelper.GetComboRoles()
-                    };
+                    ViewBag.SuccessMessage = "User created successfully!";
 
                     ModelState.Clear(); // Clear form.
-                    return View(newModel); // Keep roles.
+                    return View(new UserViewModel
+                    {
+                        Roles = _userHelper.GetComboRoles() // Keep roles.
+                    });
                 }
             }
 
+            ViewBag.ErrorMessage = "Could not create user.";
             return View(model);
         }
 

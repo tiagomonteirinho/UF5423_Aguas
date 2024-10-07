@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@inject UF5423_Aguas.Helpers.IUserHelper _userHelper
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -21,9 +23,12 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Meters" asp-action="Index">Meters</a>
-                        </li>
+                        @if (User.IsInRole("Employee, Customer"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Meters" asp-action="Index">Meters</a>
+                            </li>
+                        }
                         @if (User.IsInRole("Admin"))
                         {
                             <li class="nav-item">
@@ -34,22 +39,26 @@
                     <ul class="nav navbar-nav navbar-right">
                         @if (this.User.Identity.IsAuthenticated)
                         {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="ChangeInfo">
-                                    <img src="@Url.Content(User.Identity.Name)" style="width: 30px; height: 30px; border-radius: 50%;" />
-                                    @this.User.Identity.Name
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Logout">Logout</a>
-                            </li>
+                            var user = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
+                            if (user != null)
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="ChangeInfo">
+                                        <img src="@user.ImageFullPath" alt="Image" style="width: 30px; height: 30px; border-radius: 50%;" />
+                                        @user.FullName
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Logout">Logout</a>
+                                </li>
+                            }
                         }
                         else
                         {
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Login">Login</a>
                             </li>
-                        }
+                        }   
                     </ul>
                 </div>
             </div>

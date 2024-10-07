@@ -49,7 +49,7 @@ namespace UF5423_Aguas.Data
             if (!_context.Meters.Any())
             {
                 CreateMeter($"DAE AS320U-150P Water Meter with Pulse Output", "Rua das Flores", users[2]);
-                CreateMeter($"DAE AS320U-150P Water Meter with Pulse Output", "Rua das Cores", users[2]);
+                CreateMeter($"DAE O45S-PL Garden Water Meter", "Rua das Cores", users[2]);
                 CreateMeter($"DAE AS320U-150P Water Meter with Pulse Output", "Rua dos Amores", users[3]);
                 await _context.SaveChangesAsync();
             }

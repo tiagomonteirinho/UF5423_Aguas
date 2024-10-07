@@ -53,7 +53,7 @@ namespace UF5423_Aguas
             services.ConfigureApplicationCookie(cfg =>
             {
                 cfg.LoginPath = "/Errors/Unauthorized401";
-                cfg.AccessDeniedPath = "/Errors/Unauthorized401"; //TODO: Add Forbidden view.
+                cfg.AccessDeniedPath = "/Errors/Unauthorized401";
             });
 
             services.AddControllersWithViews();
@@ -68,7 +68,7 @@ namespace UF5423_Aguas
             }
             else
             {
-                app.UseExceptionHandler("/Home/Error");
+                app.UseExceptionHandler("/Errors/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }

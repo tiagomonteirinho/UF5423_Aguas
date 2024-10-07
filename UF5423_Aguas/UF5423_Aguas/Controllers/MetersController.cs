@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -23,9 +24,8 @@ namespace UF5423_Aguas.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var model = await _meterRepository.GetMetersAsync(this.User.Identity.Name);
+            var model = await _meterRepository.GetMetersAsync(this.User.Identity.Name); // Get meters depending on authenticated user.
             return View(model);
-            //TODO: Fix user not showing in view.
         }
 
         public async Task<IActionResult> Details(int? id)
@@ -58,7 +58,7 @@ namespace UF5423_Aguas.Controllers
             {
                 meter.User = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
                 await _meterRepository.CreateAsync(meter);
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index");
             }
 
             return View(meter);
@@ -97,19 +97,19 @@ namespace UF5423_Aguas.Controllers
                     meter.User = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
                     await _meterRepository.UpdateAsync(meter);
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (DbUpdateException ex)
                 {
-                    if (!await _meterRepository.ExistsAsync(meter.Id))
+                    if (ex.InnerException != null && ex.InnerException.Message.Contains("UPDATE"))
                     {
-                        return RedirectToAction("NotFound404", "Errors", new { entityName = "Meter" });
+                        return RedirectToAction("Error", "Errors", new
+                        {
+                            title = $"Meter update error.",
+                            message = $"Meter {meter.Name} could not be updated. Please ensure that it is not being used by other entities.",
+                        });
                     }
-                    else
-                    {
-                        throw;
-                    }
-                }
 
-                return RedirectToAction(nameof(Index));
+                    return RedirectToAction("Error", "Errors");
+                }
             }
 
             return View(meter);
@@ -120,7 +120,7 @@ namespace UF5423_Aguas.Controllers
         {
             if (id == null)
             {
-                return RedirectToAction("NotFound404", "Errors", new { entityName = "Meter" });
+                return RedirectToAction("NotFound404", "Errors", new { entityName = $"Meter" });
             }
 
             var meter = await _meterRepository.GetByIdAsync(id.Value);
@@ -137,8 +137,30 @@ namespace UF5423_Aguas.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var meter = await _meterRepository.GetByIdAsync(id);
-            await _meterRepository.DeleteAsync(meter);
-            return RedirectToAction(nameof(Index));
+            if (meter == null)
+            {
+                return RedirectToAction("NotFound404", "Errors", new { entityName = "Meter" });
+            }
+
+            try
+            {
+                await _meterRepository.DeleteAsync(meter);
+                return RedirectToAction("Index");
+
+            }
+            catch (DbUpdateException ex)
+            {
+                if (ex.InnerException != null && ex.InnerException.Message.Contains("DELETE"))
+                {
+                    return RedirectToAction("Error", "Errors", new
+                    {
+                        title = $"Meter deletion error.",
+                        message = $"Meter {meter.Name} could not be deleted. Please ensure that it is not being used by other entities.",
+                    });
+                }
+
+                return RedirectToAction("Error", "Errors");
+            }
         }
     }
 }

@@ -29,7 +29,7 @@ namespace UF5423_Aguas.Controllers
             var users = await _userRepository.GetAllAsync(); 
             foreach (var user in users)
             {
-                user.RoleName = (await _userHelper.GetUserRolesAsync(user)).FirstOrDefault(); // Fetch the role for each user
+                user.RoleName = (await _userHelper.GetUserRolesAsync(user)).FirstOrDefault();
             }
             return View(users);
         }
@@ -99,30 +99,32 @@ namespace UF5423_Aguas.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return RedirectToAction("NotFound404", "Errors", new { entityName = "User" });
             }
 
             var user = await _userRepository.GetByIdAsync(id);
             if (user == null)
             {
-                return NotFound();
+                return RedirectToAction("NotFound404", "Errors", new { entityName = "User" });
             }
 
             try
             {
-                await _userRepository.DeleteAsync(id);
+                await _userRepository.DeleteByIdAsync(id);
                 return RedirectToAction("Index");
             }
             catch (DbUpdateException ex)
             {
                 if (ex.InnerException != null && ex.InnerException.Message.Contains("DELETE"))
                 {
-                    ViewBag.ErrorTitle = $"Unable to delete user.";
-                    ViewBag.ErrorMessage = $"The user {user.FullName} could not be deleted. Please ensure that the user is not being used by other enities.</br></br>";
+                    return RedirectToAction("Error", "Errors", new
+                    {
+                        title = $"User deletion error.",
+                        message = $"The user {user.FullName} could not be deleted. Please ensure that they are not being used by other entities.",
+                    });
                 }
 
-                //TODO: Add DeletionError view and prevent cascade deletion.
-                return View("Error");
+                return RedirectToAction("Error", "Errors");
             }
         }
     }

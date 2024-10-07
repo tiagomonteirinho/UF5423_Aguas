@@ -17,9 +17,9 @@ namespace UF5423_Aguas.Data
             _userHelper = userHelper;
         }
 
-        public async Task<IQueryable<Meter>> GetMetersAsync(string email)
+        public async Task<IQueryable<Meter>> GetMetersAsync(string username)
         {
-            var user = await _userHelper.GetUserByEmailAsync(email);
+            var user = await _userHelper.GetUserByEmailAsync(username);
             if (user == null)
             {
                 return null;
@@ -27,7 +27,7 @@ namespace UF5423_Aguas.Data
 
             if (await _userHelper.IsUserInRoleAsync(user, "Employee"))
             {
-                return _context.Meters.OrderBy(m => m.User.FullName).ThenByDescending(m => m.Id);
+                return _context.Meters.Include(m => m.User).OrderBy(m => m.User.FullName).ThenByDescending(m => m.Id);
             }
 
             return _context.Meters.Where(m => m.User == user).OrderByDescending(m => m.Id);

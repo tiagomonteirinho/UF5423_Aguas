@@ -25,7 +25,7 @@ namespace UF5423_Aguas.Data
             return await _context.Users.FindAsync(userId);
         }
 
-        public async Task DeleteAsync(string userId)
+        public async Task DeleteByIdAsync(string userId)
         {
             var user = await _context.Users.FindAsync(userId);
             if (user != null)

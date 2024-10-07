@@ -1,0 +1,17 @@
+﻿@model ErrorViewModel
+@{
+    ViewData["Title"] = "Error";
+}
+
+@if (Model.Title != null && Model.Message != null)
+{
+    <h1>@Model.Title</h1>
+    <br />
+    <h5>@Model.Message</h5>
+}
+else
+{
+    <h1>Error.</h1>
+    <br />
+    <h5>An error occurred while processing your request.</h5>
+}

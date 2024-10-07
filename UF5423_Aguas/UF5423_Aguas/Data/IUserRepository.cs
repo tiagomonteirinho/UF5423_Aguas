@@ -12,6 +12,6 @@ namespace UF5423_Aguas.Data
 
         Task<User> GetByIdAsync(string userId);
 
-        Task DeleteAsync(string userId);
+        Task DeleteByIdAsync(string userId);
     }
 }

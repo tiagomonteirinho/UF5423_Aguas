@@ -30,13 +30,11 @@
             </div>
 
             <div class="form-group">
-                <label asp-for="ImageFile">Image</label>
-                @if (!string.IsNullOrEmpty(Model.ImageUrl))
-                {
-                    <div class="form-group">
-                        <img src="@Url.Content(Model.ImageUrl)" width="150" />
-                    </div>
-                }
+                <label asp-for="ImageFullPath">Image</label>
+                <div class="form-group">
+                    <img src="@Url.Content(Model.ImageFullPath)" alt="Image" width="150" />
+                </div>
+                <label asp-for="ImageFile"></label>
                 <input asp-for="ImageFile" class="form-control" type="file" />
                 <span asp-validation-for="ImageFile" class="text-warning"></span>
             </div>

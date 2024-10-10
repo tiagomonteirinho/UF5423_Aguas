@@ -22,14 +22,14 @@ namespace UF5423_Aguas.Data
 
         public async Task SeedAsync()
         {
-            await _context.Database.MigrateAsync();
+            await _context.Database.EnsureCreatedAsync();
 
             await _userHelper.EnsureCreatedRoleAsync("Admin");
             await _userHelper.EnsureCreatedRoleAsync("Employee");
             await _userHelper.EnsureCreatedRoleAsync("Customer");
 
             var users = await _userHelper.GetAllUsersAsync();
-            if (users == null || users.Count <= 1)
+            if (users == null || users.Count <= 1) // If only admin or no users exist
             {
                 var usersToAdd = new List<(string fullName, string email, string role)>
                 {
@@ -48,9 +48,9 @@ namespace UF5423_Aguas.Data
 
             if (!_context.Meters.Any())
             {
-                CreateMeter($"DAE AS320U-150P Water Meter with Pulse Output", "Rua das Flores", users[2]);
-                CreateMeter($"DAE O45S-PL Garden Water Meter", "Rua das Cores", users[2]);
-                CreateMeter($"DAE AS320U-150P Water Meter with Pulse Output", "Rua dos Amores", users[3]);
+                CreateMeter($"DAE AS320U-150P Water Meter with Pulse Output", "Rua das Flores", users.FirstOrDefault(u => u.Email == "customer@mail"));
+                CreateMeter($"DAE O45S-PL Garden Water Meter", "Rua das Cores", users.FirstOrDefault(u => u.Email == "customer2@mail"));
+                CreateMeter($"DAE AS320U-150P Water Meter with Pulse Output", "Rua dos Amores", users.FirstOrDefault(u => u.Email == "customer@mail"));
                 await _context.SaveChangesAsync();
             }
         }

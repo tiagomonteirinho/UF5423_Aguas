@@ -7,14 +7,17 @@
 @if (this.User.IsInRole("Employee"))
 {
     <h2>All meters</h2>
+    <p>
+        <a asp-action="Create" class="btn btn-primary">Add new meter</a>
+    </p>
 }
 else
 {
     <h2>My meters</h2>
+    <p>
+        <a asp-action="Request" class="btn btn-primary">Request new meter</a>
+    </p>
 }
-<p>
-    <a asp-action="Create" class="btn btn-primary">Add new meter</a>
-</p>
 <table class="table">
     <thead>
         <tr>
@@ -41,6 +44,7 @@ else
                     <td>
                         <div>
                             @Html.DisplayFor(modelItem => item.User.FullName)
+                            (@Html.DisplayFor(modelItem => item.User.Email))
                         </div>
                         <div>
                             <img src="@Url.Content(item.User.ImageFullPath)" width="65" />

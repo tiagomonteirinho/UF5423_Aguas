@@ -50,7 +50,7 @@ namespace UF5423_Aguas.Data
             return await _context.Set<T>().AnyAsync(e => e.Id == id);
         }
 
-        private async Task<bool> SaveAllAsync()
+        public async Task<bool> SaveAllAsync()
         {
             return await _context.SaveChangesAsync() > 0;
         }

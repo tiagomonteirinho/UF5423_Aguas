@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Linq;
+using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -48,26 +51,51 @@ namespace UF5423_Aguas.Controllers
         [Authorize(Roles = "Employee")]
         public IActionResult Create()
         {
-            return View();
+            return View(new MeterViewModel
+            {
+                Users = _userHelper.GetComboUsers()
+            });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Meter meter)
+        public async Task<IActionResult> Create(MeterViewModel model)
         {
+            model.Users = _userHelper.GetComboUsers(); // Repopulate view users.
             if (ModelState.IsValid)
             {
-                meter.User = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
+                var user = await _userHelper.GetUserByEmailAsync(model.UserEmail);
+                if (user == null)
+                {
+                    return RedirectToAction("NotFound404", "Errors", new { entityName = "User" });
+                }
+
+                var meter = new Meter
+                {
+                    Name = model.Name,
+                    Address = model.Address,
+                    UserEmail = user.Email,
+                    User = user,
+                };
+
                 await _meterRepository.CreateAsync(meter);
-                ViewBag.SuccessMessage = "Meter created successfully!";
-                ModelState.Clear(); // Clear form.
-                //return View(new UserViewModel
-                //{
-                //    Roles = _userHelper.GetComboRoles() // Keep users.
-                //});
+                await _meterRepository.SaveAllAsync();
+                if (!await _meterRepository.ExistsAsync(meter.Id))
+                {
+                    ViewBag.ErrorMessage = "Could not add meter.";
+                    return View(model);
+                }
+                
+                ViewBag.SuccessMessage = "Meter added successfully!";
+                ModelState.Clear(); // Clear view form.
+                return View(new MeterViewModel
+                {
+                    Users = _userHelper.GetComboUsers() // Keep view users.
+                });
             }
 
-            return View(meter);
+            ViewBag.ErrorMessage = "Could not add meter.";
+            return View(model);
         }
 
         [Authorize(Roles = "Employee")]
@@ -84,14 +112,21 @@ namespace UF5423_Aguas.Controllers
                 return RedirectToAction("NotFound404", "Errors", new { entityName = "Meter" });
             }
 
-            return View(meter);
+            return View(new MeterViewModel
+            {
+                Id = meter.Id,
+                Name = meter.Name,
+                Address = meter.Address,
+                UserEmail = meter.UserEmail,
+            });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Meter meter)
+        public async Task<IActionResult> Edit(int id, MeterViewModel model)
         {
-            if (id != meter.Id)
+            var meter = await _meterRepository.GetByIdAsync(id);
+            if (meter == null || id != model.Id)
             {
                 return RedirectToAction("NotFound404", "Errors", new { entityName = "Meter" });
             }
@@ -100,8 +135,13 @@ namespace UF5423_Aguas.Controllers
             {
                 try
                 {
-                    meter.User = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
+                    meter.Name = model.Name;
+                    meter.Address = model.Address;
+                    meter.UserEmail = model.UserEmail;
+
                     await _meterRepository.UpdateAsync(meter);
+                    ViewBag.SuccessMessage = "Meter updated successfully!";
+                    return View(model);
                 }
                 catch (DbUpdateException ex)
                 {
@@ -110,7 +150,7 @@ namespace UF5423_Aguas.Controllers
                         return RedirectToAction("Error", "Errors", new
                         {
                             title = $"Meter update error.",
-                            message = $"Meter {meter.Name} could not be updated. Please ensure that it is not being used by other entities.",
+                            message = $"Could not update meter. Please ensure that it is not being used by other entities.",
                         });
                     }
 
@@ -118,7 +158,8 @@ namespace UF5423_Aguas.Controllers
                 }
             }
 
-            return View(meter);
+            ViewBag.ErrorMessage = "Could not update meter.";
+            return View(model);
         }
 
         [Authorize(Roles = "Employee")]
@@ -161,7 +202,7 @@ namespace UF5423_Aguas.Controllers
                     return RedirectToAction("Error", "Errors", new
                     {
                         title = $"Meter deletion error.",
-                        message = $"Meter {meter.Name} could not be deleted. Please ensure that it is not being used by other entities.",
+                        message = $"Could not remove meter. Please ensure that it is not being used by other entities.",
                     });
                 }
 

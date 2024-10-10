@@ -1,4 +1,4 @@
-﻿@model UF5423_Aguas.Data.Entities.Meter
+﻿@model UF5423_Aguas.Models.MeterViewModel
 
 @{
     ViewData["Title"] = "Edit";
@@ -6,11 +6,24 @@
 
 <h2>Edit meter</h2>
 <hr />
+@if (ViewBag.SuccessMessage != null)
+{
+    <div class="alert alert-success">
+        @ViewBag.SuccessMessage
+    </div>
+}
+@if (ViewBag.ErrorMessage != null)
+{
+    <div class="alert alert-danger">
+        @ViewBag.ErrorMessage
+    </div>
+}
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="UserEmail" />
 
             <partial name="_MetersForm" />
 

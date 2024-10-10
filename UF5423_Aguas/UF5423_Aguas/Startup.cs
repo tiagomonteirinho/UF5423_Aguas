@@ -46,6 +46,7 @@ namespace UF5423_Aguas
 
             services.AddTransient<SeedDb>();
             services.AddScoped<IUserHelper, UserHelper>();
+            services.AddScoped<IBlobHelper, BlobHelper>();
 
             services.AddScoped<IMeterRepository, MeterRepository>();
             services.AddScoped<IUserRepository, UserRepository>();

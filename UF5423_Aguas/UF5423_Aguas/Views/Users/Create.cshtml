@@ -4,7 +4,7 @@
 }
 
 <h2>Create new user</h2>
-
+<hr />
 @if (ViewBag.SuccessMessage != null)
 {
     <div class="alert alert-success">
@@ -37,16 +37,6 @@
                 <label asp-for="Email">Email</label>
                 <input asp-for="Email" class="form-control" />
                 <span asp-validation-for="Email" class="text-warning"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Password">Password</label>
-                <input asp-for="Password" class="form-control" />
-                <span asp-validation-for="Password" class="text-warning"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ConfirmPassword">Confirm password</label>
-                <input asp-for="ConfirmPassword" class="form-control" />
-                <span asp-validation-for="ConfirmPassword" class="text-warning"></span>
             </div>
 
             <div class="form-group">

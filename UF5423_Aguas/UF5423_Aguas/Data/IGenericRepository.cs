@@ -16,5 +16,7 @@ namespace UF5423_Aguas.Data
         Task DeleteAsync(T entity);
 
         Task<bool> ExistsAsync(int id);
+
+        Task<bool> SaveAllAsync();
     }
 }

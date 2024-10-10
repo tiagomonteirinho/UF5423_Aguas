@@ -35,7 +35,14 @@ namespace UF5423_Aguas.Helpers
 
         public async Task<IdentityResult> RegisterUserAsync(User user, string password)
         {
-            return await _userManager.CreateAsync(user, password);
+            if (string.IsNullOrEmpty(password))
+            {
+                return await _userManager.CreateAsync(user);
+            }
+            else
+            {
+                return await _userManager.CreateAsync(user, password);
+            }
         }
 
         public async Task<SignInResult> LoginAsync(LoginViewModel model)
@@ -100,6 +107,25 @@ namespace UF5423_Aguas.Helpers
             list.Insert(0, new SelectListItem
             {
                 Text = "(Select a role...)",
+                Value = string.Empty,
+            });
+
+            return list;
+        }
+
+        public IEnumerable<SelectListItem> GetComboUsers()
+        {
+            var list = _userManager.Users
+                .AsEnumerable() // Allow custom Text string.
+                .Select(u => new SelectListItem
+                {
+                    Text = $"{u.FullName} ({u.Email})",
+                    Value = u.Email,
+                }).OrderBy(i => i.Text).ToList();
+
+            list.Insert(0, new SelectListItem
+            {
+                Text = "(Select a user...)",
                 Value = string.Empty,
             });
 

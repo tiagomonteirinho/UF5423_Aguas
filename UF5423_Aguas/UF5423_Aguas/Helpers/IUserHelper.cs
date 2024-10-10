@@ -34,5 +34,7 @@ namespace UF5423_Aguas.Helpers
         Task<IList<string>> GetUserRolesAsync(User user);
 
         IEnumerable<SelectListItem> GetComboRoles();
+
+        IEnumerable<SelectListItem> GetComboUsers();
     }
 }

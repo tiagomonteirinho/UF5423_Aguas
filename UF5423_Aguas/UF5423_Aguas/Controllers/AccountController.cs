@@ -11,10 +11,12 @@ using UF5423_Aguas.Models;
 public class AccountController : Controller
 {
     private readonly IUserHelper _userHelper;
+    private readonly IBlobHelper _blobHelper;
 
-    public AccountController(IUserHelper userHelper)
+    public AccountController(IUserHelper userHelper, IBlobHelper blobHelper)
     {
         _userHelper = userHelper;
+        _blobHelper = blobHelper;
     }
 
     public IActionResult Login()
@@ -52,71 +54,56 @@ public class AccountController : Controller
     public async Task<IActionResult> ChangeInfo()
     {
         var user = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
-        var model = new ChangeInfoViewModel
-        {
-            FullName = user.FullName,
-            ImageUrl = user.ImageUrl
-        };
-
+        var model = ConvertToChangeInfoViewModel(user);
         return View(model);
     }
 
     [HttpPost]
     public async Task<IActionResult> ChangeInfo(ChangeInfoViewModel model)
     {
-        if (ModelState.IsValid)
+        if (!ModelState.IsValid)
         {
-            var user = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
-            if (user != null)
-            {
-                if (model.FullName == user.FullName && model.ImageFile == null)
-                {
-                    ViewBag.ErrorMessage = "No changes detected. No updates were made.";
-                    return View(new ChangeInfoViewModel
-                    {
-                        ImageUrl = user.ImageUrl, // Keep image.
-                    });
-                }
+            ViewBag.ErrorMessage = "Could not update user info.";
+            return View(model);
+        }
 
-                user.FullName = model.FullName;
-                var path = model.ImageUrl;
+        var user = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
+        if (user == null)
+        {
+            return RedirectToAction("NotFound404", "Errors", new { entityName = "User" });
+        }
 
-                if (model.ImageFile != null && model.ImageFile.Length > 0)
-                {
-                    var guid = Guid.NewGuid().ToString();
-                    string fileName = $"{guid}.jpg";
+        if (model.FullName == user.FullName && model.ImageFile == null) // Prevent image file duplication.
+        {
+            ViewBag.ErrorMessage = "No changes detected. No updates were made.";
+            return View(ConvertToChangeInfoViewModel(user)); // Keep view user info.
+        }
 
-                    path = Path.Combine(
-                        Directory.GetCurrentDirectory(),
-                        "wwwroot\\images\\users",
-                        fileName
-                    );
+        user.FullName = model.FullName;
+        if (model.ImageFile != null && model.ImageFile.Length > 0)
+        {
+            user.ImageId = await _blobHelper.UploadBlobAsync(model.ImageFile, "users");
+        }
 
-                    using (var stream = new FileStream(path, FileMode.Create))
-                    {
-                        await model.ImageFile.CopyToAsync(stream);
-                    }
-
-                    user.ImageUrl = $"~/images/users/{fileName}";
-                }
-
-                var response = await _userHelper.ChangeInfoAsync(user);
-                if (response.Succeeded)
-                {
-                    ViewBag.SuccessMessage = "User info updated successfully!";
-                    return View(new ChangeInfoViewModel
-                    {
-                        ImageUrl = user.ImageUrl, // Update image.
-                    });
-                }
-
-                ViewBag.ErrorMessage = "Could not update user info.";
-                return View(model);
-            }
+        var response = await _userHelper.ChangeInfoAsync(user);
+        if (response.Succeeded)
+        {
+            ViewBag.SuccessMessage = "User info updated successfully!";
+            return View(ConvertToChangeInfoViewModel(user)); // Update view user info.
         }
 
         ViewBag.ErrorMessage = "Could not update user info.";
         return View(model);
+    }
+
+    private ChangeInfoViewModel ConvertToChangeInfoViewModel(User user)
+    {
+        return new ChangeInfoViewModel
+        {
+            FullName = user.FullName,
+            ImageId = user.ImageId,
+            ImageFullPath = user.ImageFullPath
+        };
     }
 
     public IActionResult ChangePassword()

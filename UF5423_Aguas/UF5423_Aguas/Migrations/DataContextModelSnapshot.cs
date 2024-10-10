@@ -167,6 +167,9 @@ namespace UF5423_Aguas.Migrations
                         .HasMaxLength(99)
                         .HasColumnType("nvarchar(99)");
 
+                    b.Property<string>("UserEmail")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
 
@@ -201,8 +204,8 @@ namespace UF5423_Aguas.Migrations
                         .HasMaxLength(99)
                         .HasColumnType("nvarchar(99)");
 
-                    b.Property<string>("ImageUrl")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid>("ImageId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");

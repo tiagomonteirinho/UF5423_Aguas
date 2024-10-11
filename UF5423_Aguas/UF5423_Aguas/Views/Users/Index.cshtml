@@ -6,6 +6,19 @@
 
 <h2>All users</h2>
 <br />
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+else if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
 <a asp-action="Create" class="btn btn-primary">Create new user</a>
 <table class="table">
     <thead>
@@ -43,17 +56,26 @@
                     @Html.DisplayFor(modelItem => item.Email)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.EmailConfirmed)
+                    <div>
+                        @Html.DisplayFor(modelItem => item.EmailConfirmed)
+                    </div>
+                    @if (!item.EmailConfirmed)
+                    {
+                        <form method="post" asp-action="ResendEmail">
+                            <input type="hidden" name="Id" value="@item.Id" />
+                            <input type="submit" value="Resend email" class="btn btn-primary" />
+                        </form>
+                    }
                 </td>
-                @if (item.Email != "admin@mail")
+                @if (item.Email == "admin@mail")
+                {
+                    <td></td>
+                }
+                else
                 {
                     <td>
                         <a asp-action="Delete" id="btnDelete" data-id="@item.Id">Delete</a>
                     </td>
-                }
-                else
-                {
-                    <td></td>
                 }
             </tr>
         }

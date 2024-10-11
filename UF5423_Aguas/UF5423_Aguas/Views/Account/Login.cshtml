@@ -33,7 +33,10 @@
                 </div>
                 <span asp-validation-for="StaySignedIn" class="text-warning"></span>
             </div>
-            <input type="submit" value="Login" class="btn btn-success" />
+            <div class="form-group">
+                <input type="submit" value="Login" class="btn btn-primary" />
+                <a asp-action="RecoverPassword" class="btn btn-link">Forgotten password?</a>
+            </div>
         </form>
     </div>
 </div>

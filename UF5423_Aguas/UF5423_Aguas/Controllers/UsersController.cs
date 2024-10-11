@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Razor.Language.Intermediate;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using UF5423_Aguas.Data;
@@ -16,11 +18,13 @@ namespace UF5423_Aguas.Controllers
     {
         private readonly IUserRepository _userRepository;
         private readonly IUserHelper _userHelper;
+        private readonly IMailHelper _mailHelper;
 
-        public UsersController(IUserRepository userRepository, IUserHelper userHelper)
+        public UsersController(IUserRepository userRepository, IUserHelper userHelper, IMailHelper mailHelper)
         {
             _userRepository = userRepository;
             _userHelper = userHelper;
+            _mailHelper = mailHelper;
         }
 
         public async Task<IActionResult> Index()
@@ -77,11 +81,15 @@ namespace UF5423_Aguas.Controllers
             var isInRole = await _userHelper.IsUserInRoleAsync(user, model.RoleName);
             if (!isInRole)
             {
-                ViewBag.ErrorMessage = "Could not create user..";
+                ViewBag.ErrorMessage = "Could not add user to role.";
                 return View(model);
             }
 
-            //TODO: Add account email confirmation and password creation email sender.
+            if (!await SendConfirmationEmail(user))
+            {
+                ViewBag.ErrorMessage = "Could not send email.";
+                return View(model);
+            }
 
             ViewBag.SuccessMessage = "User created successfully!";
             ModelState.Clear(); // Clear view form.
@@ -89,6 +97,53 @@ namespace UF5423_Aguas.Controllers
             {
                 Roles = _userHelper.GetComboRoles() // Update view roles.
             });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ResendEmail(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+            {
+                return RedirectToAction("NotFound404", "Errors", new { entityName = "User" });
+            }
+
+            var user = await _userRepository.GetByIdAsync(id);
+            if (user == null)
+            {
+                return RedirectToAction("NotFound404", "Errors", new { entityName = "User" });
+            }
+
+            if (user.EmailConfirmed)
+            {
+                TempData["ErrorMessage"] = "That email has already been confirmed.";
+                return RedirectToAction("Index");
+            }
+
+            if (!await SendConfirmationEmail(user))
+            {
+                TempData["ErrorMessage"] = "Could not send email.";
+                return RedirectToAction("Index", new { id });
+            }
+
+            TempData["SuccessMessage"] = "Email sent successfully!";
+            return RedirectToAction("Index", new { id });
+        }
+
+        private async Task<bool> SendConfirmationEmail(User user)
+        {
+            string token = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
+            string tokenUrl = Url.Action
+            (
+                "ConfirmEmail",
+                "Account",
+                new { id = user.Id, token },
+                protocol: HttpContext.Request.Scheme
+            );
+
+            bool emailSent = _mailHelper.SendEmail(user.Email, "Email address confirmation", $"<h2>Email address confirmation</h2>"
+                + $"To complete your account registration, please confirm your email address <a href=\"{tokenUrl}\" style=\"color: blue;\">here</a>.");
+
+            return emailSent;
         }
 
         public async Task<IActionResult> Delete(string id)

@@ -6,9 +6,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using UF5423_Aguas.Data;
 using UF5423_Aguas.Data.Entities;
@@ -30,6 +32,8 @@ namespace UF5423_Aguas
         {
             services.AddIdentity<User, IdentityRole>(cfg =>
             {
+                cfg.Tokens.AuthenticatorTokenProvider = TokenOptions.DefaultAuthenticatorProvider;
+                cfg.SignIn.RequireConfirmedEmail = true;
                 cfg.User.RequireUniqueEmail = true;
                 cfg.Password.RequiredLength = 6;
                 cfg.Password.RequireDigit = false;
@@ -37,7 +41,20 @@ namespace UF5423_Aguas
                 cfg.Password.RequireLowercase = false;
                 cfg.Password.RequiredUniqueChars = 0;
                 cfg.Password.RequireNonAlphanumeric = false;
-            }).AddEntityFrameworkStores<DataContext>();
+            }).AddDefaultTokenProviders()
+                .AddEntityFrameworkStores<DataContext>();
+
+            services.AddAuthentication()
+                .AddCookie()
+                .AddJwtBearer(cfg => 
+                {
+                    cfg.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidIssuer = this.Configuration["Tokens:Issuer"],
+                        ValidAudience = this.Configuration["Tokens:Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(this.Configuration["Tokens:Key"]))
+                    };
+                });
 
             services.AddDbContext <DataContext>(cfg =>
             {
@@ -47,9 +64,10 @@ namespace UF5423_Aguas
             services.AddTransient<SeedDb>();
             services.AddScoped<IUserHelper, UserHelper>();
             services.AddScoped<IBlobHelper, BlobHelper>();
+            services.AddScoped<IMailHelper, MailHelper>();
 
-            services.AddScoped<IMeterRepository, MeterRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IMeterRepository, MeterRepository>();
 
             services.ConfigureApplicationCookie(cfg =>
             {

@@ -13,6 +13,8 @@ namespace UF5423_Aguas.Helpers
 
         Task<User> GetUserByEmailAsync(string email);
 
+        Task<User> GetUserByIdAsync(string id);
+
         Task<IdentityResult> RegisterUserAsync(User user, string password);
 
         Task<SignInResult> LoginAsync(LoginViewModel model);
@@ -36,5 +38,15 @@ namespace UF5423_Aguas.Helpers
         IEnumerable<SelectListItem> GetComboRoles();
 
         IEnumerable<SelectListItem> GetComboUsers();
+
+        Task<SignInResult> ValidatePasswordAsync(User user, string password);
+
+        Task<string> GenerateEmailConfirmationTokenAsync(User user);
+
+        Task<IdentityResult> ConfirmEmailAsync(User user, string token);
+
+        Task<string> GeneratePasswordResetTokenAsync(User user);
+
+        Task<IdentityResult> ResetPasswordAsync(User user, string token, string password);
     }
 }

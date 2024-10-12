@@ -76,7 +76,7 @@ namespace UF5423_Aguas.Data
 
                 await _userHelper.AddUserToRoleAsync(user, role);
                 var token = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
-                await _userHelper.ConfirmEmailAsync(user, token);
+                await _userHelper.ConfirmAccountAsync(user, token);
             }
 
             if (!await _userHelper.IsUserInRoleAsync(user, role))

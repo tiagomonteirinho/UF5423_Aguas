@@ -43,10 +43,10 @@ namespace UF5423_Aguas.Helpers
 
         Task<string> GenerateEmailConfirmationTokenAsync(User user);
 
-        Task<IdentityResult> ConfirmEmailAsync(User user, string token);
+        Task<IdentityResult> ConfirmAccountAsync(User user, string token);
 
         Task<string> GeneratePasswordResetTokenAsync(User user);
 
-        Task<IdentityResult> ResetPasswordAsync(User user, string token, string password);
+        Task<IdentityResult> SetPasswordAsync(User user, string token, string password);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json.Linq;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
@@ -58,6 +59,50 @@ public class AccountController : Controller
         return RedirectToAction("Index", "Home");
     }
 
+    [HttpPost]
+    public async Task<IActionResult> GenerateApiToken([FromBody] LoginViewModel model)
+    {
+        if (this.ModelState.IsValid)
+        {
+            var user = await _userHelper.GetUserByEmailAsync(model.Email);
+            if (user == null)
+            {
+                return RedirectToAction("NotFound404", "Errors", new { entityName = "User" });
+            }
+
+            var result = await _userHelper.ValidatePasswordAsync(user, model.Password);
+            if (result.Succeeded)
+            {
+                var claims = new[]
+                {
+                    new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                };
+
+                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Tokens:Key"]));
+                var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+                var token = new JwtSecurityToken
+                (
+                    _configuration["Tokens:Issuer"],
+                    _configuration["Tokens:Audience"],
+                    claims,
+                    expires: DateTime.UtcNow.AddDays(15),
+                    signingCredentials: credentials
+                );
+
+                var results = new
+                {
+                    token = new JwtSecurityTokenHandler().WriteToken(token),
+                    expiration = token.ValidTo,
+                };
+
+                return this.Created(string.Empty, results);
+            }
+        }
+
+        return BadRequest();
+    }
+
     public async Task<IActionResult> ChangeInfo()
     {
         var user = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
@@ -113,72 +158,6 @@ public class AccountController : Controller
         };
     }
 
-    [HttpPost]
-    public async Task<IActionResult> GenerateApiToken([FromBody] LoginViewModel model)
-    {
-        if (this.ModelState.IsValid)
-        {
-            var user = await _userHelper.GetUserByEmailAsync(model.Email);
-            if (user == null)
-            {
-                return RedirectToAction("NotFound404", "Errors", new { entityName = "User" });
-            }
-
-            var result = await _userHelper.ValidatePasswordAsync(user, model.Password);
-            if (result.Succeeded)
-            {
-                var claims = new[]
-                {
-                    new Claim(JwtRegisteredClaimNames.Sub, user.Email),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                };
-
-                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Tokens:Key"]));
-                var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-                var token = new JwtSecurityToken
-                (
-                    _configuration["Tokens:Issuer"],
-                    _configuration["Tokens:Audience"],
-                    claims,
-                    expires: DateTime.UtcNow.AddDays(15),
-                    signingCredentials: credentials
-                );
-
-                var results = new
-                {
-                    token = new JwtSecurityTokenHandler().WriteToken(token),
-                    expiration = token.ValidTo,
-                };
-
-                return this.Created(string.Empty, results);
-            }
-        }
-
-        return BadRequest();
-    }
-
-    public async Task<IActionResult> ConfirmEmail(string id, string token)
-    {
-        if (string.IsNullOrEmpty(id) || string.IsNullOrEmpty(token))
-        {
-            return RedirectToAction("NotFound404", "Errors", new { entityName = "User" });
-        }
-
-        var user = await _userHelper.GetUserByIdAsync(id);
-        if (user == null)
-        {
-            return RedirectToAction("NotFound404", "Errors", new { entityName = "User" });
-        }
-
-        var result = await _userHelper.ConfirmEmailAsync(user, token);
-        if (!result.Succeeded)
-        {
-            return RedirectToAction("NotFound404", "Errors");
-        }
-
-        return View();
-    }
-
     public IActionResult ChangePassword()
     {
         return View();
@@ -225,16 +204,17 @@ public class AccountController : Controller
                 return View(model);
             }
 
-            var token = await _userHelper.GeneratePasswordResetTokenAsync(user);
-            var tokenUrl = Url.Action(
-                "ResetPassword",
+            var passwordToken = await _userHelper.GeneratePasswordResetTokenAsync(user);
+            var actionUrl = Url.Action
+            (
+                "SetPassword",
                 "Account",
-                new { token },
+                new { email = user.Email, passwordToken },
                 protocol: HttpContext.Request.Scheme
             );
 
             bool emailSent = _mailHelper.SendEmail(user.Email, "Password recovery", $"<h2>Password recovery</h2>"
-                + $"To recover your password, please reset it <a href=\"{tokenUrl}\" style=\"color: blue;\">here</a>.");
+                + $"To recover your password, please reset it <a href=\"{actionUrl}\" style=\"color: blue;\">here</a>.");
 
             if (!emailSent)
             {
@@ -242,20 +222,30 @@ public class AccountController : Controller
                 return View(model);
             }
 
-            ViewBag.SuccessMessage = "Instructions to recover your password have been sent to your email address.";
+            ViewBag.SuccessMessage = "A password recovery email has been sent to your email address. Please find it and follow the instructions.";
             return View();
         }
 
         return View(model);
     }
 
-    public IActionResult ResetPassword(string token)
+    public IActionResult SetPassword(string email, string passwordToken, string confirmationToken)
     {
-        return View();
+        if (this.User.Identity.IsAuthenticated)
+        {
+            _userHelper.LogoutAsync(); // Sign out from current session.
+        }
+
+        return View(new SetPasswordViewModel
+        {
+            Email = email,
+            PasswordToken = passwordToken,
+            ConfirmationToken = confirmationToken
+        });
     }
 
     [HttpPost]
-    public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
+    public async Task<IActionResult> SetPassword(SetPasswordViewModel model)
     {
         var user = await _userHelper.GetUserByEmailAsync(model.Email);
         if (user == null)
@@ -264,14 +254,23 @@ public class AccountController : Controller
             return View(model);
         }
 
-        var result = await _userHelper.ResetPasswordAsync(user, model.Token, model.NewPassword);
+        if (!string.IsNullOrEmpty(model.ConfirmationToken))
+        {
+            var confirmEmail = await _userHelper.ConfirmAccountAsync(user, model.ConfirmationToken);
+            if (!confirmEmail.Succeeded)
+            {
+                return RedirectToAction("NotFound404", "Errors");
+            }
+        }
+
+        var result = await _userHelper.SetPasswordAsync(user, model.PasswordToken, model.Password);
         if (!result.Succeeded)
         {
             ViewBag.ErrorMessage = "Could not reset password.";
             return View(model);
         }
 
-        ViewBag.SuccessMessage = "Password updated successfully!";
+        ViewBag.SuccessMessage = "Password updated successfully! You may now sign in to your account.";
         return View();
     }
 }

@@ -147,7 +147,7 @@ namespace UF5423_Aguas.Helpers
             return await _userManager.GenerateEmailConfirmationTokenAsync(user);
         }
 
-        public async Task<IdentityResult> ConfirmEmailAsync(User user, string token)
+        public async Task<IdentityResult> ConfirmAccountAsync(User user, string token)
         {
             return await _userManager.ConfirmEmailAsync(user, token);
         }
@@ -157,7 +157,7 @@ namespace UF5423_Aguas.Helpers
             return await _userManager.GeneratePasswordResetTokenAsync(user);
         }
 
-        public async Task<IdentityResult> ResetPasswordAsync(User user, string token, string password)
+        public async Task<IdentityResult> SetPasswordAsync(User user, string token, string password)
         {
             return await _userManager.ResetPasswordAsync(user, token, password);
         }

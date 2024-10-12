@@ -85,9 +85,9 @@ namespace UF5423_Aguas.Controllers
                 return View(model);
             }
 
-            if (!await SendConfirmationEmail(user))
+            if (!await ConfirmAccount(user))
             {
-                ViewBag.ErrorMessage = "Could not send email.";
+                ViewBag.ErrorMessage = "Could not send account confirmation email.";
                 return View(model);
             }
 
@@ -115,33 +115,34 @@ namespace UF5423_Aguas.Controllers
 
             if (user.EmailConfirmed)
             {
-                TempData["ErrorMessage"] = "That email has already been confirmed.";
+                TempData["ErrorMessage"] = "That acount has already been confirmed.";
                 return RedirectToAction("Index");
             }
 
-            if (!await SendConfirmationEmail(user))
+            if (!await ConfirmAccount(user))
             {
-                TempData["ErrorMessage"] = "Could not send email.";
+                TempData["ErrorMessage"] = "Could not send account confirmation email.";
                 return RedirectToAction("Index", new { id });
             }
 
-            TempData["SuccessMessage"] = "Email sent successfully!";
+            TempData["SuccessMessage"] = "Account confirmation email sent successfully!";
             return RedirectToAction("Index", new { id });
         }
 
-        private async Task<bool> SendConfirmationEmail(User user)
+        private async Task<bool> ConfirmAccount(User user)
         {
-            string token = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
-            string tokenUrl = Url.Action
+            string passwordToken = await _userHelper.GeneratePasswordResetTokenAsync(user);
+            string confirmationToken = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
+            string actionUrl = Url.Action
             (
-                "ConfirmEmail",
+                "SetPassword",
                 "Account",
-                new { id = user.Id, token },
+                new { email = user.Email, passwordToken, confirmationToken },
                 protocol: HttpContext.Request.Scheme
             );
 
-            bool emailSent = _mailHelper.SendEmail(user.Email, "Email address confirmation", $"<h2>Email address confirmation</h2>"
-                + $"To complete your account registration, please confirm your email address <a href=\"{tokenUrl}\" style=\"color: blue;\">here</a>.");
+            bool emailSent = _mailHelper.SendEmail(user.Email, "Account confirmation", $"<h2>Account confirmation</h2>"
+                + $"To confirm your account, please set your password <a href=\"{actionUrl}\" style=\"color: blue;\">here</a>.");
 
             return emailSent;
         }

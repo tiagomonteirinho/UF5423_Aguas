@@ -1,0 +1,84 @@
+﻿@model IEnumerable<UF5423_Aguas.Data.Entities.Consumption>
+
+@{
+    ViewData["Title"] = "Consumptions";
+}
+
+@if (this.User.IsInRole("Employee"))
+{
+    <h2>All consumptions</h2>
+@*     <p>
+        <a asp-action="Create" class="btn btn-primary">Add new consumption</a>
+    </p> *@
+}
+else
+{
+    <h2>My consumptions</h2>
+@*     <p>
+        <a asp-action="Request" class="btn btn-primary">Request new meter</a>
+    </p> *@
+}
+<table class="table">
+    <thead>
+        <tr>
+            @if (this.User.IsInRole("Employee"))
+            {
+                <th>
+                    @Html.DisplayNameFor(model => model.Meter.User)
+                </th>
+            }
+            <th>
+                Meter
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Date)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Volume)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PaymentConfirmed)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                @if (this.User.IsInRole("Employee"))
+                {
+                    <td>
+                        <div>
+                            @Html.DisplayFor(modelItem => item.Meter.User.FullName)
+                            @Html.DisplayFor(modelItem => item.Meter.User.Email)
+                        </div>
+                        <div>
+                            <img src="@Url.Content(item.Meter.User.ImageFullPath)" width="40" />
+                        </div>
+                    </td>
+                }
+                <td>
+                    @Html.DisplayFor(modelItem => item.Meter.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Date)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Volume)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PaymentConfirmed)
+                </td>
+                <td>
+                    @if (this.User.IsInRole("Employee") && !item.PaymentConfirmed)
+                    {
+                        <a asp-action="AddInvoice" asp-route-id="@item.Id" class="btn btn-info">Add invoice</a>
+                        <a asp-action="EditConsumption" asp-route-id="@item.Id" class="btn btn-warning">Edit</a>
+                        <a asp-action="DeleteConsumption" asp-route-id="@item.Id" class="btn btn-danger" id="btnDelete">Delete</a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

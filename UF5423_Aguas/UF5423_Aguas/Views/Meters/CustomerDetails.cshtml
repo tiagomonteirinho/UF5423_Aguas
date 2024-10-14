@@ -1,0 +1,77 @@
+﻿@model UF5423_Aguas.Data.Entities.User
+
+@{
+    ViewData["Title"] = "Customer details";
+}
+
+<h2>Customer details</h2>
+<hr />
+<div>
+    <div class="row">
+        <dl class="col-md-4">
+            <dt class="col-sm-4">
+                @Html.DisplayNameFor(model => model.FullName)
+            </dt>
+            <dd class="col-sm-8">
+                @Html.DisplayFor(model => model.FullName)
+            </dd>
+            <dt class="col-sm-4">
+                @Html.DisplayNameFor(model => model.Email)
+            </dt>
+            <dd class="col-sm-8">
+                @Html.DisplayFor(model => model.Email)
+            </dd>
+        </dl>
+        <div class="col-md-4">
+            @if (!string.IsNullOrEmpty(Model.ImageFullPath))
+            {
+                <img src="@Url.Content(Model.ImageFullPath)" alt="Image" style="width:350px" />
+            }
+        </div>
+    </div>
+    <div>
+        <a asp-action="ListCustomers" class="btn btn-success">Back to list</a>
+    </div>
+    <br />
+    <a asp-controller="Meters" asp-action="Create" class="btn btn-primary">Add meter</a>
+</div>
+<br />
+<h4>Meters</h4>
+@if (Model.Meters == null || Model.Meters.Count == 0)
+{
+    <h5>This user does not have any meters.</h5>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Meters.SingleOrDefault().Name)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Meters.SingleOrDefault().Address)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Meters.OrderBy(m => m.Id))
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Address)
+                    </td>
+                    <td>
+                        <a asp-controller="Meters" asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning">Edit</a>
+                        <a asp-controller="Meters" asp-action="Details" asp-route-id="@item.Id" class="text-info">Details</a>
+                        <a asp-controller="Meters" asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger" id="btnDelete">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

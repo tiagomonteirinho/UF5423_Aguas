@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using UF5423_Aguas.Data.Entities;
@@ -118,9 +119,18 @@ namespace UF5423_Aguas.Helpers
             return list;
         }
 
-        public IEnumerable<SelectListItem> GetComboUsers()
+        public async Task<IEnumerable<SelectListItem>> GetComboUsers()
         {
-            var list = _userManager.Users
+            var customers = new List<User>();
+            foreach (User user in _userManager.Users)
+            {
+                if (await _userManager.IsInRoleAsync(user, "Customer"))
+                {
+                    customers.Add(user);
+                }
+            }
+
+            var list = customers
                 .AsEnumerable() // Allow custom Text string.
                 .Select(u => new SelectListItem
                 {

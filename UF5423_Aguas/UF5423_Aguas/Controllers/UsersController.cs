@@ -13,7 +13,7 @@ using UF5423_Aguas.Models;
 
 namespace UF5423_Aguas.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin, Employee")]
     public class UsersController : Controller
     {
         private readonly IUserRepository _userRepository;

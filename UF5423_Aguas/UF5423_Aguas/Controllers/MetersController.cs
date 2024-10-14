@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading;
@@ -26,12 +27,36 @@ namespace UF5423_Aguas.Controllers
             _userHelper = userHelper;
         }
 
-        public async Task<IActionResult> Index()
+        [Authorize(Roles = "Employee")]
+        public IActionResult Index()
         {
-            var model = await _meterRepository.GetMetersAsync(this.User.Identity.Name); // Get meters depending on authenticated user.
+            return View(_meterRepository.GetAll().Include(m => m.User).OrderBy(m => m.User.FullName).ThenByDescending(m => m.Id));
+        }
+
+        [Authorize(Roles = "Employee")]
+        public async Task<IActionResult> ListCustomers()
+        {
+            var users = await _userHelper.GetAllUsersAsync();
+            var customers = new List<User>();
+            foreach (var user in users)
+            {
+                user.RoleName = (await _userHelper.GetUserRolesAsync(user)).FirstOrDefault();
+                if (user.RoleName == "Customer")
+                {
+                    customers.Add(user);
+                }
+            }
+
+            return View(customers);
+        }
+
+        public async Task<IActionResult> ListConsumptions()
+        {
+            var model = await _meterRepository.GetConsumptionsAsync(this.User.Identity.Name); // Get consumptions depending on authenticated user.
             return View(model);
         }
 
+        [Authorize(Roles = "Employee")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -39,7 +64,7 @@ namespace UF5423_Aguas.Controllers
                 return RedirectToAction("NotFound404", "Errors", new {entityName = "Meter"});
             }
 
-            var meter = await _meterRepository.GetByIdAsync(id.Value);
+            var meter = await _meterRepository.GetMeterWithConsumptionsAsync(id.Value);
             if (meter == null)
             {
                 return RedirectToAction("NotFound404", "Errors", new { entityName = "Meter" });
@@ -49,11 +74,28 @@ namespace UF5423_Aguas.Controllers
         }
 
         [Authorize(Roles = "Employee")]
-        public IActionResult Create()
+        public async Task<IActionResult> CustomerDetails(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+            {
+                return RedirectToAction("NotFound404", "Errors", new { entityName = "User" });
+            }
+
+            var user = await _userHelper.GetUserByIdAsync(id);
+            if (user == null)
+            {
+                return RedirectToAction("NotFound404", "Errors", new { entityName = "User" });
+            }
+
+            return View(user);
+        }
+
+        [Authorize(Roles = "Employee")]
+        public async Task<IActionResult> Create()
         {
             return View(new MeterViewModel
             {
-                Users = _userHelper.GetComboUsers()
+                Users = await _userHelper.GetComboUsers()
             });
         }
 
@@ -61,7 +103,7 @@ namespace UF5423_Aguas.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(MeterViewModel model)
         {
-            model.Users = _userHelper.GetComboUsers(); // Repopulate view users.
+            model.Users = await _userHelper.GetComboUsers(); // Repopulate view users.
             if (ModelState.IsValid)
             {
                 var user = await _userHelper.GetUserByEmailAsync(model.UserEmail);
@@ -79,6 +121,7 @@ namespace UF5423_Aguas.Controllers
                 };
 
                 await _meterRepository.CreateAsync(meter);
+                user.Meters.Add(meter);
                 await _meterRepository.SaveAllAsync();
                 if (!await _meterRepository.ExistsAsync(meter.Id))
                 {
@@ -90,7 +133,7 @@ namespace UF5423_Aguas.Controllers
                 ModelState.Clear(); // Clear view form.
                 return View(new MeterViewModel
                 {
-                    Users = _userHelper.GetComboUsers() // Keep view users.
+                    Users = await _userHelper.GetComboUsers() // Keep view users.
                 });
             }
 
@@ -191,6 +234,7 @@ namespace UF5423_Aguas.Controllers
 
             try
             {
+                var user = await _userHelper.GetUserByEmailAsync(meter.UserEmail);
                 await _meterRepository.DeleteAsync(meter);
                 return RedirectToAction("Index");
 
@@ -203,6 +247,131 @@ namespace UF5423_Aguas.Controllers
                     {
                         title = $"Meter deletion error.",
                         message = $"Could not remove meter. Please ensure that it is not being used by other entities.",
+                    });
+                }
+
+                return RedirectToAction("Error", "Errors");
+            }
+        }
+
+        public async Task<IActionResult> AddConsumption(int? id)
+        {
+            if (id == null)
+            {
+                return RedirectToAction("NotFound404", "Errors", new { entityName = "Meter" });
+            }
+
+            var meter = await _meterRepository.GetByIdAsync(id.Value);
+            if (meter == null)
+            {
+                return RedirectToAction("NotFound404", "Errors", new { entityName = "Meter" });
+            }
+
+            var model = new ConsumptionViewModel
+            {
+                MeterId = meter.Id,
+                Meter = meter,
+            };
+
+            return View(model);
+        }
+
+        [Authorize(Roles = "Employee")]
+        [HttpPost]
+        public async Task<IActionResult> AddConsumption(ConsumptionViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                await _meterRepository.AddConsumptionAsync(model);
+                return RedirectToAction("Details", new { id = model.MeterId });
+            }
+
+            return View(model);
+        }
+
+        [Authorize(Roles = "Employee")]
+        public async Task<IActionResult> EditConsumption(int? id)
+        {
+            if (id == null)
+            {
+                return RedirectToAction("NotFound404", "Errors", new { entityName = "Consumption" });
+            }
+
+            var consumption = await _meterRepository.GetConsumptionAsync(id.Value);
+            if (consumption == null)
+            {
+                return RedirectToAction("NotFound404", "Errors", new { entityName = "Consumption" });
+            }
+
+            return View(consumption);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditConsumption(Consumption consumption)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var meterId = await _meterRepository.UpdateConsumptionAsync(consumption);
+                    if (meterId != 0)
+                    {
+                        return RedirectToAction("Details", new { id = meterId });
+                    }
+
+                }
+                catch (DbUpdateException ex)
+                {
+                    if (ex.InnerException != null && ex.InnerException.Message.Contains("UPDATE"))
+                    {
+                        return RedirectToAction("Error", "Errors", new
+                        {
+                            title = $"Consumption update error.",
+                            message = $"Could not update consumption. Please ensure that it is not being used by other entities.",
+                        });
+                    }
+
+                    return RedirectToAction("Error", "Errors");
+                }
+            }
+
+            return View(consumption);
+        }
+
+        [Authorize(Roles = "Employee")]
+        public async Task<IActionResult> DeleteConsumption(int? id)
+        {
+            if (id == null)
+            {
+                return RedirectToAction("NotFound404", "Errors", new { entityName = "Consumption" });
+            }
+
+            var consumption = await _meterRepository.GetConsumptionAsync(id.Value);
+            if (consumption == null)
+            {
+                return RedirectToAction("NotFound404", "Errors", new { entityName = "Consumption" });
+            }
+
+            try
+            {
+                var meterId = await _meterRepository.DeleteConsumptionAsync(consumption);
+
+                var referer = Request.Headers["Referer"].ToString();
+                if (!string.IsNullOrEmpty(referer))
+                {
+                    return Redirect(referer); // Redirect to previous page.
+                }
+
+                return RedirectToAction($"Details", new { id = meterId });
+            }
+            catch (DbUpdateException ex)
+            {
+                if (ex.InnerException != null && ex.InnerException.Message.Contains("DELETE"))
+                {
+                    return RedirectToAction("Error", "Errors", new
+                    {
+                        title = $"Consumption deletion error.",
+                        message = $"Could not remove consumption. Please ensure that it is not being used by other entities.",
                     });
                 }
 

@@ -7,6 +7,64 @@
 <h2>Meter details</h2>
 <partial name="_MetersDetails" />
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
-    <a asp-action="Index">Back to list</a>
+    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a>
+    <a asp-action="Index" class="btn btn-success">Back to list</a>
 </div>
+<br />
+<div>
+    <a asp-action="AddConsumption" asp-route-id="@Model.Id" class="btn btn-primary">Add consumption</a>
+</div>
+<br />
+<h4>Consumptions</h4>
+@if (Model.Consumptions == null || Model.Consumptions.Count == 0)
+{
+    <h5>This meter does not have any consumptions.</h5>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Consumptions.SingleOrDefault().Id)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Consumptions.SingleOrDefault().Date)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Consumptions.SingleOrDefault().Volume)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Consumptions.SingleOrDefault().PaymentConfirmed)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Consumptions.OrderBy(c => c.Id))
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Id)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Date)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Volume) m³
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.PaymentConfirmed)
+                    </td>
+                    <td>
+                        @if (!item.PaymentConfirmed)
+                        {
+                            <a asp-action="EditConsumption" asp-route-id="@item.Id" class="btn btn-warning">Edit</a>
+                            <a asp-action="DeleteConsumption" asp-route-id="@item.Id" class="btn btn-danger" id="btnDelete">Delete</a>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

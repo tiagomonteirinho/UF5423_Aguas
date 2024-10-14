@@ -37,7 +37,7 @@ namespace UF5423_Aguas.Helpers
 
         IEnumerable<SelectListItem> GetComboRoles();
 
-        IEnumerable<SelectListItem> GetComboUsers();
+        Task<IEnumerable<SelectListItem>> GetComboUsers();
 
         Task<SignInResult> ValidatePasswordAsync(User user, string password);
 

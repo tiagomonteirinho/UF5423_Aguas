@@ -4,20 +4,10 @@
     ViewData["Title"] = "Index";
 }
 
-@if (this.User.IsInRole("Employee"))
-{
-    <h2>All meters</h2>
-    <p>
-        <a asp-action="Create" class="btn btn-primary">Add new meter</a>
-    </p>
-}
-else
-{
-    <h2>My meters</h2>
-    <p>
-        <a asp-action="Request" class="btn btn-primary">Request new meter</a>
-    </p>
-}
+<h2>All meters</h2>
+<p>
+    <a asp-action="Create" class="btn btn-primary">Add new meter</a>
+</p>
 <table class="table">
     <thead>
         <tr>
@@ -57,18 +47,14 @@ else
                 <td>
                     @Html.DisplayFor(modelItem => item.Address)
                 </td>
-                @if (this.User.IsInRole("Employee"))
-                {
-                    <td>
-                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                        <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                        <a asp-action="Delete" asp-route-id="@item.Id">Remove</a>
-                    </td>
-                }
-                else
-                {
-                    <td></td>
-                }
+                <td>
+                    @if (this.User.IsInRole("Employee"))
+                    {
+                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning">Edit</a>
+                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info">Details</a>
+                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger" id="btnDelete">Delete</a>
+                    }
+                </td>
             </tr>
         }
     </tbody>

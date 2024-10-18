@@ -190,14 +190,13 @@ namespace UF5423_Aguas.Controllers
         {
             var userEmail = User.Identity.Name;
             var user = await _userHelper.GetUserByEmailAsync(userEmail);
-            var userRoles = await _userHelper.GetUserRolesAsync(user);
-            if (userRoles.Contains("Customer"))
+            if (await _userHelper.IsUserInRoleAsync(user, "Customer"))
             {
                 var userNotifications = _userRepository.GetNotifications(userEmail, null);
                 return View(userNotifications);
             }
 
-            var roleNotifications = _userRepository.GetNotifications(null, userRoles.FirstOrDefault());
+            var roleNotifications = _userRepository.GetNotifications(null, user.RoleName);
             return View(roleNotifications);
         }
 

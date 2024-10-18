@@ -22,8 +22,8 @@
     <div class="col-md-4">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
             <input type="hidden" asp-for="UserEmail" />
+            <input type="hidden" asp-for="SerialNumber" />
 
             <div class="form-group">
                 <label asp-for="Address" class="control-label"></label>
@@ -32,16 +32,15 @@
             </div>
 
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+                <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-success"><i class="fa fa-arrow-alt-circle-left"></i> Go back</a>
+                <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> Save</button>
             </div>
         </form>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to list</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

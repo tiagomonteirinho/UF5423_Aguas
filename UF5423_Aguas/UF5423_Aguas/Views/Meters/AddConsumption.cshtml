@@ -2,6 +2,18 @@
 @{
     ViewData["Title"] = "AddConsumption";
 }
+@if (ViewBag.SuccessMessage != null)
+{
+    <div class="alert alert-success">
+        @ViewBag.SuccessMessage
+    </div>
+}
+@if (ViewBag.ErrorMessage != null)
+{
+    <div class="alert alert-danger">
+        @ViewBag.ErrorMessage
+    </div>
+}
 
 <h2>Add consumption</h2>
 <hr />
@@ -19,8 +31,8 @@
             </div>
 
             <div class="form-group">
-                <input type="submit" value="Add" class="btn btn-primary" />
-                <a asp-action="Index" class="btn btn-success">Back to list</a>
+                <a asp-action="Details" asp-route-id="@Model.MeterId" class="btn btn-success"><i class="fa fa-arrow-alt-circle-left"></i> Go back</a>
+                <button type="submit" value="Add" class="btn btn-primary"><i class="fa fa-save"></i> Save</button>
             </div>
         </form>
     </div>

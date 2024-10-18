@@ -1,7 +1,7 @@
 ﻿@model UF5423_Aguas.Models.MeterViewModel
 
 @{
-    ViewData["Title"] = "Add new meter";
+    ViewData["Title"] = "Add meter";
 }
 
 <h2>Add meter</h2>
@@ -23,12 +23,7 @@
     <div class="col-md-4">
         <form asp-action="Create" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-            <div class="form-group">
-                <label asp-for="UserEmail" class="control-label"></label>
-                <select asp-for="UserEmail" asp-items="Model.Users" class="form-control"></select>
-                <span asp-validation-for="UserEmail" class="text-danger"></span>
-            </div>
+            <input type="hidden" asp-for="UserId" />
 
             <div class="form-group">
                 <label asp-for="Address" class="control-label"></label>
@@ -37,14 +32,11 @@
             </div>
 
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <a asp-action="CustomerDetails" asp-route-id="@Model.UserId" class="btn btn-success"><i class="fa fa-arrow-alt-circle-left"></i> Go back</a>
+                <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> Save</button>
             </div>
         </form>
     </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to list</a>
 </div>
 
 @section Scripts {

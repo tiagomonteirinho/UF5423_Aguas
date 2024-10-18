@@ -48,7 +48,7 @@ else if (TempData["ErrorMessage"] != null)
                     @Html.DisplayFor(modelItem => item.Email)
                 </td>
                 <td>
-                    <a asp-controller="Meters" asp-action="CustomerDetails" asp-route-id="@item.Id" data-id="@item.Id" class="btn btn-primary">Details</a>
+                    <a asp-controller="Meters" asp-action="CustomerDetails" asp-route-id="@item.Id" data-id="@item.Id" class="btn btn-info">Details</a>
                 </td>
             </tr>
         }

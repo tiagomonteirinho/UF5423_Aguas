@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using UF5423_Aguas.Data.Entities;
@@ -18,35 +19,58 @@ namespace UF5423_Aguas.Data
             _userHelper = userHelper;
         }
 
+        public async Task<Meter> GetMeterWithUserByIdAsync(int id)
+        {
+            return await _context.Meters
+                    .Include(m => m.User)
+                    .FirstOrDefaultAsync(m => m.Id == id);
+        }
+
+        public async Task<IQueryable<Meter>> GetMetersAsync(string email)
+        {
+            var user = await _userHelper.GetUserByEmailAsync(email);
+            if (await _userHelper.IsUserInRoleAsync(user, "Employee"))
+            {
+                return _context.Meters
+                    .Include(m => m.User)
+                    .OrderBy(m => m.User.FullName);
+            }
+
+            return _context.Meters
+                    .Include(m => m.User)
+                    .Where(m => m.User.Email == email)
+                    .OrderBy(m => m.Id);
+        }
+
         public async Task<IQueryable<Consumption>> GetConsumptionsAsync(string email)
         {
             var user = await _userHelper.GetUserByEmailAsync(email);
-
             if (await _userHelper.IsUserInRoleAsync(user, "Employee"))
             {
                 return _context.Consumptions
                     .Include(c => c.Meter)
                     .ThenInclude(m => m.User)
                     .OrderBy(c => c.Meter.User.FullName)
-                    .ThenByDescending(c => c.Meter.Name);
+                    .ThenByDescending(c => c.Meter.Id);
             }
 
             return _context.Consumptions
                     .Include(c => c.Meter)
                     .ThenInclude(m => m.User)
                     .Where(c => c.Meter.User.Email == email)
-                    .OrderBy(c => c.Meter.Name);
+                    .OrderBy(c => c.Meter.Id);
         }
 
         public async Task<Meter> GetMeterWithConsumptionsAsync(int id)
         {
             return await _context.Meters
                 .Include(m => m.Consumptions)
+                .Include(m => m.User)
                 .Where(m => m.Id == id)
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<Consumption> GetConsumptionAsync(int id)
+        public async Task<Consumption> GetConsumptionByIdAsync(int id)
         {
             return await _context.Consumptions.FindAsync(id);
         }

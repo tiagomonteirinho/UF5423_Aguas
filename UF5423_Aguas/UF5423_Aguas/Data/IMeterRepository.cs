@@ -7,11 +7,15 @@ namespace UF5423_Aguas.Data
 {
     public interface IMeterRepository : IGenericRepository<Meter>
     {
+        Task<Meter> GetMeterWithUserByIdAsync(int id);
+
+        Task<IQueryable<Meter>> GetMetersAsync(string email);
+
         Task<IQueryable<Consumption>> GetConsumptionsAsync(string email);
 
         Task<Meter> GetMeterWithConsumptionsAsync(int id);
 
-        Task<Consumption> GetConsumptionAsync(int id);
+        Task<Consumption> GetConsumptionByIdAsync(int id);
 
         Task AddConsumptionAsync(ConsumptionViewModel model);
 

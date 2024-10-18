@@ -6,11 +6,16 @@
 
 <h2>Add meter</h2>
 <hr />
-
 @if (ViewBag.SuccessMessage != null)
 {
     <div class="alert alert-success">
         @ViewBag.SuccessMessage
+    </div>
+}
+@if (ViewBag.ErrorMessage != null)
+{
+    <div class="alert alert-danger">
+        @ViewBag.ErrorMessage
     </div>
 }
 
@@ -25,7 +30,11 @@
                 <span asp-validation-for="UserEmail" class="text-danger"></span>
             </div>
 
-            <partial name="_MetersForm" model="Model" />
+            <div class="form-group">
+                <label asp-for="Address" class="control-label"></label>
+                <input asp-for="Address" class="form-control" />
+                <span asp-validation-for="Address" class="text-danger"></span>
+            </div>
 
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />

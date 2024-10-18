@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using UF5423_Aguas.Data;
 
 namespace UF5423_Aguas.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20241015210228_AddNotifications")]
+    partial class AddNotifications
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -166,8 +168,8 @@ namespace UF5423_Aguas.Migrations
                     b.Property<bool>("PaymentConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<int>("Volume")
-                        .HasColumnType("int");
+                    b.Property<decimal>("Volume")
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 
@@ -188,8 +190,10 @@ namespace UF5423_Aguas.Migrations
                         .HasMaxLength(99)
                         .HasColumnType("nvarchar(99)");
 
-                    b.Property<int>("SerialNumber")
-                        .HasColumnType("int");
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(99)
+                        .HasColumnType("nvarchar(99)");
 
                     b.Property<string>("UserEmail")
                         .HasColumnType("nvarchar(max)");
@@ -211,20 +215,11 @@ namespace UF5423_Aguas.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("Action")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Message")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NewAccountEmail")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("Read")
-                        .HasColumnType("bit");
 
                     b.Property<string>("ReceiverEmail")
                         .HasColumnType("nvarchar(max)");
@@ -233,6 +228,12 @@ namespace UF5423_Aguas.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ReceiverRole")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SenderEmail")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SenderName")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Title")
@@ -395,7 +396,7 @@ namespace UF5423_Aguas.Migrations
             modelBuilder.Entity("UF5423_Aguas.Data.Entities.Notification", b =>
                 {
                     b.HasOne("UF5423_Aguas.Data.Entities.User", "Receiver")
-                        .WithMany()
+                        .WithMany("Notifications")
                         .HasForeignKey("ReceiverId");
 
                     b.Navigation("Receiver");
@@ -409,6 +410,8 @@ namespace UF5423_Aguas.Migrations
             modelBuilder.Entity("UF5423_Aguas.Data.Entities.User", b =>
                 {
                     b.Navigation("Meters");
+
+                    b.Navigation("Notifications");
                 });
 #pragma warning restore 612, 618
         }

@@ -16,7 +16,7 @@ namespace UF5423_Aguas.Models
 
         [Required]
         [Display(Name = "Volume")]
-        public decimal Volume { get; set; }
+        public int Volume { get; set; }
 
         [Display(Name = "Payment confirmed")]
         public bool PaymentConfirmed { get; set; }

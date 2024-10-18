@@ -13,7 +13,7 @@ using UF5423_Aguas.Models;
 
 namespace UF5423_Aguas.Controllers
 {
-    [Authorize(Roles = "Admin, Employee")]
+    [Authorize(Roles = "Admin, Employee, Customer")]
     public class UsersController : Controller
     {
         private readonly IUserRepository _userRepository;
@@ -27,6 +27,7 @@ namespace UF5423_Aguas.Controllers
             _mailHelper = mailHelper;
         }
 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index()
         {
             var users = await _userRepository.GetAllAsync();
@@ -38,6 +39,7 @@ namespace UF5423_Aguas.Controllers
             return View(users);
         }
 
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             return View(new UserViewModel
@@ -81,7 +83,7 @@ namespace UF5423_Aguas.Controllers
             var isInRole = await _userHelper.IsUserInRoleAsync(user, model.RoleName);
             if (!isInRole)
             {
-                ViewBag.ErrorMessage = "Could not add user to role.";
+                ViewBag.ErrorMessage = "Could not create user.";
                 return View(model);
             }
 
@@ -99,6 +101,7 @@ namespace UF5423_Aguas.Controllers
             });
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> ResendEmail(string id)
         {
@@ -129,6 +132,7 @@ namespace UF5423_Aguas.Controllers
             return RedirectToAction("Index", new { id });
         }
 
+        [Authorize(Roles = "Admin")]
         private async Task<bool> ConfirmAccount(User user)
         {
             string passwordToken = await _userHelper.GeneratePasswordResetTokenAsync(user);
@@ -147,6 +151,7 @@ namespace UF5423_Aguas.Controllers
             return emailSent;
         }
 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null)
@@ -178,6 +183,46 @@ namespace UF5423_Aguas.Controllers
 
                 return RedirectToAction("Error", "Errors");
             }
+        }
+
+        [Authorize(Roles = "Admin, Employee, Customer")]
+        public async Task<IActionResult> ListNotifications()
+        {
+            var userEmail = User.Identity.Name;
+            var user = await _userHelper.GetUserByEmailAsync(userEmail);
+            var userRoles = await _userHelper.GetUserRolesAsync(user);
+            if (userRoles.Contains("Customer"))
+            {
+                var userNotifications = _userRepository.GetNotifications(userEmail, null);
+                return View(userNotifications);
+            }
+
+            var roleNotifications = _userRepository.GetNotifications(null, userRoles.FirstOrDefault());
+            return View(roleNotifications);
+        }
+
+        [Authorize(Roles = "Admin, Employee, Customer")]
+        public async Task<IActionResult> NotificationDetails(int? id)
+        {
+            if (id == null)
+            {
+                return RedirectToAction("NotFound404", "Errors", new { entityName = "Notification" });
+            }
+
+            var notification = await _userRepository.GetNotificationByIdAsync(id.Value);
+            if (notification == null)
+            {
+                return RedirectToAction("NotFound404", "Errors", new { entityName = "Notification" });
+            }
+
+            if (!notification.Read)
+            {
+                notification.Read = true;
+                await _userRepository.UpdateNotificationAsync(notification);
+            }
+
+            notification.Read = true;
+            return View(notification);
         }
     }
 }

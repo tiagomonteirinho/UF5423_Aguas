@@ -9,16 +9,13 @@ namespace UF5423_Aguas.Models
     {
         public int Id { get; set; }
 
+        public int SerialNumber { get; set; }
+
         [Display(Name = "User")]
         [Required(ErrorMessage = "A user must be selected")]
         public string UserEmail { get; set; }
 
         public IEnumerable<SelectListItem> Users { get; set; }
-
-        [Required]
-        [Display(Name = "Name")]
-        [MaxLength(99)]
-        public string Name { get; set; }
 
         [Required]
         [Display(Name = "Address")]

@@ -4,20 +4,8 @@
     ViewData["Title"] = "Consumptions";
 }
 
-@if (this.User.IsInRole("Employee"))
-{
-    <h2>All consumptions</h2>
-@*     <p>
-        <a asp-action="Create" class="btn btn-primary">Add new consumption</a>
-    </p> *@
-}
-else
-{
-    <h2>My consumptions</h2>
-@*     <p>
-        <a asp-action="Request" class="btn btn-primary">Request new meter</a>
-    </p> *@
-}
+<h2>Consumptions</h2>
+<br />
 <table class="table">
     <thead>
         <tr>
@@ -28,7 +16,7 @@ else
                 </th>
             }
             <th>
-                Meter
+                Meter serial number
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Date)
@@ -59,13 +47,13 @@ else
                     </td>
                 }
                 <td>
-                    @Html.DisplayFor(modelItem => item.Meter.Name)
+                    @Html.DisplayFor(modelItem => item.Meter.SerialNumber)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Date)
+                    @item.Date.ToString("dd/MM/yyyy")
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Volume)
+                    @Html.DisplayFor(modelItem => item.Volume) m³
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.PaymentConfirmed)
@@ -73,7 +61,7 @@ else
                 <td>
                     @if (this.User.IsInRole("Employee") && !item.PaymentConfirmed)
                     {
-                        <a asp-action="AddInvoice" asp-route-id="@item.Id" class="btn btn-info">Add invoice</a>
+                        <a asp-controller="Meters" asp-action="Details" asp-route-id="@item.Meter.Id" class="btn btn-info">Go to meter</a>
                         <a asp-action="EditConsumption" asp-route-id="@item.Id" class="btn btn-warning">Edit</a>
                         <a asp-action="DeleteConsumption" asp-route-id="@item.Id" class="btn btn-danger" id="btnDelete">Delete</a>
                     }

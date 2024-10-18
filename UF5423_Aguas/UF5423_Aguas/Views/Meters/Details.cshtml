@@ -7,14 +7,24 @@
 <h2>Meter details</h2>
 <partial name="_MetersDetails" />
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a>
+    @if (this.User.IsInRole("Employee"))
+    {
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a>
+    }
     <a asp-action="Index" class="btn btn-success">Back to list</a>
 </div>
 <br />
 <div>
+@if (User.IsInRole("Customer") && DateTime.Now.Day > 5)
+{
+    <a class="btn btn-primary disabled" style="pointer-events: none;">Add consumption</a>
+    <p style="color:gray">*Consumptions can only be added during the first 5 days of each month.</p>
+}
+else
+{
     <a asp-action="AddConsumption" asp-route-id="@Model.Id" class="btn btn-primary">Add consumption</a>
+}
 </div>
-<br />
 <h4>Consumptions</h4>
 @if (Model.Consumptions == null || Model.Consumptions.Count == 0)
 {
@@ -25,9 +35,6 @@ else
     <table class="table">
         <thead>
             <tr>
-                <th>
-                    @Html.DisplayNameFor(model => model.Consumptions.SingleOrDefault().Id)
-                </th>
                 <th>
                     @Html.DisplayNameFor(model => model.Consumptions.SingleOrDefault().Date)
                 </th>
@@ -45,10 +52,7 @@ else
             {
                 <tr>
                     <td>
-                        @Html.DisplayFor(modelItem => item.Id)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Date)
+                        @item.Date.ToString("dd/MM/yyyy")
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.Volume) m³
@@ -57,10 +61,13 @@ else
                         @Html.DisplayFor(modelItem => item.PaymentConfirmed)
                     </td>
                     <td>
-                        @if (!item.PaymentConfirmed)
+                        @if (this.User.IsInRole("Employee"))
                         {
-                            <a asp-action="EditConsumption" asp-route-id="@item.Id" class="btn btn-warning">Edit</a>
-                            <a asp-action="DeleteConsumption" asp-route-id="@item.Id" class="btn btn-danger" id="btnDelete">Delete</a>
+                            @if (!item.PaymentConfirmed)
+                            {
+                                <a asp-action="EditConsumption" asp-route-id="@item.Id" class="btn btn-warning">Edit</a>
+                                <a asp-action="DeleteConsumption" asp-route-id="@item.Id" class="btn btn-danger" id="btnDelete">Delete</a>
+                            }
                         }
                     </td>
                 </tr>

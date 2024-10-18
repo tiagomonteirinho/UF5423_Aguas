@@ -25,15 +25,13 @@
         <div class="col-md-4">
             @if (!string.IsNullOrEmpty(Model.ImageFullPath))
             {
-                <img src="@Url.Content(Model.ImageFullPath)" alt="Image" style="width:350px" />
+                <img src="@Url.Content(Model.ImageFullPath)" alt="Image" style="width:50%" />
             }
         </div>
     </div>
     <div>
         <a asp-action="ListCustomers" class="btn btn-success">Back to list</a>
     </div>
-    <br />
-    <a asp-controller="Meters" asp-action="Create" class="btn btn-primary">Add meter</a>
 </div>
 <br />
 <h4>Meters</h4>
@@ -47,7 +45,7 @@ else
         <thead>
             <tr>
                 <th>
-                    @Html.DisplayNameFor(model => model.Meters.SingleOrDefault().Name)
+                    Serial number
                 </th>
                 <th>
                     @Html.DisplayNameFor(model => model.Meters.SingleOrDefault().Address)
@@ -60,7 +58,7 @@ else
             {
                 <tr>
                     <td>
-                        @Html.DisplayFor(modelItem => item.Name)
+                        @Html.DisplayFor(modelItem => item.SerialNumber)
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.Address)

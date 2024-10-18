@@ -200,7 +200,7 @@ public class AccountController : Controller
             var user = await _userHelper.GetUserByEmailAsync(model.Email);
             if (user == null)
             {
-                ViewBag.ErrorMessage = "Email address not found.";
+                ViewBag.ErrorMessage = "Could not find that email address.";
                 return View(model);
             }
 
@@ -250,7 +250,7 @@ public class AccountController : Controller
         var user = await _userHelper.GetUserByEmailAsync(model.Email);
         if (user == null)
         {
-            ViewBag.ErrorMessage = "Email address not found.";
+            ViewBag.ErrorMessage = "Could not find that email address.";
             return View(model);
         }
 

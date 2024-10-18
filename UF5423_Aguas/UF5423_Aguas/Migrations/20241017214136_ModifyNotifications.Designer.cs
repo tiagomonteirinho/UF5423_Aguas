@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using UF5423_Aguas.Data;
 
 namespace UF5423_Aguas.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20241017214136_ModifyNotifications")]
+    partial class ModifyNotifications
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -188,8 +190,10 @@ namespace UF5423_Aguas.Migrations
                         .HasMaxLength(99)
                         .HasColumnType("nvarchar(99)");
 
-                    b.Property<int>("SerialNumber")
-                        .HasColumnType("int");
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(99)
+                        .HasColumnType("nvarchar(99)");
 
                     b.Property<string>("UserEmail")
                         .HasColumnType("nvarchar(max)");

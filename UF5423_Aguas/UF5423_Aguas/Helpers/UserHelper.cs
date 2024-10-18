@@ -34,9 +34,11 @@ namespace UF5423_Aguas.Helpers
             return await _userManager.FindByEmailAsync(email);
         }
 
-        public async Task<User> GetUserByIdAsync(string userId)
+        public async Task<User> GetUserByIdAsync(string id)
         {
-            return await _userManager.FindByIdAsync(userId);
+            return await _userManager.Users
+                .Include(u => u.Meters)
+                .FirstOrDefaultAsync(u => u.Id == id);
         }
 
         public async Task<IdentityResult> RegisterUserAsync(User user, string password)

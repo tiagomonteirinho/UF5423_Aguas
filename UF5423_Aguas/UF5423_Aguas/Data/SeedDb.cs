@@ -50,7 +50,6 @@ namespace UF5423_Aguas.Data
             {
                 CreateMeter($"DAE AS320U-150P Water Meter with Pulse Output", "Rua das Flores", users.FirstOrDefault(u => u.Email == "customer@mail"));
                 CreateMeter($"DAE O45S-PL Garden Water Meter", "Rua das Cores", users.FirstOrDefault(u => u.Email == "customer2@mail"));
-                CreateMeter($"DAE AS320U-150P Water Meter with Pulse Output", "Rua dos Amores", users.FirstOrDefault(u => u.Email == "customer@mail"));
                 await _context.SaveChangesAsync();
             }
         }
@@ -89,12 +88,17 @@ namespace UF5423_Aguas.Data
 
         private void CreateMeter(string name, string address, User user)
         {
-            _context.Meters.Add(new Meter
+            var random = new Random();
+            var meter = new Meter()
             {
-                Name = name,
                 Address = address,
+                UserEmail = user.Email,
                 User = user,
-            });
+                SerialNumber = random.Next(1000000, 10000000),
+            };
+
+            _context.Meters.Add(meter);
+            user.Meters.Add(meter);
         }
     }
 }

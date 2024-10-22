@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Braintree;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -21,12 +22,14 @@ namespace UF5423_Aguas.Controllers
         private readonly IMeterRepository _meterRepository;
         private readonly IUserHelper _userHelper;
         private readonly DataContext _context;
+        private readonly IPaymentHelper _paymentHelper;
 
-        public MetersController(IMeterRepository meterRepository, IUserHelper userHelper, DataContext context)
+        public MetersController(IMeterRepository meterRepository, IUserHelper userHelper, DataContext context, IPaymentHelper paymentHelper)
         {
             _meterRepository = meterRepository;
             _userHelper = userHelper;
             _context = context;
+            _paymentHelper = paymentHelper;
         }
 
         [Authorize(Roles = "Customer")]
@@ -157,7 +160,7 @@ namespace UF5423_Aguas.Controllers
             var meterUrl = Url.Action("Details", "Meters", new { id = meter.Id }, protocol: HttpContext.Request.Scheme);
             var notification = new Notification
             {
-                Title = "New water meter added successfully",
+                Title = "New water meter added successfully.",
                 Action = $"<a href=\"{meterUrl}\" class=\"btn btn-primary\">Go to meter</a>",
                 Receiver = user,
                 ReceiverEmail = user.Email,
@@ -322,6 +325,9 @@ namespace UF5423_Aguas.Controllers
                 return View(model);
             }
 
+            var consumption = await _meterRepository.AddConsumptionAsync(model);
+            await _context.SaveChangesAsync();
+
             var meter = await _meterRepository.GetMeterWithUserByIdAsync(model.MeterId);
             if (meter == null)
             {
@@ -330,35 +336,33 @@ namespace UF5423_Aguas.Controllers
 
             var userEmail = User.Identity.Name;
             var user = await _userHelper.GetUserByEmailAsync(userEmail);
-
             var meterUrl = Url.Action("Details", "Meters", new { id = meter.Id }, protocol: HttpContext.Request.Scheme);
             if (await _userHelper.IsUserInRoleAsync(user, "Customer"))
             {
                 var roleNotification = new Notification
                 {
-                    Title = "New water meter consumption awaiting validation.",
+                    Title = "Consumption awaiting approval.",
                     Action = $"<a href=\"{meterUrl}\" class=\"btn btn-primary\">Go to meter</a>",
                     ReceiverRole = "Employee"
                 };
 
                 _context.Notifications.Add(roleNotification);
-                await _context.SaveChangesAsync();
             }
             else
             {
+                await _meterRepository.ApproveConsumption(consumption);
                 var userNotification = new Notification
                 {
-                    Title = "New water meter consumption invoice awaiting payment.",
+                    Title = "Consumption awaiting payment.",
                     Action = $"<a href=\"{meterUrl}\" class=\"btn btn-primary\">Go to meter</a>",
                     Receiver = meter.User,
                     ReceiverEmail = meter.User.Email,
                 };
 
                 _context.Notifications.Add(userNotification);
-                await _context.SaveChangesAsync();
-
-                var consumption = await _meterRepository.AddConsumptionAsync(model);
             }
+
+            await _context.SaveChangesAsync();
 
             ViewBag.SuccessMessage = "Consumption added successfully!";
             return View(new ConsumptionViewModel
@@ -498,7 +502,7 @@ namespace UF5423_Aguas.Controllers
 
             var notification = new Notification
             {
-                Title = "New water meter contract request awaiting validation",
+                Title = "New water meter contract request awaiting approval.",
                 Message =
                 $"<h5>Contract holder (full name)</h5>" +
                 $"<p>{model.FullName}</p>" +
@@ -582,7 +586,7 @@ namespace UF5423_Aguas.Controllers
             var userUrl = Url.Action("CustomerDetails", "Meters", new { id = user.Id }, protocol: HttpContext.Request.Scheme);
             var forwardedNotification = new Notification
             {
-                Title = "New customer contract confirmed and awaiting water meter addition",
+                Title = "New customer contract confirmed and awaiting water meter addition.",
                 Message = notification.Message,
                 Action = $"<a href=\"{userUrl}\" class=\"btn btn-primary\">Go to user</a>",
                 ReceiverRole = "Employee",
@@ -624,7 +628,7 @@ namespace UF5423_Aguas.Controllers
             return RedirectToAction("Details", "Meters", new { id = consumption.MeterId });
         }
 
-        [Authorize(Roles = "Employee, Customer")]
+        [Authorize(Roles = "Customer")]
         public async Task<IActionResult> PayConsumption(int? id)
         {
             if (id == null)
@@ -644,7 +648,38 @@ namespace UF5423_Aguas.Controllers
                 return RedirectToAction("NotFound404", "Errors", new { entityName = "Invoice" });
             }
 
+            var gateway = _paymentHelper.GetGateway();
+            var clientToken = gateway.ClientToken.Generate();
+            ViewBag.ClientToken = clientToken;
             return View(invoice);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> PayConsumption(Invoice model)
+        {
+            var consumption = await _meterRepository.GetConsumptionByIdAsync(model.ConsumptionId);
+            var gateway = _paymentHelper.GetGateway();
+            var request = new TransactionRequest
+            {
+                Amount = Convert.ToDecimal(model.Price),
+                PaymentMethodNonce = model.Nonce,
+                Options = new TransactionOptionsRequest
+                {
+                    SubmitForSettlement = true
+                }
+            };
+
+            Result<Transaction> result = gateway.Transaction.Sale(request);
+            if (!result.IsSuccess())
+            {
+                TempData["ErrorMessage"] = "Could not accept payment.";
+                return RedirectToAction("Details", "Meters", new { id = consumption.MeterId });
+            }
+
+            consumption.Status = "Payment confirmed";
+            await _meterRepository.UpdateConsumptionAsync(consumption);
+            TempData["SuccessMessage"] = "Payment accepted successfully!";
+            return RedirectToAction("Details", "Meters", new { id = consumption.MeterId });
         }
     }
 }

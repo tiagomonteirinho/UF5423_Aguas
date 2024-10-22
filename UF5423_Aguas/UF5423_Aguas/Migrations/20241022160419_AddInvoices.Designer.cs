@@ -10,7 +10,7 @@ using UF5423_Aguas.Data;
 namespace UF5423_Aguas.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20241022100748_AddInvoices")]
+    [Migration("20241022160419_AddInvoices")]
     partial class AddInvoices
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -187,6 +187,9 @@ namespace UF5423_Aguas.Migrations
 
                     b.Property<int>("ConsumptionId")
                         .HasColumnType("int");
+
+                    b.Property<string>("Nonce")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");

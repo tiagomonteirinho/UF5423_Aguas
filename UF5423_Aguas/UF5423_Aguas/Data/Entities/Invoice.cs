@@ -9,5 +9,7 @@
         public int ConsumptionId { get; set; }
 
         public decimal Price { get; set; }
+
+        public string Nonce { get; set; }
     }
 }

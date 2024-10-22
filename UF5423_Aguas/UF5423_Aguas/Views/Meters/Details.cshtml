@@ -6,6 +6,18 @@
 
 <h2>Meter details</h2>
 <hr>
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
 <partial name="_MetersDetails" />
 <div>
     @if (this.User.IsInRole("Employee"))
@@ -71,7 +83,7 @@ else
                             <a asp-action="EditConsumption" asp-route-id="@item.Id" class="btn btn-warning"><i class="fa fa-edit"></i></a>
                             <a asp-action="DeleteConsumption" asp-route-id="@item.Id" class="btn btn-danger" id="btnDeleteConsumption"><i class="fa fa-trash"></i></a>
                         }
-                        else if (item.Status == "Awaiting payment")
+                        else if (item.Status == "Awaiting payment" && User.IsInRole("Customer"))
                         {
                             <a asp-action="PayConsumption" asp-route-id="@item.Id" class="btn btn-primary"><i class="fa fa-file-invoice"></i></a>
                         }

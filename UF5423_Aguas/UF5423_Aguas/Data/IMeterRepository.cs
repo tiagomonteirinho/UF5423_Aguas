@@ -24,5 +24,7 @@ namespace UF5423_Aguas.Data
         Task<int> DeleteConsumptionAsync(Consumption consumption);
 
         Task<Invoice> ApproveConsumption(Consumption consumption);
+
+        Task<Invoice> GetInvoiceByConsumptionIdAsync(int id);
     }
 }

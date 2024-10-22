@@ -65,6 +65,7 @@ namespace UF5423_Aguas
             services.AddScoped<IUserHelper, UserHelper>();
             services.AddScoped<IBlobHelper, BlobHelper>();
             services.AddScoped<IMailHelper, MailHelper>();
+            services.AddScoped<IPaymentHelper, PaymentHelper>();
 
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IMeterRepository, MeterRepository>();

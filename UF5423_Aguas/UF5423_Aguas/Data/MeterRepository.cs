@@ -156,5 +156,12 @@ namespace UF5423_Aguas.Data
             await _context.SaveChangesAsync();
             return invoice;
         }
+
+        public async Task<Invoice> GetInvoiceByConsumptionIdAsync(int id)
+        {
+            return await _context.Invoices
+                .Include(i => i.Consumption)
+                .FirstOrDefaultAsync(i => i.ConsumptionId == id);
+        }
     }
 }

@@ -186,6 +186,9 @@ namespace UF5423_Aguas.Migrations
                     b.Property<int>("ConsumptionId")
                         .HasColumnType("int");
 
+                    b.Property<string>("Nonce")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 

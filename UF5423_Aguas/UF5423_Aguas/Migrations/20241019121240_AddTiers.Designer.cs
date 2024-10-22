@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using UF5423_Aguas.Data;
 
 namespace UF5423_Aguas.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20241019121240_AddTiers")]
+    partial class AddTiers
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -174,26 +176,6 @@ namespace UF5423_Aguas.Migrations
                     b.HasIndex("MeterId");
 
                     b.ToTable("Consumptions");
-                });
-
-            modelBuilder.Entity("UF5423_Aguas.Data.Entities.Invoice", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("ConsumptionId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ConsumptionId");
-
-                    b.ToTable("Invoices");
                 });
 
             modelBuilder.Entity("UF5423_Aguas.Data.Entities.Meter", b =>
@@ -419,17 +401,6 @@ namespace UF5423_Aguas.Migrations
                         .IsRequired();
 
                     b.Navigation("Meter");
-                });
-
-            modelBuilder.Entity("UF5423_Aguas.Data.Entities.Invoice", b =>
-                {
-                    b.HasOne("UF5423_Aguas.Data.Entities.Consumption", "Consumption")
-                        .WithMany()
-                        .HasForeignKey("ConsumptionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Consumption");
                 });
 
             modelBuilder.Entity("UF5423_Aguas.Data.Entities.Meter", b =>

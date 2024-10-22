@@ -12,11 +12,13 @@ namespace UF5423_Aguas.Data
     {
         private readonly DataContext _context;
         private readonly IUserHelper _userHelper;
+        private readonly ITierRepository _tierRepository;
 
-        public MeterRepository(DataContext context, IUserHelper userHelper) : base(context)
+        public MeterRepository(DataContext context, IUserHelper userHelper, ITierRepository tierRepository) : base(context)
         {
             _context = context;
             _userHelper = userHelper;
+            _tierRepository = tierRepository;
         }
 
         public async Task<Meter> GetMeterWithUserByIdAsync(int id)
@@ -75,24 +77,26 @@ namespace UF5423_Aguas.Data
             return await _context.Consumptions.FindAsync(id);
         }
 
-        public async Task AddConsumptionAsync(ConsumptionViewModel model)
+        public async Task<Consumption> AddConsumptionAsync(ConsumptionViewModel model)
         {
-            var meter = await this.GetMeterWithConsumptionsAsync(model.MeterId);
+            var meter = await GetMeterWithConsumptionsAsync(model.MeterId);
             if (meter == null)
             {
-                return;
+                return null;
             }
 
-            meter.Consumptions.Add(new Consumption
+            var consumption = new Consumption
             {
                 MeterId = model.MeterId,
                 Meter = model.Meter,
                 Date = model.Date,
                 Volume = model.Volume,
-            });
+                Status = "Awaiting approval",
+            };
 
-            _context.Meters.Update(meter);
+            meter.Consumptions.Add(consumption);
             await _context.SaveChangesAsync();
+            return consumption;
         }
 
         public async Task<int> UpdateConsumptionAsync(Consumption consumption)
@@ -120,6 +124,37 @@ namespace UF5423_Aguas.Data
             _context.Consumptions.Remove(consumption);
             await _context.SaveChangesAsync();
             return meter.Id;
+        }
+
+        public async Task<Invoice> ApproveConsumption(Consumption consumption)
+        {
+            var tiers = _tierRepository.GetAll().OrderBy(t => t.VolumeLimit);
+            decimal price = 0;
+            var remainingVolume = consumption.Volume;
+
+            foreach (var tier in tiers)
+            {
+                var remainingTierVolume = Math.Min(remainingVolume, tier.VolumeLimit);
+                price += remainingTierVolume * tier.UnitPrice;
+                remainingVolume -= remainingTierVolume;
+                if (remainingVolume <= 0)
+                {
+                    break;
+                }
+            }
+
+            var invoice = new Invoice
+            {
+                Consumption = consumption,
+                ConsumptionId = consumption.Id,
+                Price = price,
+            };
+
+            _context.Invoices.Add(invoice);
+            consumption.Status = "Awaiting payment";
+            _context.Consumptions.Update(consumption);
+            await _context.SaveChangesAsync();
+            return invoice;
         }
     }
 }

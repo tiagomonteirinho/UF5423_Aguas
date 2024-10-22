@@ -17,10 +17,12 @@ namespace UF5423_Aguas.Data
 
         Task<Consumption> GetConsumptionByIdAsync(int id);
 
-        Task AddConsumptionAsync(ConsumptionViewModel model);
+        Task<Consumption> AddConsumptionAsync(ConsumptionViewModel model);
 
         Task<int> UpdateConsumptionAsync(Consumption consumption);
 
         Task<int> DeleteConsumptionAsync(Consumption consumption);
+
+        Task<Invoice> ApproveConsumption(Consumption consumption);
     }
 }

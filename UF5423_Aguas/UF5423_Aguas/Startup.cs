@@ -68,6 +68,7 @@ namespace UF5423_Aguas
 
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IMeterRepository, MeterRepository>();
+            services.AddScoped<ITierRepository, TierRepository>();
 
             services.ConfigureApplicationCookie(cfg =>
             {

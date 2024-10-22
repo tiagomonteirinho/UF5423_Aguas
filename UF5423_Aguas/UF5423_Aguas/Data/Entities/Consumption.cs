@@ -12,15 +12,12 @@ namespace UF5423_Aguas.Data.Entities
 
         public int Id { get; set; }
 
-        [Display(Name = "Date")]
         public DateTime Date { get; set; }
 
         [Required]
-        [Display(Name = "Volume")]
         public int Volume { get; set; }
 
-        [Display(Name = "Payment confirmed")]
-        public bool PaymentConfirmed { get; set; }
+        public string Status { get; set; }
 
         public int MeterId { get; set; }
 

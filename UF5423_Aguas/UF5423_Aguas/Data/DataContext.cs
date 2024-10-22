@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using UF5423_Aguas.Data.Entities;
+using UF5423_Aguas.Models;
 
 namespace UF5423_Aguas.Data
 {
@@ -12,6 +13,10 @@ namespace UF5423_Aguas.Data
         public DbSet<Consumption> Consumptions { get; set; }
 
         public DbSet<Notification> Notifications { get; set; }
+
+        public DbSet<Tier> Tiers { get; set; }
+
+        public DbSet<Invoice> Invoices { get; set; }
 
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
@@ -30,6 +35,8 @@ namespace UF5423_Aguas.Data
             modelBuilder.Entity<Consumption>()
                 .Property(c => c.Date)
                 .HasColumnType("date"); // Store consumption date without time.
+
+            modelBuilder.Ignore<TierViewModel>(); // Prevent table creation.
         }
     }
 }

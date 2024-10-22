@@ -12,6 +12,7 @@ namespace UF5423_Aguas.Data.Entities
     {
         public int Id { get; set; }
 
+        [Required]
         [Display(Name = "Serial number")]
         public int SerialNumber { get; set; }
 

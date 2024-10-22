@@ -1,10 +1,10 @@
-﻿@model UF5423_Aguas.Models.MeterViewModel
+﻿@model UF5423_Aguas.Models.TierViewModel
 
 @{
-    ViewData["Title"] = "Edit meter";
+    ViewData["Title"] = "Edit tier";
 }
 
-<h2>Edit meter</h2>
+<h2>Edit tier</h2>
 <hr />
 @if (ViewBag.SuccessMessage != null)
 {
@@ -22,21 +22,20 @@
     <div class="col-md-4">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="UserEmail" />
 
             <div class="form-group">
-                <label asp-for="SerialNumber" class="control-label"></label>
-                <input asp-for="SerialNumber" class="form-control" />
-                <span asp-validation-for="SerialNumber" class="text-danger"></span>
+                <label asp-for="UnitPrice" class="control-label"></label>
+                <input asp-for="UnitPrice" class="form-control" />
+                <span asp-validation-for="UnitPrice" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Address" class="control-label"></label>
-                <input asp-for="Address" class="form-control" />
-                <span asp-validation-for="Address" class="text-danger"></span>
+                <label asp-for="VolumeLimit" class="control-label"></label>
+                <input asp-for="VolumeLimit" class="form-control" />
+                <span asp-validation-for="VolumeLimit" class="text-danger"></span>
             </div>
 
             <div class="form-group">
-                <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-success"><i class="fa fa-arrow-alt-circle-left"></i> Go back</a>
+                <a asp-action="Index" class="btn btn-success"><i class="fa fa-arrow-alt-circle-left"></i> Go back</a>
                 <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> Save</button>
             </div>
         </form>

@@ -44,12 +44,41 @@ namespace UF5423_Aguas.Data
                     var user = await CreateUser(fullName, email, role);
                     users.Add(user);
                 }
+
+                await _context.SaveChangesAsync();
             }
 
-            if (!_context.Meters.Any())
+            var meters = _context.Meters.ToList();
+            if (meters == null || !meters.Any())
             {
-                CreateMeter($"DAE AS320U-150P Water Meter with Pulse Output", "Rua das Flores", users.FirstOrDefault(u => u.Email == "customer@mail"));
-                CreateMeter($"DAE O45S-PL Garden Water Meter", "Rua das Cores", users.FirstOrDefault(u => u.Email == "customer2@mail"));
+                var metersToAdd = new List<(int serialNumber, string address, User user)>
+                {
+                    (3427654, "Rua das Flores", users.FirstOrDefault(u => u.Email == "customer@mail")),
+                    (1974534, "Rua das Cores", users.FirstOrDefault(u => u.Email == "customer2@mail")),
+                };
+
+                foreach (var (serialNumber, address, user) in metersToAdd)
+                {
+                    var meter = CreateMeter(serialNumber, address, user);
+                    meters.Add(meter);
+                }
+
+                await _context.SaveChangesAsync();
+            }
+
+            if (!_context.Consumptions.Any())
+            {
+                CreateConsumption(20, "Awaiting approval", meters.FirstOrDefault(m => m.UserEmail == "customer@mail"));
+                CreateConsumption(9, "Awaiting approval", meters.FirstOrDefault(m => m.UserEmail == "customer2@mail"));
+                await _context.SaveChangesAsync();
+            }
+
+            if (!_context.Tiers.Any())
+            {
+                CreateTier(0.30M, 5);
+                CreateTier(0.80M, 10);
+                CreateTier(1.20M, 5);
+                CreateTier(1.60M, 9999999);
                 await _context.SaveChangesAsync();
             }
         }
@@ -86,19 +115,45 @@ namespace UF5423_Aguas.Data
             return user;
         }
 
-        private void CreateMeter(string name, string address, User user)
+        private Meter CreateMeter(int serialNumber, string address, User user)
         {
             var random = new Random();
             var meter = new Meter()
             {
+                SerialNumber = serialNumber,
                 Address = address,
-                UserEmail = user.Email,
                 User = user,
-                SerialNumber = random.Next(1000000, 10000000),
+                UserEmail = user.Email,
             };
 
             _context.Meters.Add(meter);
             user.Meters.Add(meter);
+            return meter;
+        }
+
+        private void CreateConsumption(int volume, string status, Meter meter)
+        {
+            var consumption = new Consumption()
+            {
+                Volume = volume,
+                Status = status,
+                Meter = meter,
+                MeterId = meter.Id,
+            };
+
+            _context.Consumptions.Add(consumption);
+            meter.Consumptions.Add(consumption);
+        }
+
+        private void CreateTier(decimal unitPrice, int volumeLimit)
+        {
+            var tier = new Tier()
+            {
+                UnitPrice = unitPrice,
+                VolumeLimit = volumeLimit,
+            };
+
+            _context.Tiers.Add(tier);
         }
     }
 }

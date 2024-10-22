@@ -12,11 +12,13 @@ namespace UF5423_Aguas.Data
 
         public DbSet<Consumption> Consumptions { get; set; }
 
-        public DbSet<Notification> Notifications { get; set; }
+        public DbSet<Invoice> Invoices { get; set; }
 
         public DbSet<Tier> Tiers { get; set; }
 
-        public DbSet<Invoice> Invoices { get; set; }
+        public DbSet<TierUsage> TierUsages { get; set; }
+
+        public DbSet<Notification> Notifications { get; set; }
 
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {

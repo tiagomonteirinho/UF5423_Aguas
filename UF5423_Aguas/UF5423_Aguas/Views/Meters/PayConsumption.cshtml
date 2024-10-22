@@ -20,22 +20,72 @@
 }
 
 <div>
-    <h4>Invoice</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Consumption)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Consumption.Id)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Price)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Price)
-        </dd>
-    </dl>
+    <h3>Invoice</h3>
+    <br />
+    <div class="row">
+        <dl class="col-sm-6">
+            <dt class = "col-sm-6">
+                @Html.DisplayNameFor(model => model.Consumption.Meter.Address)
+            </dt>
+            <dd class = "col-sm-6">
+                @Html.DisplayFor(model => model.Consumption.Meter.Address)
+            </dd>
+            <dt class = "col-sm-6">
+                @Html.DisplayNameFor(model => model.Consumption.Meter.SerialNumber)
+            </dt>
+            <dd class = "col-sm-6">
+                @Html.DisplayFor(model => model.Consumption.Meter.SerialNumber)
+            </dd>
+            <dt class = "col-sm-6">
+                @Html.DisplayNameFor(model => model.Consumption.Date)
+            </dt>
+            <dd class = "col-sm-6">
+                @Model.Consumption.Date.ToString("dd/MM/yyyy")
+            </dd>
+            <dt class="col-sm-6">
+                Total volume
+            </dt>
+            <dd class="col-sm-6">
+                @Html.DisplayFor(model => model.Consumption.Volume) m³
+            </dd>
+            <dt class="col-sm-6">
+                Total cost
+            </dt>
+            <dd class="col-sm-6">
+                @Html.DisplayFor(model => model.Price) €
+            </dd>
+        </dl>
+        <div class="col-sm-6">
+            <h5>Cost per tier</h5>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Tier</th>
+                        <th>Used volume</th>
+                        <th>Unit price</th>
+                        <th>Cost</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var tierUsage in Model.TierUsages.OrderBy(u => u.UnitPrice))
+                    {
+                        <tr>
+                            <td>@tierUsage.TierId</td>
+                            <td>@tierUsage.VolumeUsed m³</td>
+                            <td>@tierUsage.UnitPrice €</td>
+                            <td>@tierUsage.Price €</td>
+                        </tr>
+                    }
+                    <tr>
+                        <td><b>Total</b></td>
+                        <td>@Model.Consumption.Volume m³</td>
+                        <td></td>
+                        <td>@Model.Price €</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
 <div class="wrapper">
@@ -50,8 +100,7 @@
                 </div>
             </section>
             @Html.HiddenFor(n => n.Nonce, new { @id = "nonce" })
-            <hr />
-            <button class="btn btn-success" type="submit"><span>Confirm payment - $@Model.Price</span></button>
+            <button class="btn btn-success" type="submit">Confirm payment</button>
         </form>
     </div>
 </div>

@@ -75,11 +75,10 @@ namespace UF5423_Aguas.Data
 
             if (!_context.Tiers.Any())
             {
-                CreateTier(0.30M, 5);
-                CreateTier(0.80M, 10);
-                CreateTier(1.20M, 5);
-                CreateTier(1.60M, 9999999);
-                await _context.SaveChangesAsync();
+                await CreateTier(0.30M, 5);
+                await CreateTier(0.80M, 10);
+                await CreateTier(1.20M, 5);
+                await CreateTier(1.60M, 9999999);
             }
         }
 
@@ -145,7 +144,7 @@ namespace UF5423_Aguas.Data
             meter.Consumptions.Add(consumption);
         }
 
-        private void CreateTier(decimal unitPrice, int volumeLimit)
+        private async Task CreateTier(decimal unitPrice, int volumeLimit)
         {
             var tier = new Tier()
             {
@@ -154,6 +153,7 @@ namespace UF5423_Aguas.Data
             };
 
             _context.Tiers.Add(tier);
+            await _context.SaveChangesAsync();
         }
     }
 }

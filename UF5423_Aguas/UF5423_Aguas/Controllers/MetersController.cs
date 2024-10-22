@@ -642,7 +642,7 @@ namespace UF5423_Aguas.Controllers
                 return RedirectToAction("NotFound404", "Errors", new { entityName = "Consumption" });
             }
 
-            var invoice = await _context.Invoices.FirstOrDefaultAsync(i => i.ConsumptionId == consumption.Id);
+            var invoice = await _meterRepository.GetInvoiceByConsumptionIdAsync(consumption.Id);
             if (invoice == null)
             {
                 return RedirectToAction("NotFound404", "Errors", new { entityName = "Invoice" });

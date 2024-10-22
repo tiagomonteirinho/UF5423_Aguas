@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UF5423_Aguas.Data.Entities;
@@ -128,14 +129,29 @@ namespace UF5423_Aguas.Data
 
         public async Task<Invoice> ApproveConsumption(Consumption consumption)
         {
-            var tiers = _tierRepository.GetAll().OrderBy(t => t.VolumeLimit);
+            var tiers = _tierRepository.GetAll();
             decimal price = 0;
             var remainingVolume = consumption.Volume;
+            var tierUsages = new List<TierUsage>();
 
             foreach (var tier in tiers)
             {
                 var remainingTierVolume = Math.Min(remainingVolume, tier.VolumeLimit);
                 price += remainingTierVolume * tier.UnitPrice;
+                decimal tierPrice = 0;
+
+                if (remainingTierVolume > 0)
+                {
+                    tierPrice += tier.UnitPrice;
+                    tierUsages.Add(new TierUsage
+                    {
+                        TierId = tier.Id,
+                        VolumeUsed = remainingTierVolume,
+                        UnitPrice = tier.UnitPrice,
+                        Price = remainingTierVolume * tier.UnitPrice,
+                    });
+                }
+
                 remainingVolume -= remainingTierVolume;
                 if (remainingVolume <= 0)
                 {
@@ -148,6 +164,7 @@ namespace UF5423_Aguas.Data
                 Consumption = consumption,
                 ConsumptionId = consumption.Id,
                 Price = price,
+                TierUsages = tierUsages,
             };
 
             _context.Invoices.Add(invoice);
@@ -160,7 +177,9 @@ namespace UF5423_Aguas.Data
         public async Task<Invoice> GetInvoiceByConsumptionIdAsync(int id)
         {
             return await _context.Invoices
+                .Include(i => i.TierUsages)
                 .Include(i => i.Consumption)
+                .ThenInclude(c => c.Meter)
                 .FirstOrDefaultAsync(i => i.ConsumptionId == id);
         }
     }

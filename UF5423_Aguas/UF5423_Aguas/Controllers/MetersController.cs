@@ -289,6 +289,14 @@ namespace UF5423_Aguas.Controllers
 
                 return RedirectToAction("Error", "Errors");
             }
+            catch (InvalidOperationException)
+            {
+                return RedirectToAction("Error", "Errors", new
+                {
+                    title = $"Meter deletion error.",
+                    message = $"Could not remove meter. Please ensure that it is not being used by other entities.",
+                });
+            }
         }
 
         [Authorize(Roles = "Employee, Customer")]
@@ -502,7 +510,7 @@ namespace UF5423_Aguas.Controllers
 
             var notification = new Notification
             {
-                Title = "New water meter contract request awaiting approval.",
+                Title = "New contract awaiting approval.",
                 Message =
                 $"<h5>Contract holder (full name)</h5>" +
                 $"<p>{model.FullName}</p>" +
@@ -513,7 +521,9 @@ namespace UF5423_Aguas.Controllers
                 $"<h5>Address</h5>" +
                 $"<p>{model.Address}</p>" +
                 $"<h5>Postal code</h5>" +
-                $"<p>{model.PostalCode}</p>",
+                $"<p>{model.PostalCode}</p>" +
+                $"<h5>Serial number</h5>" +
+                $"<p>{model.SerialNumber}</p>",
                 ReceiverRole = "Employee",
                 NewAccountEmail = model.Email,
             };
@@ -524,7 +534,7 @@ namespace UF5423_Aguas.Controllers
             _context.Notifications.Update(notification);
             await _context.SaveChangesAsync();
 
-            ViewBag.SuccessMessage = "Meter request submitted successfully!";
+            ViewBag.SuccessMessage = "Meter contract request submitted successfully!";
             ModelState.Clear();
             return View();
         }

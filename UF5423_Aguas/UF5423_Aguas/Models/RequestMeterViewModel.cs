@@ -30,5 +30,9 @@ namespace UF5423_Aguas.Models
         [DataType(DataType.PostalCode)]
         [Display(Name = "Postal code (example: 0000-000)")]
         public string PostalCode { get; set; }
+
+        [Required]
+        [Display(Name = "Serial number")]
+        public int SerialNumber { get; set; }
     }
 }

@@ -10,6 +10,7 @@ using UF5423_Aguas.Models;
 
 namespace UF5423_Aguas.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class TiersController : Controller
     {
         private readonly ITierRepository _tierRepository;
@@ -21,20 +22,17 @@ namespace UF5423_Aguas.Controllers
             _context = context;
         }
 
-        [Authorize(Roles = "Admin")]
         public IActionResult Index()
         {
             var model = _tierRepository.GetAll();
             return View(model);
         }
 
-        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             return View(new TierViewModel());
         }
 
-        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Create(TierViewModel model)
         {
@@ -62,7 +60,6 @@ namespace UF5423_Aguas.Controllers
             return View();
         }
 
-        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -129,7 +126,6 @@ namespace UF5423_Aguas.Controllers
             }
         }
 
-        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -143,23 +139,10 @@ namespace UF5423_Aguas.Controllers
                 return RedirectToAction("NotFound404", "Errors", new { entityName = "Tier" });
             }
 
-            return View("Index");
-        }
-
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var tier = await _tierRepository.GetByIdAsync(id);
-            if (tier == null)
-            {
-                return RedirectToAction("NotFound404", "Errors", new { entityName = "Tier" });
-            }
-
             try
             {
                 await _tierRepository.DeleteAsync(tier);
-                return View("Index");
+                return RedirectToAction("Index");
             }
             catch (DbUpdateException ex)
             {

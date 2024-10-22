@@ -3,6 +3,12 @@
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <h1>Welcome to your water company</h1>
+    <br />
+    <h2>About us</h2>
+    <p>As one of Portugal’s largest water companies based in Lisbon, its capital, we impact on the lives of thousands of portuguese, from north to south.</p>
+    @if (!User.Identity.IsAuthenticated)
+    {
+        <p>Apply now for a water meter clicking <a asp-controller="Meters" asp-action="RequestMeter">here</a>.</p>
+    }
 </div>

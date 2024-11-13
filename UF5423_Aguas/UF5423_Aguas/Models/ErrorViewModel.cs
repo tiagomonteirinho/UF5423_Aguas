@@ -1,5 +1,3 @@
-using System;
-
 namespace UF5423_Aguas.Models
 {
     public class ErrorViewModel

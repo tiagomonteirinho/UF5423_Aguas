@@ -1,8 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using MailKit.Net.Smtp;
+using Microsoft.Extensions.Configuration;
 using MimeKit;
-using MailKit.Net.Smtp;
-using System.Threading.Tasks;
-using System;
 
 namespace UF5423_Aguas.Helpers
 {

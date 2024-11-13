@@ -1,9 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Razor.Language.Intermediate;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 using UF5423_Aguas.Data;
@@ -220,7 +218,6 @@ namespace UF5423_Aguas.Controllers
                 await _userRepository.UpdateNotificationAsync(notification);
             }
 
-            notification.Read = true;
             return View(notification);
         }
     }

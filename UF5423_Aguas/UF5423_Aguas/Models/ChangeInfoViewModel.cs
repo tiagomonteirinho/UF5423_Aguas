@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Http;
-using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace UF5423_Aguas.Models
@@ -14,7 +13,7 @@ namespace UF5423_Aguas.Models
         [Display(Name = "Image")]
         public string ImageFullPath { get; set; }
 
-        public Guid ImageId { get; set; }
+        public string ImageUrl { get; set; }
 
         [Display(Name = "New image")]
         public IFormFile ImageFile { get; set; }

@@ -1,17 +1,12 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using UF5423_Aguas.Data;
 using UF5423_Aguas.Data.Entities;
 using UF5423_Aguas.Helpers;
@@ -46,7 +41,7 @@ namespace UF5423_Aguas
 
             services.AddAuthentication()
                 .AddCookie()
-                .AddJwtBearer(cfg => 
+                .AddJwtBearer(cfg =>
                 {
                     cfg.TokenValidationParameters = new TokenValidationParameters
                     {
@@ -56,7 +51,7 @@ namespace UF5423_Aguas
                     };
                 });
 
-            services.AddDbContext <DataContext>(cfg =>
+            services.AddDbContext<DataContext>(cfg =>
             {
                 cfg.UseSqlServer(this.Configuration.GetConnectionString("LocalConnectionString"));
             });

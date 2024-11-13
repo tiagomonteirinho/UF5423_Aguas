@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 using UF5423_Aguas.Data.Entities;
@@ -12,7 +11,7 @@ namespace UF5423_Aguas.Data
 
         public GenericRepository(DataContext context)
         {
-             _context = context;
+            _context = context;
         }
 
         public IQueryable<T> GetAll()

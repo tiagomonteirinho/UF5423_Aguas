@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json.Linq;
 using System;
 using System.IdentityModel.Tokens.Jwt;
+using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
@@ -15,14 +15,12 @@ using UF5423_Aguas.Models;
 public class AccountController : Controller
 {
     private readonly IUserHelper _userHelper;
-    private readonly IBlobHelper _blobHelper;
     private readonly IConfiguration _configuration;
     private readonly IMailHelper _mailHelper;
 
-    public AccountController(IUserHelper userHelper, IBlobHelper blobHelper, IConfiguration configuration, IMailHelper mailHelper)
+    public AccountController(IUserHelper userHelper, IConfiguration configuration, IMailHelper mailHelper)
     {
         _userHelper = userHelper;
-        _blobHelper = blobHelper;
         _configuration = configuration;
         _mailHelper = mailHelper;
     }
@@ -132,9 +130,22 @@ public class AccountController : Controller
         }
 
         user.FullName = model.FullName;
+
+        var path = model.ImageUrl;
         if (model.ImageFile != null && model.ImageFile.Length > 0)
         {
-            user.ImageId = await _blobHelper.UploadBlobAsync(model.ImageFile, "users");
+            var guid = Guid.NewGuid().ToString();
+            string fileName = $"{guid}.jpg";
+            path = Path.Combine(
+                Directory.GetCurrentDirectory(),
+                "wwwroot\\images\\users",
+                fileName
+            );
+            using (var stream = new FileStream(path, FileMode.Create))
+            {
+                await model.ImageFile.CopyToAsync(stream);
+            }
+            user.ImageUrl = $"~/images/users/{fileName}";
         }
 
         var response = await _userHelper.ChangeInfoAsync(user);
@@ -153,7 +164,7 @@ public class AccountController : Controller
         return new ChangeInfoViewModel
         {
             FullName = user.FullName,
-            ImageId = user.ImageId,
+            ImageUrl = user.ImageUrl,
             ImageFullPath = user.ImageFullPath
         };
     }

@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using UF5423_Aguas.Data.API;
 using UF5423_Aguas.Data.Entities;
 using UF5423_Aguas.Models;
 
@@ -10,6 +11,8 @@ namespace UF5423_Aguas.Data
         Task<Meter> GetMeterWithUserByIdAsync(int id);
 
         Task<IQueryable<Meter>> GetMetersAsync(string email);
+
+        IQueryable<MeterDto> ConvertToMeterDtoAsync(IQueryable<Meter> meters);
 
         Task<IQueryable<Consumption>> GetConsumptionsAsync(string email);
 

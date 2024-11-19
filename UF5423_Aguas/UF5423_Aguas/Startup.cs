@@ -6,7 +6,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 using System.Text;
+using System.Text.Json;
 using UF5423_Aguas.Data;
 using UF5423_Aguas.Data.Entities;
 using UF5423_Aguas.Helpers;
@@ -47,7 +49,8 @@ namespace UF5423_Aguas
                     {
                         ValidIssuer = this.Configuration["Tokens:Issuer"],
                         ValidAudience = this.Configuration["Tokens:Audience"],
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(this.Configuration["Tokens:Key"]))
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(this.Configuration["Tokens:Key"])),
+                        NameClaimType = ClaimTypes.Email
                     };
                 });
 
@@ -65,6 +68,7 @@ namespace UF5423_Aguas
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IMeterRepository, MeterRepository>();
             services.AddScoped<ITierRepository, TierRepository>();
+            services.AddScoped<INotificationRepository, NotificationRepository>();
 
             services.ConfigureApplicationCookie(cfg =>
             {
@@ -72,7 +76,12 @@ namespace UF5423_Aguas
                 cfg.AccessDeniedPath = "/Errors/Unauthorized401";
             });
 
-            services.AddControllersWithViews();
+            services.AddControllersWithViews()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.IgnoreNullValues = true;  // Ignore null values.
+                    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;  // Use camelCase.
+                });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

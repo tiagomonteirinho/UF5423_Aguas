@@ -34,32 +34,5 @@ namespace UF5423_Aguas.Data
                 await _context.SaveChangesAsync();
             }
         }
-
-        public async Task<Notification> GetNotificationByIdAsync(int id)
-        {
-            return await _context.Notifications.FindAsync(id);
-        }
-
-        public IQueryable<Notification> GetNotifications(string email, string role)
-        {
-            if (email != null)
-            {
-                return _context.Notifications
-                        .Include(n => n.Receiver)
-                        .Where(n => n.ReceiverEmail == email)
-                        .OrderByDescending(n => n.Date);
-            }
-
-            return _context.Notifications
-                    .Include(n => n.Receiver)
-                    .Where(n => n.ReceiverRole == role)
-                    .OrderByDescending(n => n.Date);
-        }
-
-        public async Task UpdateNotificationAsync(Notification notification)
-        {
-            _context.Notifications.Update(notification);
-            await _context.SaveChangesAsync();
-        }
     }
 }

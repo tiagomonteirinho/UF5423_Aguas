@@ -1,5 +1,6 @@
 ﻿@inject UF5423_Aguas.Helpers.IUserHelper _userHelper
 @inject UF5423_Aguas.Data.IUserRepository _userRepository
+@inject UF5423_Aguas.Data.INotificationRepository _notificationRepository
 
 <!DOCTYPE html>
 <html lang="en">
@@ -64,7 +65,7 @@
                                         <i class="fa fa-bell"></i>
                                         @if (await _userHelper.IsUserInRoleAsync(user, "Customer"))
                                         {
-                                            var userNotifications = _userRepository.GetNotifications(User.Identity.Name, null);
+                                            var userNotifications = _notificationRepository.GetNotifications(User.Identity.Name, null);
                                             var userUnreadNotifications = userNotifications.Count(n => !n.Read);
                                             if (userUnreadNotifications > 0)
                                             {
@@ -74,7 +75,7 @@
                                         }
                                         else
                                         {
-                                            var roleNotifications = _userRepository.GetNotifications(null, user.RoleName);
+                                            var roleNotifications = _notificationRepository.GetNotifications(null, user.RoleName);
                                             var roleUnreadNotifications = roleNotifications.Count(n => !n.Read);
                                             if (roleUnreadNotifications > 0)
                                             {

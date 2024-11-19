@@ -12,11 +12,5 @@ namespace UF5423_Aguas.Data
         Task<User> GetByIdAsync(string userId);
 
         Task DeleteByIdAsync(string userId);
-
-        Task<Notification> GetNotificationByIdAsync(int id);
-
-        IQueryable<Notification> GetNotifications(string email, string role);
-
-        Task UpdateNotificationAsync(Notification notification);
     }
 }

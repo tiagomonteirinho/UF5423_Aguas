@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using UF5423_Aguas.Data.API;
 using UF5423_Aguas.Data.Entities;
 using UF5423_Aguas.Helpers;
 using UF5423_Aguas.Models;
@@ -43,6 +44,19 @@ namespace UF5423_Aguas.Data
                     .Include(m => m.User)
                     .Where(m => m.User.Email == email)
                     .OrderBy(m => m.Id);
+        }
+
+        public IQueryable<MeterDto> ConvertToMeterDtoAsync(IQueryable<Meter> meters)
+        {
+            var meterDtos = meters.Select(m => new MeterDto
+            {
+                Id = m.Id,
+                Address = m.Address,
+                SerialNumber = m.SerialNumber,
+                Consumptions = m.Consumptions,
+            });
+
+            return meterDtos;
         }
 
         public async Task<IQueryable<Consumption>> GetConsumptionsAsync(string email)

@@ -15,12 +15,14 @@ namespace UF5423_Aguas.Controllers
     public class UsersController : Controller
     {
         private readonly IUserRepository _userRepository;
+        private readonly INotificationRepository _notificationRepository;
         private readonly IUserHelper _userHelper;
         private readonly IMailHelper _mailHelper;
 
-        public UsersController(IUserRepository userRepository, IUserHelper userHelper, IMailHelper mailHelper)
+        public UsersController(IUserRepository userRepository, INotificationRepository notificationRepository, IUserHelper userHelper, IMailHelper mailHelper)
         {
             _userRepository = userRepository;
+            _notificationRepository = notificationRepository;
             _userHelper = userHelper;
             _mailHelper = mailHelper;
         }
@@ -190,11 +192,11 @@ namespace UF5423_Aguas.Controllers
             var user = await _userHelper.GetUserByEmailAsync(userEmail);
             if (await _userHelper.IsUserInRoleAsync(user, "Customer"))
             {
-                var userNotifications = _userRepository.GetNotifications(userEmail, null);
+                var userNotifications = _notificationRepository.GetNotifications(userEmail, null);
                 return View(userNotifications);
             }
 
-            var roleNotifications = _userRepository.GetNotifications(null, user.RoleName);
+            var roleNotifications = _notificationRepository.GetNotifications(null, user.RoleName);
             return View(roleNotifications);
         }
 
@@ -206,7 +208,7 @@ namespace UF5423_Aguas.Controllers
                 return RedirectToAction("NotFound404", "Errors", new { entityName = "Notification" });
             }
 
-            var notification = await _userRepository.GetNotificationByIdAsync(id.Value);
+            var notification = await _notificationRepository.GetNotificationByIdAsync(id.Value);
             if (notification == null)
             {
                 return RedirectToAction("NotFound404", "Errors", new { entityName = "Notification" });
@@ -215,7 +217,7 @@ namespace UF5423_Aguas.Controllers
             if (!notification.Read)
             {
                 notification.Read = true;
-                await _userRepository.UpdateNotificationAsync(notification);
+                await _notificationRepository.UpdateAsync(notification);
             }
 
             return View(notification);

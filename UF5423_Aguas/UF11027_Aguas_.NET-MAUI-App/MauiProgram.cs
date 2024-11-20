@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
+using UF11027_Aguas_.NET_MAUI_App.Services;
+using UF11027_Aguas_.NET_MAUI_App.Validations;
 
 namespace UF11027_Aguas_.NET_MAUI_App
 {
@@ -18,6 +20,10 @@ namespace UF11027_Aguas_.NET_MAUI_App
 #if DEBUG
     		builder.Logging.AddDebug();
 #endif
+
+            builder.Services.AddHttpClient();
+            builder.Services.AddSingleton<ApiService>();
+            builder.Services.AddSingleton<IValidator, Validator>();
 
             return builder.Build();
         }

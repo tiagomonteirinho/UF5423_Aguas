@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using UF5423_Aguas.Data;
@@ -30,6 +31,12 @@ namespace UF5423_Aguas.Controllers.API
 
             var meters = await _meterRepository.GetMetersAsync(userEmail);
             var meterDtos = _meterRepository.ConvertToMeterDtoAsync(meters);
+
+            if (meterDtos is null || !meterDtos.Any())
+            {
+                return NotFound("Meters not found.");
+            }
+
             return Ok(meterDtos);
         }
     }

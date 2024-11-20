@@ -10,6 +10,7 @@ using UF5423_Aguas.Models;
 
 namespace UF5423_Aguas.Data
 {
+    //TODO: Add Authorize.
     public class MeterRepository : GenericRepository<Meter>, IMeterRepository
     {
         private readonly DataContext _context;
@@ -33,17 +34,17 @@ namespace UF5423_Aguas.Data
         public async Task<IQueryable<Meter>> GetMetersAsync(string email)
         {
             var user = await _userHelper.GetUserByEmailAsync(email);
-            if (await _userHelper.IsUserInRoleAsync(user, "Employee"))
+            if (await _userHelper.IsUserInRoleAsync(user, "Customer"))
             {
                 return _context.Meters
-                    .Include(m => m.User)
-                    .OrderBy(m => m.User.FullName);
+                        .Include(m => m.User)
+                        .Where(m => m.User.Email == email)
+                        .OrderBy(m => m.Id);
             }
 
             return _context.Meters
-                    .Include(m => m.User)
-                    .Where(m => m.User.Email == email)
-                    .OrderBy(m => m.Id);
+                .Include(m => m.User)
+                .OrderBy(m => m.User.FullName);
         }
 
         public IQueryable<MeterDto> ConvertToMeterDtoAsync(IQueryable<Meter> meters)

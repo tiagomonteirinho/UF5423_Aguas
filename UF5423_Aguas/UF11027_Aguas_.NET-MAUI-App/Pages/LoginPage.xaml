@@ -17,9 +17,9 @@
 
         <Frame Grid.Row="2" Padding="15" BackgroundColor="White">
             <VerticalStackLayout>
-                <Entry Placeholder="Email" x:Name="email_entry1"
+                <Entry Placeholder="Email" x:Name="email_entry"
                        Keyboard="Email"/>
-                <Entry Placeholder="Password" x:Name="password_entry1" 
+                <Entry Placeholder="Password" x:Name="password_entry" 
                        IsPassword="True"/>
             </VerticalStackLayout>
         </Frame>

@@ -68,20 +68,15 @@ namespace UF5423_Aguas.Controllers.API
                 signingCredentials: credentials
             );
 
-            //return Ok(new
-            //{
-            //    jwt = new JwtSecurityTokenHandler().WriteToken(token),
-            //    expiration = token.ValidTo,
-            //});
-
             var jwt = new JwtSecurityTokenHandler().WriteToken(token);
 
             return new ObjectResult(new
             {
-                accesstoken = jwt,
                 tokentype = "bearer",
+                accesstoken = jwt,
                 userid = user.Id,
-                username = user.UserName,
+                useremail = user.Email,
+                username = user.FullName
             });
         }
 

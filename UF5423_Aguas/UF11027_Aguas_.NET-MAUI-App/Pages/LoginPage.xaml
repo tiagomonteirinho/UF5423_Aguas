@@ -9,10 +9,10 @@
           RowSpacing="20"
           Margin="20,150,20,40">
 
-        <Image Grid.Row="0" Source="logo.png"
+        <Image Grid.Row="0" Source="logo"
                Aspect="AspectFit"
                WidthRequest="100" HeightRequest="100"/>
-        <Label Grid.Row="1" Text="Sign in"
+        <Label Grid.Row="1" Text="Sign in" TextColor="#486AC6"
                FontAttributes="Bold" HorizontalOptions="Center" />
 
         <Frame Grid.Row="2" Padding="15" BackgroundColor="White">
@@ -26,12 +26,12 @@
 
         <Button Grid.Row="3" x:Name="login_button" Clicked="login_button_Clicked"
                 Text="Sign in" FontSize="Medium"
-                BackgroundColor="#a90409"/>
+                BackgroundColor="#486AC6"/>
 
         <HorizontalStackLayout Grid.Row="4" Spacing="2" 
                                HorizontalOptions="Center" VerticalOptions="EndAndExpand">
             <Label Text="Don't have an account?"/>
-            <Label Text=" Request a water meter" TextColor="#a90409" FontAttributes="Bold">
+            <Label Text=" Request a water meter" TextColor="#486AC6" FontAttributes="Bold">
                 <Label.GestureRecognizers>
                     <TapGestureRecognizer x:Name="requestWaterMeter_tap" Tapped="requestWaterMeter_tap_Tapped"/>
                 </Label.GestureRecognizers>

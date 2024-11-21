@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using System.Net;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using UF11027_Aguas_.NET_MAUI_App.Models;
@@ -51,6 +52,7 @@ namespace UF11027_Aguas_.NET_MAUI_App.Services
 
                 Preferences.Set("accesstoken", result!.AccessToken);
                 Preferences.Set("userid", result.UserId);
+                Preferences.Set("useremail", result.UserEmail);
                 Preferences.Set("username", result.UserName);
 
                 return new ApiResponse<bool> { Data = true };
@@ -74,6 +76,68 @@ namespace UF11027_Aguas_.NET_MAUI_App.Services
             {
                 _logger.LogError($"Could not process HTTP request to {uri}: {ex.Message}");
                 return new HttpResponseMessage(HttpStatusCode.BadRequest);
+            }
+        }
+
+        public async Task<(List<Meter>? meters, string? errorMessage)> GetMeters()
+        {
+            return await GetAsync<List<Meter>>("api/metersApi/getMeters");
+        }
+
+        private async Task<(T? data, string? errorMessage)> GetAsync<T>(string endpoint)
+        {
+            try
+            {
+                AddAuthorizationHeader();
+                var response = await _httpClient.GetAsync(AppConfig.BaseUrl + endpoint);
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseString = await response.Content.ReadAsStringAsync();
+                    var data = JsonSerializer.Deserialize<T>(responseString, _serializerOptions);
+
+                    // If data returns null, create generic type instance.
+                    return (data ?? Activator.CreateInstance<T>(), null);
+                }
+                else
+                {
+                    if (response.StatusCode == HttpStatusCode.Unauthorized)
+                    {
+                        string errorMessage = "Unauthorized";
+                        _logger.LogWarning(errorMessage);
+                        return (default, errorMessage);
+                    }
+
+                    string generalErrorMessage = $"Could not process HTTP request: {response.ReasonPhrase}";
+                    _logger.LogError(generalErrorMessage);
+                    return (default, generalErrorMessage);
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                string errorMessage = $"Could not process HTTP request: {ex.Message}";
+                _logger.LogError(ex, errorMessage);
+                return (default, errorMessage);
+            }
+            catch (JsonException ex)
+            {
+                string errorMessage = $"Could not deserialize JSON: {ex.Message}";
+                _logger.LogError(ex, errorMessage);
+                return (default, errorMessage);
+            }
+            catch (Exception ex)
+            {
+                string errorMessage = $"Could not process request: {ex.Message}";
+                _logger.LogError(ex, errorMessage);
+                return (default, errorMessage);
+            }
+        }
+
+        private void AddAuthorizationHeader()
+        {
+            var token = Preferences.Get("accesstoken", string.Empty);
+            if (!string.IsNullOrEmpty(token))
+            {
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
             }
         }
     }

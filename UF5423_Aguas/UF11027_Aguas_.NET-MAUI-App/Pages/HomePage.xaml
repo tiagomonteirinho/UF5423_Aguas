@@ -3,10 +3,35 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="UF11027_Aguas_.NET_MAUI_App.Pages.HomePage"
              Title="Home">
-    <VerticalStackLayout>
-        <Label 
-            Text="Home"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+    
+    <Grid RowDefinitions="2*,Auto,Auto,Auto,3*"
+          RowSpacing="20" Margin="15">
+
+        <VerticalStackLayout Grid.Row="0" Spacing="3">
+            <Label x:Name="greetings_label" FontSize="Large" TextColor="#03045e"/>
+        </VerticalStackLayout>
+
+        <Label Grid.Row="1" Text="Water Meters" FontSize="Medium"
+               TextColor="#03045e" FontAttributes="Bold"/>
+
+        <CollectionView Grid.Row="2" x:Name="meters_collection" SelectionMode="Single">
+
+            <CollectionView.ItemsLayout>
+                <LinearItemsLayout Orientation="Horizontal" ItemSpacing="20"/>
+            </CollectionView.ItemsLayout>
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Border StrokeShape="RoundRectangle 10,10,10,10">
+                    <VerticalStackLayout>
+                        <Image Source="water_meter_blue"
+                               HeightRequest="150" WidthRequest="150"/>
+                        <Label Text="{Binding SerialNumber}"
+                               FontSize="Small" HorizontalOptions="Center"/>
+                        </VerticalStackLayout>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
 </ContentPage>

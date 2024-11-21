@@ -12,14 +12,14 @@ namespace UF11027_Aguas_.NET_MAUI_App
         public AppShell(ApiService apiService, IValidator validator)
         {
             InitializeComponent();
-            _apiService = apiService;
+            _apiService = apiService ?? throw new ArgumentNullException(nameof(apiService));
             _validator = validator;
             ConfigureShell();
         }
 
         private void ConfigureShell()
         {
-            var homePage = new HomePage();
+            var homePage = new HomePage(_apiService, _validator);
             var notificationsPage = new NotificationsPage();
             var consumptionsPage = new ConsumptionsPage();
             var accountPage = new AccountPage();

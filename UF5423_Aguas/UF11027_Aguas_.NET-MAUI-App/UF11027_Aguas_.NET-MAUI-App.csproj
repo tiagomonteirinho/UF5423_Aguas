@@ -79,6 +79,9 @@
 	  <MauiXaml Update="Pages\NotificationsPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Pages\RecoverPassword.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Pages\RequestWaterMeterPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

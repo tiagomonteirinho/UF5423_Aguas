@@ -37,7 +37,7 @@ namespace UF11027_Aguas_.NET_MAUI_App.Services
                 var json = JsonSerializer.Serialize(login, _serializerOptions);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var response = await PostRequest("api/AccountApi/Login", content);
+                var response = await PostRequest("api/AccountApi/login", content);
                 if (!response.IsSuccessStatusCode)
                 {
                     _logger.LogError($"Could not process HTTP request: {response.StatusCode}");
@@ -54,6 +54,32 @@ namespace UF11027_Aguas_.NET_MAUI_App.Services
                 Preferences.Set("userid", result.UserId);
                 Preferences.Set("useremail", result.UserEmail);
                 Preferences.Set("username", result.UserName);
+
+                return new ApiResponse<bool> { Data = true };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Could not log in: {ex.Message}");
+                return new ApiResponse<bool> { ErrorMessage = ex.Message };
+            }
+        }
+        public async Task<ApiResponse<bool>> RecoverPassword(string email)
+        {
+            try
+            {
+                var recoverPassword = new { Email = email };
+                var json = JsonSerializer.Serialize(recoverPassword, _serializerOptions);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await PostRequest("api/accountApi/recoverPassword", content);
+                if (!response.IsSuccessStatusCode)
+                {
+                    _logger.LogError($"Could not process HTTP request: {response.StatusCode}");
+                    return new ApiResponse<bool>
+                    {
+                        ErrorMessage = $"Could not process HTTP request: {response.StatusCode}"
+                    };
+                }
 
                 return new ApiResponse<bool> { Data = true };
             }
@@ -95,7 +121,6 @@ namespace UF11027_Aguas_.NET_MAUI_App.Services
                     var responseString = await response.Content.ReadAsStringAsync();
                     var data = JsonSerializer.Deserialize<T>(responseString, _serializerOptions);
 
-                    // If data returns null, create generic type instance.
                     return (data ?? Activator.CreateInstance<T>(), null);
                 }
                 else

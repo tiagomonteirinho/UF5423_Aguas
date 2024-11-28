@@ -10,7 +10,7 @@ namespace UF11027_Aguas_.NET_MAUI_App.Services
     public class ApiService
     {
         private readonly HttpClient _httpClient;
-        private readonly string _baseUrl = "https://fcbdb5dh-5001.uks1.devtunnels.ms/";
+        private readonly string _baseUrl = AppConfig.BaseUrl;
         private readonly ILogger<ApiService> _logger;
 
         JsonSerializerOptions _serializerOptions;
@@ -63,6 +63,7 @@ namespace UF11027_Aguas_.NET_MAUI_App.Services
                 return new ApiResponse<bool> { ErrorMessage = ex.Message };
             }
         }
+
         public async Task<ApiResponse<bool>> RecoverPassword(string email)
         {
             try
@@ -90,6 +91,29 @@ namespace UF11027_Aguas_.NET_MAUI_App.Services
             }
         }
 
+        public async Task<ApiResponse<bool>> ChangeImage(byte[] imageArray)
+        {
+            try
+            {
+                var content = new MultipartFormDataContent();
+                content.Add(new ByteArrayContent(imageArray), "image", "image.png");
+                var response = await PostRequest("api/accountApi/ChangeImage", content);
+                if (!response.IsSuccessStatusCode)
+                {
+                    string errorMessage = response.StatusCode == HttpStatusCode.Unauthorized ? "Unauthorized" : $"Could not process request: {response.ReasonPhrase}";
+                    _logger.LogError($"Could not process request: {response.StatusCode}");
+                    return new ApiResponse<bool> { ErrorMessage = errorMessage };
+                }
+
+                return new ApiResponse<bool> { Data = true };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Could not upload image: {ex.Message}");
+                return new ApiResponse<bool> { ErrorMessage = ex.Message };
+            }
+        }
+
         private async Task<HttpResponseMessage> PostRequest(string uri, HttpContent content)
         {
             var url = _baseUrl + uri;
@@ -108,6 +132,12 @@ namespace UF11027_Aguas_.NET_MAUI_App.Services
         public async Task<(List<Meter>? meters, string? errorMessage)> GetMeters()
         {
             return await GetAsync<List<Meter>>("api/metersApi/getMeters");
+        }
+
+        public async Task<(UserImage? userImage, string? ErrorMessage)> GetImage()
+        {
+            string endpoint = "api/accountApi/getImage";
+            return await GetAsync<UserImage>(endpoint);
         }
 
         private async Task<(T? data, string? errorMessage)> GetAsync<T>(string endpoint)

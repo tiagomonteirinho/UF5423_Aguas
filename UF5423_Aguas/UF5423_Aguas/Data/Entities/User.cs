@@ -23,9 +23,12 @@ namespace UF5423_Aguas.Data.Entities
             {
                 if (string.IsNullOrEmpty(ImageUrl))
                 {
-                    return $"https://localhost:5001/images/default_profile_picture.jpg";
+                    return $"https://fcbdb5dh-5001.uks1.devtunnels.ms/images/default_profile_picture.jpg";
+                    //return $"https://localhost:5001/images/default_profile_picture.jpg";
                 }
-                return $"https://localhost:5001{ImageUrl.Substring(1)}";
+
+                return $"https://fcbdb5dh-5001.uks1.devtunnels.ms{ImageUrl.Substring(1)}";
+                //return $"https://localhost:5001{ImageUrl.Substring(1)}";
             }
         }
 

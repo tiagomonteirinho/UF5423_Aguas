@@ -3,10 +3,70 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="UF11027_Aguas_.NET_MAUI_App.Pages.AccountPage"
              Title="Account">
-    <VerticalStackLayout>
-        <Label 
-            Text="Account"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+
+    <Grid RowDefinitions="Auto,5*,1*" RowSpacing="0">
+        <VerticalStackLayout Grid.Row="0" Spacing="5" Padding="20"
+                             BackgroundColor="Cyan" VerticalOptions="Start">
+            <ImageButton Source="user_image.png" x:Name="image_imgBtn" Clicked="image_imgBtn_Clicked"
+                         Aspect="AspectFill" CornerRadius="30"
+                         WidthRequest="120" HeightRequest="120" 
+                         HorizontalOptions="Center"/>
+            <Label x:Name="name_lbl" TextColor="Black" FontSize="Medium"
+                   HorizontalOptions="Center"/>
+        </VerticalStackLayout>
+
+        <VerticalStackLayout Grid.Row="1" Margin="20" Spacing="20">
+            <HorizontalStackLayout Spacing="10">
+                <Image Source="water_meter.png" HeightRequest="40"/>
+                <Label Text="Devices" FontSize="Small" FontAttributes="Bold"
+                       VerticalTextAlignment="Center"/>
+
+                <HorizontalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer x:Name="waterMeters_tap"/>
+                </HorizontalStackLayout.GestureRecognizers>
+            </HorizontalStackLayout>
+
+            <Border HeightRequest="1" BackgroundColor="Gray"/>
+
+            <HorizontalStackLayout Spacing="10">
+                <Image Source="account_settings.png" HeightRequest="40"/>
+                <Label Text="Account Settings" FontSize="Small" FontAttributes="Bold"
+                       VerticalTextAlignment="Center"/>
+                
+                <HorizontalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer x:Name="account_tap"/>
+                </HorizontalStackLayout.GestureRecognizers>
+            </HorizontalStackLayout>
+
+            <Border HeightRequest="1" BackgroundColor="Gray"/>
+
+            <HorizontalStackLayout Spacing="10">
+                <Image Source="faq.png" HeightRequest="40"/>
+                <Label Text="FAQ" FontSize="Small" FontAttributes="Bold"
+                       VerticalTextAlignment="Center"/>
+
+                <HorizontalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer x:Name="faq_tap"/>
+                </HorizontalStackLayout.GestureRecognizers>
+            </HorizontalStackLayout>
+
+            <Border HeightRequest="1" BackgroundColor="Gray"/>
+
+            <HorizontalStackLayout Spacing="10">
+                <Image Source="about.png" HeightRequest="40"/>
+                <Label Text="About" FontSize="Small" FontAttributes="Bold"
+                       VerticalTextAlignment="Center"/>
+
+                <HorizontalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer x:Name="about_tap"/>
+                </HorizontalStackLayout.GestureRecognizers>
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
+
+        <ImageButton Grid.Row="2" Source="logout.png"
+                     x:Name="logout_imgBtn" ToolTipProperties.Text="Logout"
+                     BackgroundColor="Transparent" Padding="5"
+                     WidthRequest="60"
+                     HeightRequest="60" HorizontalOptions="Center"/>
+    </Grid>
 </ContentPage>

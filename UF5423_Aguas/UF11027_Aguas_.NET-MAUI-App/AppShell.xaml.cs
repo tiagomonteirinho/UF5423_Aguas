@@ -22,7 +22,7 @@ namespace UF11027_Aguas_.NET_MAUI_App
             var homePage = new HomePage(_apiService, _validator);
             var notificationsPage = new NotificationsPage();
             var consumptionsPage = new ConsumptionsPage();
-            var accountPage = new AccountPage();
+            var accountPage = new AccountPage(_apiService, _validator);
 
             Items.Add(new TabBar
             {

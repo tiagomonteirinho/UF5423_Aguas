@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.IdentityModel.Tokens.Jwt;
+using System.IO;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -78,6 +80,48 @@ namespace UF5423_Aguas.Controllers.API
                 useremail = user.Email,
                 username = user.FullName
             });
+        }
+
+        [HttpGet("getimage")]
+        public async Task<IActionResult> GetImage()
+        {
+            var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
+            var user = await _userHelper.GetUserByEmailAsync(userEmail);
+            if (user == null)
+            {
+                return NotFound("User could not be found.");
+            }
+
+            return Ok(new { ImageUrl = user.ImageFullPath });
+        }
+
+        [Authorize]
+        [HttpPost("changeimage")]
+        public async Task<IActionResult> ChangeImage(IFormFile image)
+        {
+            var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
+            var user = await _userHelper.GetUserByEmailAsync(userEmail);
+            if (user == null)
+            {
+                return NotFound("User could not be found.");
+            }
+
+            if (image != null)
+            {
+                string uniqueFileName = $"{Guid.NewGuid()}_{image.FileName}";
+                string filePath = Path.Combine("wwwroot/images/users", uniqueFileName);
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await image.CopyToAsync(stream);
+                }
+
+                user.ImageUrl = $"//images/users/{uniqueFileName}";
+                await _userHelper.ChangeInfoAsync(user);
+
+                return Ok(new { user.ImageUrl });
+            }
+
+            return BadRequest("Image could not be uploaded.");
         }
 
         [HttpPost("changeinfo")]

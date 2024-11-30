@@ -6,7 +6,6 @@ namespace UF5423_Aguas.Data.API
     {
         [Required]
         [MaxLength(99)]
-        [Display(Name = "Full name")]
-        public string FullName { get; set; }
+        public string Name { get; set; }
     }
 }

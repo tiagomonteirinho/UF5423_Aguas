@@ -95,7 +95,6 @@ namespace UF5423_Aguas.Controllers.API
             return Ok(new { ImageUrl = user.ImageFullPath });
         }
 
-        [Authorize]
         [HttpPost("changeimage")]
         public async Task<IActionResult> ChangeImage(IFormFile image)
         {
@@ -139,7 +138,7 @@ namespace UF5423_Aguas.Controllers.API
                 return NotFound("Invalid email or password.");
             }
 
-            user.FullName = model.FullName;
+            user.FullName = model.Name;
 
             var response = await _userHelper.ChangeInfoAsync(user);
             if (!response.Succeeded)

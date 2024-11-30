@@ -162,6 +162,33 @@ namespace UF11027_Aguas_.NET_MAUI_App.Services
             }
         }
 
+        public async Task<ApiResponse<bool>> ChangeInfo(string name)
+        {
+            try
+            {
+                var changeInfo = new { Name = name };
+                var json = JsonSerializer.Serialize(changeInfo, _serializerOptions);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await PostRequest("api/accountApi/changeInfo", content);
+                if (!response.IsSuccessStatusCode)
+                {
+                    _logger.LogError($"Could not process HTTP request: {response.StatusCode}");
+                    return new ApiResponse<bool>
+                    {
+                        ErrorMessage = $"Could not process HTTP request: {response.StatusCode}"
+                    };
+                }
+
+                return new ApiResponse<bool> { Data = true };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Could not log in: {ex.Message}");
+                return new ApiResponse<bool> { ErrorMessage = ex.Message };
+            }
+        }
+
         private async Task<HttpResponseMessage> PostRequest(string uri, HttpContent content)
         {
             var url = _baseUrl + uri;

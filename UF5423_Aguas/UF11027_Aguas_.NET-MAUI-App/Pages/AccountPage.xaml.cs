@@ -28,6 +28,12 @@ namespace UF11027_Aguas_.NET_MAUI_App.Pages
             string defaultUserImageUrl = AppConfig.DefaultUserImageUrl;
 
             var (response, errorMessage) = await _apiService.GetImage();
+            if (errorMessage == "Unauthorized" && !_loginPageDisplayed)
+            {
+                await DisplayLoginPage();
+                return null;
+            }
+
             if (response == null || string.IsNullOrEmpty(response?.ImageUrl))
             {
                 return defaultUserImageUrl;
@@ -99,6 +105,17 @@ namespace UF11027_Aguas_.NET_MAUI_App.Pages
             }
 
             return null;
+        }
+
+        private void logout_imgBtn_Clicked(object sender, EventArgs e)
+        {
+            Preferences.Set("accesstoken", string.Empty);
+            Application.Current!.MainPage = new NavigationPage(new LoginPage(_apiService, _validator));
+        }
+
+        private void account_tap_Tapped(object sender, TappedEventArgs e)
+        {
+            Navigation.PushAsync(new AccountSettingsPage(_apiService, _validator));
         }
     }
 }

@@ -7,21 +7,24 @@ namespace UF11027_Aguas_.NET_MAUI_App.Validations
         public string NameError { get; set; } = "";
         public string EmailError { get; set; } = "";
         public string PhoneNumberError { get; set; } = "";
-        public string PasswordError { get; set; } = "";
+        public string SerialNumberError { get; set; } = "";
 
         private const string EmptyNameErrorMessage = "Name is required.";
         private const string InvalidNameErrorMessage = "Name is invalid.";
         private const string EmptyEmailErrorMessage = "Email is required.";
         private const string InvalidEmailErrorMessage = "Email is invalid.";
-        private const string EmptyPasswordErrorMessage = "Password is required.";
-        private const string InvalidPasswordErrorMessage = "Password must contain at least 8 characters and include letters and digits.";
+        private const string EmptyPhoneNumberErrorMessage = "Phone number is required.";
+        private const string InvalidPhoneNumberErrorMessage = "Phone number is invalid.";
+        private const string EmptySerialNumberErrorMessage = "Serial number is required.";
+        private const string InvalidSerialNumberErrorMessage = "Serial number is invalid.";
 
-        public Task<bool> Validate(string name, string email, string password)
+        public Task<bool> Validate(string name, string email, string phoneNumber, string serialNumber)
         {
             var isNameValid = ValidateName(name);
             var isEmailValid = ValidateEmail(email);
-            var isPasswordValid = ValidatePassword(password);
-            return Task.FromResult(isNameValid && isEmailValid && isPasswordValid);
+            var isPhoneNumberValid = ValidatePhoneNumber(phoneNumber);
+            var isSerialNumberValid = ValidateSerialNumber(serialNumber);
+            return Task.FromResult(isNameValid && isEmailValid && isPhoneNumberValid);
         }
 
         private bool ValidateName(string name)
@@ -60,21 +63,39 @@ namespace UF11027_Aguas_.NET_MAUI_App.Validations
             return true;
         }
 
-        private bool ValidatePassword(string password)
+        private bool ValidatePhoneNumber(string phoneNumber)
         {
-            if (string.IsNullOrEmpty(password))
+            if (string.IsNullOrEmpty(phoneNumber))
             {
-                PasswordError = EmptyPasswordErrorMessage;
+                PhoneNumberError = EmptyPhoneNumberErrorMessage;
                 return false;
             }
 
-            if (password.Length < 8 || !Regex.IsMatch(password, @"[a-zA-Z]") || !Regex.IsMatch(password, @"\d"))
+            if (phoneNumber.Length < 9)
             {
-                PasswordError = InvalidPasswordErrorMessage;
+                PhoneNumberError = InvalidPhoneNumberErrorMessage;
                 return false;
             }
 
-            PasswordError = "";
+            PhoneNumberError = "";
+            return true;
+        }
+
+        private bool ValidateSerialNumber(string serialNumber)
+        {
+            if (string.IsNullOrEmpty(serialNumber))
+            {
+                SerialNumberError = EmptySerialNumberErrorMessage;
+                return false;
+            }
+
+            if (serialNumber.Length < 6 || !Regex.IsMatch(serialNumber, @"^\d+$"))
+            {
+                SerialNumberError = InvalidSerialNumberErrorMessage;
+                return false;
+            }
+
+            SerialNumberError = "";
             return true;
         }
     }

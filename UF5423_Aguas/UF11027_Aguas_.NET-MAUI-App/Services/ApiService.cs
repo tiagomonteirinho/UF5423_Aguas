@@ -64,6 +64,54 @@ namespace UF11027_Aguas_.NET_MAUI_App.Services
             }
         }
 
+        public async Task<ApiResponse<bool>> RequestWaterMeter(string name, string email, string phoneNumber,
+            string address, string postalCode, string serialNumber)
+        {
+            try
+            {
+                if (!int.TryParse(serialNumber, out int parsedSerialNumber))
+                {
+                    _logger.LogError($"Invalid serial number: {serialNumber}");
+                    return new ApiResponse<bool>
+                    {
+                        ErrorMessage = "Invalid serial number format."
+                    };
+                }
+
+                var requestWaterMeter = new RequestWaterMeter()
+                {
+                    FullName = name,
+                    Email = email,
+                    PhoneNumber = phoneNumber,
+                    Address = address,
+                    PostalCode = postalCode,
+                    SerialNumber = parsedSerialNumber,
+                };
+
+                var json = JsonSerializer.Serialize(requestWaterMeter, _serializerOptions);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await PostRequest("api/MetersApi/RequestWaterMeter", content);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    _logger.LogError($"Could not process HTTP request: {response.StatusCode}, Content: {errorContent}");
+                    return new ApiResponse<bool>
+                    {
+                        ErrorMessage = $"Could not process HTTP request: {response.StatusCode}, Content: {errorContent}"
+                    };
+                }
+
+                return new ApiResponse<bool> { Data = true };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Could not register: {ex.Message}");
+                return new ApiResponse<bool> { ErrorMessage = ex.Message };
+            }
+        }
+
         public async Task<ApiResponse<bool>> RecoverPassword(string email)
         {
             try

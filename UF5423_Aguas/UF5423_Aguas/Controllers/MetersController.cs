@@ -511,7 +511,7 @@ namespace UF5423_Aguas.Controllers
             {
                 Title = "New contract awaiting approval.",
                 Message =
-                $"<h5>Contract holder (full name)</h5>" +
+                $"<h5>Contract holder</h5>" +
                 $"<p>{model.FullName}</p>" +
                 $"<h5>E-mail</h5>" +
                 $"<p>{model.Email}</p>" +

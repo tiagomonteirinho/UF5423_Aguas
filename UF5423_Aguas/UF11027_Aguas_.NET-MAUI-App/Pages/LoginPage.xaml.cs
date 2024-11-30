@@ -42,7 +42,7 @@ namespace UF11027_Aguas_.NET_MAUI_App.Pages
 
         private async void requestWaterMeter_tap_Tapped(object sender, TappedEventArgs e)
         {
-            await Navigation.PushAsync(new RequestWaterMeterPage(_apiService));
+            await Navigation.PushAsync(new RequestWaterMeterPage(_apiService, _validator));
         }
 
         private async void recoverPassword_tap_Tapped(object sender, TappedEventArgs e)

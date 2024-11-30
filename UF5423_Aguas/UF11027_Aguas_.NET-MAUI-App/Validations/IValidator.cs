@@ -6,8 +6,10 @@
 
         string EmailError { get; set; }
 
-        string PasswordError { get; set; }
+        string PhoneNumberError { get; set; }
 
-        Task<bool> Validate(string name, string email, string password);
+        string SerialNumberError { get; set; }
+
+        Task<bool> Validate(string name, string email, string phoneNumber, string serialNumber);
     }
 }

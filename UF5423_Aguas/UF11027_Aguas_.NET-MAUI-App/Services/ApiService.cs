@@ -242,6 +242,11 @@ namespace UF11027_Aguas_.NET_MAUI_App.Services
             return await GetAsync<List<Meter>>("api/metersApi/getMeters");
         }
 
+        public async Task<(List<Notification>? notifications, string? errorMessage)> GetNotifications()
+        {
+            return await GetAsync<List<Notification>>("api/accountApi/getNotifications");
+        }
+
         public async Task<(UserImage? userImage, string? ErrorMessage)> GetImage()
         {
             string endpoint = "api/accountApi/getImage";

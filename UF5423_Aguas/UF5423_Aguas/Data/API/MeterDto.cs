@@ -10,7 +10,6 @@ namespace UF5423_Aguas.Data.API
         public int Id { get; set; }
 
         [Required]
-        [Display(Name = "Serial number")]
         public int SerialNumber { get; set; }
 
         [Required]

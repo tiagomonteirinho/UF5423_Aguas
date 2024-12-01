@@ -7,9 +7,11 @@ using Microsoft.IdentityModel.Tokens;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
+using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using UF5423_Aguas.Data;
 using UF5423_Aguas.Data.API;
 using UF5423_Aguas.Helpers;
 
@@ -23,12 +25,14 @@ namespace UF5423_Aguas.Controllers.API
         private readonly IUserHelper _userHelper;
         private readonly IConfiguration _configuration;
         private readonly IMailHelper _mailHelper;
+        private readonly INotificationRepository _notificationRepository;
 
-        public AccountApiController(IUserHelper userHelper, IConfiguration configuration, IMailHelper mailHelper)
+        public AccountApiController(IUserHelper userHelper, IConfiguration configuration, IMailHelper mailHelper, INotificationRepository notificationRepository)
         {
             _userHelper = userHelper;
             _configuration = configuration;
             _mailHelper = mailHelper;
+            _notificationRepository = notificationRepository;
         }
 
         [HttpPost("login")]
@@ -95,6 +99,26 @@ namespace UF5423_Aguas.Controllers.API
             return Ok(new { ImageUrl = user.ImageFullPath });
         }
 
+        [HttpGet("getnotifications")]
+        public IActionResult GetNotifications()
+        {
+            var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
+            if (string.IsNullOrEmpty(userEmail))
+            {
+                return NotFound("User not found.");
+            }
+
+            var notifications = _notificationRepository.GetNotifications(userEmail, null);
+            var notificationDtos = _notificationRepository.ConvertToNotificationDtoAsync(notifications);
+
+            if (notificationDtos == null || !notificationDtos.Any())
+            {
+                return NotFound("Notifications not found.");
+            }
+
+            return Ok(notificationDtos);
+        }
+
         [HttpPost("changeimage")]
         public async Task<IActionResult> ChangeImage(IFormFile image)
         {
@@ -120,7 +144,7 @@ namespace UF5423_Aguas.Controllers.API
                 return Ok(new { user.ImageUrl, Message = "Image successfully uploaded." });
             }
 
-            return BadRequest("Could not be upload image.");
+            return BadRequest("Could not upload image.");
         }
 
         [HttpPost("changeinfo")]

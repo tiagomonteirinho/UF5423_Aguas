@@ -3,10 +3,48 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="UF11027_Aguas_.NET_MAUI_App.Pages.NotificationsPage"
              Title="Notifications">
-    <VerticalStackLayout>
-        <Label 
-            Text="Notifications"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+    
+    <ScrollView>
+        <VerticalStackLayout>
+            <ActivityIndicator x:Name="notificationsLoaded_ai" IsRunning="false" 
+                               IsVisible="false" Color="Blue"
+                               HorizontalOptions="Center" VerticalOptions="Center"/>
+
+            <CollectionView x:Name="notifications_collection"
+                            SelectionMode="Single" Margin="20">
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout Orientation="Vertical" ItemSpacing="10"/>
+                </CollectionView.ItemsLayout>
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Border Padding="15" Stroke="#87A7AC" StrokeShape="RoundRectangle 10">
+                            <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="2*,8*,1*">
+                                <Label Grid.Row="0" Grid.Column="0" 
+                                       Text="Title" FontSize="12"/>
+                                <Label Grid.Row="0" Grid.Column="1" Text="{Binding Title}"
+                                       FontSize="12" FontAttributes="Bold"/>
+
+                                <Label Grid.Row="1" Grid.Column="0"
+                                       Text="Date" FontSize="12"/>
+                                <Label Grid.Row="1" Grid.Column="1" 
+                                       Text="{Binding Date, StringFormat='{dd.MM.yyyy HH:mm}'}"
+                                       FontSize="12" FontAttributes="Bold"/>
+
+                                <Ellipse Grid.RowSpan="3" Grid.Column="2" Fill="#2ea3f2" WidthRequest="20" HeightRequest="20"
+                                         HorizontalOptions="Center" VerticalOptions="Center">
+                                    <Ellipse.Triggers>
+                                        <DataTrigger TargetType="Ellipse" Binding="{Binding Read}" Value="True">
+                                            <Setter Property="IsVisible" Value="False" />
+                                        </DataTrigger>
+                                    </Ellipse.Triggers>
+                                </Ellipse>
+                                
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

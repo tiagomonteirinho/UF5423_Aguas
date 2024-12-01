@@ -1,4 +1,5 @@
-﻿using UF11027_Aguas_.NET_MAUI_App.Pages;
+﻿using Android.Net;
+using UF11027_Aguas_.NET_MAUI_App.Pages;
 using UF11027_Aguas_.NET_MAUI_App.Services;
 using UF11027_Aguas_.NET_MAUI_App.Validations;
 
@@ -20,7 +21,7 @@ namespace UF11027_Aguas_.NET_MAUI_App
         private void ConfigureShell()
         {
             var homePage = new HomePage(_apiService, _validator);
-            var notificationsPage = new NotificationsPage();
+            var notificationsPage = new NotificationsPage(_apiService, _validator);
             var consumptionsPage = new ConsumptionsPage();
             var accountPage = new AccountPage(_apiService, _validator);
 

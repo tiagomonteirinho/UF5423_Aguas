@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
+using UF5423_Aguas.Data.API;
 using UF5423_Aguas.Data.Entities;
 
 namespace UF5423_Aguas.Data
@@ -33,6 +34,21 @@ namespace UF5423_Aguas.Data
                     .Include(n => n.Receiver)
                     .Where(n => n.ReceiverRole == role)
                     .OrderByDescending(n => n.Date);
+        }
+
+        public IQueryable<NotificationDto> ConvertToNotificationDtoAsync(IQueryable<Notification> notifications)
+        {
+            var notificationDtos = notifications.Select(m => new NotificationDto
+            {
+                Id = m.Id,
+                Title = m.Title,
+                Message = m.Message,
+                Action = m.Action,
+                Date = m.Date,
+                Read = m.Read
+            });
+
+            return notificationDtos;
         }
     }
 }

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="UF11027_Aguas_.NET_MAUI_App.Pages.NotificationDetailsPage"
+             Title="Notification Details">
+
+    <VerticalStackLayout>
+        <ActivityIndicator x:Name="notificationDetailsLoaded_ai" IsRunning="false"
+                           IsVisible="false" Color="#0c71c3"
+                           HorizontalOptions="Center" VerticalOptions="Center"/>
+
+        <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="Auto,*" 
+              Margin="10,30" RowSpacing="20">
+            
+            <Label Grid.Row="0" Grid.Column="1" Text="{Binding Title}"
+                   FontSize="Medium"/>
+
+            <Label Grid.Row="1" Grid.Column="1" Text="{Binding Message}" />
+
+            <Label Grid.Row="2" Grid.Column="1" 
+                   Text="{Binding Date, StringFormat='{dd.MM.yyyy HH:mm}'}" />
+        </Grid>
+    </VerticalStackLayout>
+</ContentPage>

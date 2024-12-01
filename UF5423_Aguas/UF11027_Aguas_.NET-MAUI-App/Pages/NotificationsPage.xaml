@@ -7,10 +7,10 @@
     <ScrollView>
         <VerticalStackLayout>
             <ActivityIndicator x:Name="notificationsLoaded_ai" IsRunning="false" 
-                               IsVisible="false" Color="Blue"
+                               IsVisible="false" Color="#0c71c3"
                                HorizontalOptions="Center" VerticalOptions="Center"/>
 
-            <CollectionView x:Name="notifications_collection"
+            <CollectionView x:Name="notifications_collection" SelectionChanged="notifications_collection_SelectionChanged"
                             SelectionMode="Single" Margin="20">
                 <CollectionView.ItemsLayout>
                     <LinearItemsLayout Orientation="Vertical" ItemSpacing="10"/>

@@ -43,7 +43,6 @@ namespace UF5423_Aguas.Data
                 Id = m.Id,
                 Title = m.Title,
                 Message = m.Message,
-                Action = m.Action,
                 Date = m.Date,
                 Read = m.Read
             });

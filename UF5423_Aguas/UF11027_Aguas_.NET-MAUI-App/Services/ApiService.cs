@@ -247,6 +247,12 @@ namespace UF11027_Aguas_.NET_MAUI_App.Services
             return await GetAsync<List<Notification>>("api/accountApi/getNotifications");
         }
 
+        public async Task<(Notification? notificationDetails, string? errorMessage)> GetNotificationDetails(int id)
+        {
+            string endpoint = $"api/accountApi/getNotificationDetails/{id}";
+            return await GetAsync<Notification>(endpoint);
+        }
+
         public async Task<(UserImage? userImage, string? ErrorMessage)> GetImage()
         {
             string endpoint = "api/accountApi/getImage";
@@ -297,6 +303,67 @@ namespace UF11027_Aguas_.NET_MAUI_App.Services
                 string errorMessage = $"Could not process request: {ex.Message}";
                 _logger.LogError(ex, errorMessage);
                 return (default, errorMessage);
+            }
+        }
+
+        public async Task<string?> MarkNotificationAsRead(int id)
+        {
+            try
+            {
+                var content = new StringContent(string.Empty, Encoding.UTF8, "application/json");
+                var response = await PutRequest($"api/accountApi/markNotificationAsRead/{id}", content);
+                if (response.IsSuccessStatusCode)
+                {
+                    return null;
+                }
+                else
+                {
+                    if (response.StatusCode == HttpStatusCode.Unauthorized)
+                    {
+                        string errorMessage = "Unauthorized";
+                        _logger.LogWarning(errorMessage);
+                        return errorMessage;
+                    }
+
+                    string generalErrorMessage = $"Could not process HTTP request: {response.ReasonPhrase}";
+                    _logger.LogError(generalErrorMessage);
+                    return generalErrorMessage;
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                string errorMessage = $"Could not process HTTP request: {ex.Message}";
+                _logger.LogError(ex, errorMessage);
+                return errorMessage;
+            }
+            catch (JsonException ex)
+            {
+                string errorMessage = $"Could not deserialize JSON: {ex.Message}";
+                _logger.LogError(ex, errorMessage);
+                return errorMessage;
+            }
+            catch (Exception ex)
+            {
+                string errorMessage = $"Could not process request: {ex.Message}";
+                _logger.LogError(ex, errorMessage);
+                return errorMessage;
+            }
+        }
+
+        private async Task<HttpResponseMessage> PutRequest(string uri, HttpContent content)
+        {
+            var url = AppConfig.BaseUrl + uri;
+
+            try
+            {
+                AddAuthorizationHeader();
+                var result = await _httpClient.PutAsync(url, content);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Could not process HTTP request to {uri}: {ex.Message}");
+                return new HttpResponseMessage(HttpStatusCode.BadRequest);
             }
         }
 

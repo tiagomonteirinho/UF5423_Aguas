@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -86,37 +87,39 @@ namespace UF5423_Aguas.Controllers.API
             });
         }
 
-        [HttpGet("getimage")]
-        public async Task<IActionResult> GetImage()
+        [HttpPost("recoverpassword")]
+        [AllowAnonymous]
+        public async Task<IActionResult> RecoverPassword(RecoverPasswordDto model)
         {
-            var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
-            var user = await _userHelper.GetUserByEmailAsync(userEmail);
-            if (user == null)
+            if (!ModelState.IsValid)
             {
-                return NotFound("User could not be found.");
+                return BadRequest(ModelState);
             }
 
-            return Ok(new { ImageUrl = user.ImageFullPath });
-        }
-
-        [HttpGet("getnotifications")]
-        public IActionResult GetNotifications()
-        {
-            var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
-            if (string.IsNullOrEmpty(userEmail))
+            var user = await _userHelper.GetUserByEmailAsync(model.Email);
+            if (user == null)
             {
                 return NotFound("User not found.");
             }
 
-            var notifications = _notificationRepository.GetNotifications(userEmail, null);
-            var notificationDtos = _notificationRepository.ConvertToNotificationDtoAsync(notifications);
+            var passwordToken = await _userHelper.GeneratePasswordResetTokenAsync(user);
+            var actionUrl = Url.Action
+            (
+                "SetPassword",
+                "Account",
+                new { email = user.Email, passwordToken },
+                protocol: HttpContext.Request.Scheme
+            );
 
-            if (notificationDtos == null || !notificationDtos.Any())
+            bool emailSent = _mailHelper.SendEmail(user.Email, "Password recovery", $"<h2>Password recovery</h2>"
+                + $"To recover your password, please reset it <a href=\"{actionUrl}\" style=\"color: blue;\">here</a>.");
+
+            if (!emailSent)
             {
-                return NotFound("Notifications not found.");
+                return BadRequest(new { Message = "Could not send password recovery email." });
             }
 
-            return Ok(notificationDtos);
+            return Ok(new { Message = "A password recovery email has been sent to your email address. Please find it and follow the instructions." });
         }
 
         [HttpPost("changeimage")]
@@ -197,39 +200,73 @@ namespace UF5423_Aguas.Controllers.API
             return Ok(new { Message = "Password successfully updated." });
         }
 
-        [HttpPost("recoverpassword")]
-        [AllowAnonymous]
-        public async Task<IActionResult> RecoverPassword(RecoverPasswordDto model)
+        [HttpGet("getimage")]
+        public async Task<IActionResult> GetImage()
         {
-            if (!ModelState.IsValid)
+            var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
+            var user = await _userHelper.GetUserByEmailAsync(userEmail);
+            if (user == null)
             {
-                return BadRequest(ModelState);
+                return NotFound("User could not be found.");
             }
 
-            var user = await _userHelper.GetUserByEmailAsync(model.Email);
-            if (user == null)
+            return Ok(new { ImageUrl = user.ImageFullPath });
+        }
+
+        [HttpGet("getnotifications")]
+        public IActionResult GetNotifications()
+        {
+            var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
+            if (string.IsNullOrEmpty(userEmail))
             {
                 return NotFound("User not found.");
             }
 
-            var passwordToken = await _userHelper.GeneratePasswordResetTokenAsync(user);
-            var actionUrl = Url.Action
-            (
-                "SetPassword",
-                "Account",
-                new { email = user.Email, passwordToken },
-                protocol: HttpContext.Request.Scheme
-            );
+            var notifications = _notificationRepository.GetNotifications(userEmail, null);
+            var notificationDtos = _notificationRepository.ConvertToNotificationDtoAsync(notifications);
 
-            bool emailSent = _mailHelper.SendEmail(user.Email, "Password recovery", $"<h2>Password recovery</h2>"
-                + $"To recover your password, please reset it <a href=\"{actionUrl}\" style=\"color: blue;\">here</a>.");
-
-            if (!emailSent)
+            if (notificationDtos == null || !notificationDtos.Any())
             {
-                return BadRequest(new { Message = "Could not send password recovery email." });
+                return NotFound("Notifications not found.");
             }
 
-            return Ok(new { Message = "A password recovery email has been sent to your email address. Please find it and follow the instructions." });
+            return Ok(notificationDtos);
+        }
+
+        [HttpGet("getnotificationdetails/{id}")]
+        public async Task<IActionResult> GetNotificationDetails(int id)
+        {
+            var notification = await _notificationRepository.GetByIdAsync(id);
+            if (notification == null)
+            {
+                return NotFound($"Could not find notification details.");
+            }
+
+            var notificationDetails = new
+            {
+                Id = notification.Id,
+                Title = notification.Title,
+                Message = notification.Message,
+                Date = notification.Date,
+                Read = notification.Read,
+            };
+
+            return Ok(notificationDetails);
+        }
+
+        [HttpPut("markNotificationAsRead/{id}")]
+        public async Task<IActionResult> MarkNotificationAsRead(int id)
+        {
+            var notification = await _notificationRepository.GetByIdAsync(id);
+            if (notification == null)
+            {
+                return NotFound("Could not find notification.");
+            }
+
+            notification.Read = true;
+            await _notificationRepository.UpdateAsync(notification);
+
+            return Ok("Notification marked as read.");
         }
     }
 }

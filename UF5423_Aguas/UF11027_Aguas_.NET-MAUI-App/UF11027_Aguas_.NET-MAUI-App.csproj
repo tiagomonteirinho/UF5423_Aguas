@@ -64,6 +64,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Update="Pages\NotificationDetailsPage.xaml.cs">
+	    <DependentUpon>NotificationDetailsPage.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="Pages\RecoverPasswordPage.xaml.cs">
 	    <DependentUpon>RecoverPasswordPage.xaml</DependentUpon>
 	  </Compile>
@@ -86,6 +89,9 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Pages\LoginPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Pages\NotificationDetailsPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Pages\NotificationsPage.xaml">

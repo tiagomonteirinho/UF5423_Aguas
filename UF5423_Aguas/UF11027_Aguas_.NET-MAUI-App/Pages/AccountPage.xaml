@@ -7,10 +7,9 @@
     <Grid RowDefinitions="Auto,5*,1*" RowSpacing="0">
         <VerticalStackLayout Grid.Row="0" Spacing="5" Padding="20"
                              BackgroundColor="Cyan" VerticalOptions="Start">
-            <ImageButton Source="user_image.png" x:Name="image_imgBtn" Clicked="image_imgBtn_Clicked"
+            <ImageButton x:Name="image_imgBtn" Source="user_image.png" Clicked="image_imgBtn_Clicked"
                          Aspect="AspectFill" CornerRadius="30"
-                         WidthRequest="120" HeightRequest="120" 
-                         HorizontalOptions="Center"/>
+                         WidthRequest="120" HeightRequest="120" HorizontalOptions="Center"/>
             <Label x:Name="name_lbl" FontSize="Medium" HorizontalOptions="Center"/>
         </VerticalStackLayout>
 

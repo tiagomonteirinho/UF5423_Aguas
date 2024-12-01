@@ -76,5 +76,10 @@ namespace UF11027_Aguas_.NET_MAUI_App.Pages
                 await DisplayAlert("Error", "Could not change info.", "OK");
             }
         }
+
+        private void changePassword_tap_Tapped(object sender, TappedEventArgs e)
+        {
+            Navigation.PushAsync(new ChangePasswordPage(_apiService, _validator));
+        }
     }
 }

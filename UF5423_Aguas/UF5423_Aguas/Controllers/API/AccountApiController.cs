@@ -102,7 +102,7 @@ namespace UF5423_Aguas.Controllers.API
             var user = await _userHelper.GetUserByEmailAsync(userEmail);
             if (user == null)
             {
-                return NotFound("User could not be found.");
+                return NotFound("Session expired.");
             }
 
             if (image != null)
@@ -117,10 +117,10 @@ namespace UF5423_Aguas.Controllers.API
                 user.ImageUrl = $"//images/users/{uniqueFileName}";
                 await _userHelper.ChangeInfoAsync(user);
 
-                return Ok(new { user.ImageUrl });
+                return Ok(new { user.ImageUrl, Message = "Image successfully uploaded." });
             }
 
-            return BadRequest("Image could not be uploaded.");
+            return BadRequest("Could not be upload image.");
         }
 
         [HttpPost("changeinfo")]
@@ -135,7 +135,7 @@ namespace UF5423_Aguas.Controllers.API
             var user = await _userHelper.GetUserByEmailAsync(userEmail);
             if (user == null)
             {
-                return NotFound("Invalid email or password.");
+                return NotFound("Session expired.");
             }
 
             user.FullName = model.Name;
@@ -143,8 +143,7 @@ namespace UF5423_Aguas.Controllers.API
             var response = await _userHelper.ChangeInfoAsync(user);
             if (!response.Succeeded)
             {
-                ViewBag.ErrorMessage = "Could not update user info.";
-                return View(model);
+                return BadRequest(new { Message = "Could not update user info." });
             }
 
             return Ok(new { Message = "User info successfully updated." });
@@ -153,23 +152,22 @@ namespace UF5423_Aguas.Controllers.API
         [HttpPost("changepassword")]
         public async Task<IActionResult> ChangePassword(ChangePasswordDto model)
         {
-            var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
-            var user = await _userHelper.GetUserByEmailAsync(userEmail);
-
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
+            var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
+            var user = await _userHelper.GetUserByEmailAsync(userEmail);
             if (user == null)
             {
-                return NotFound("User not found.");
+                return NotFound("Session expired.");
             }
 
-            var result = await _userHelper.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
-            if (result.Succeeded)
+            var response = await _userHelper.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
+            if (!response.Succeeded)
             {
-                return BadRequest(new { Message = "Could not update password." }); //TODO: Fix error when logged in somewhere else.
+                return BadRequest(new { Message = "Could not update password." });
             }
 
             return Ok(new { Message = "Password successfully updated." });

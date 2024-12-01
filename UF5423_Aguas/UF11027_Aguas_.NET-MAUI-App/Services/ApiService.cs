@@ -184,7 +184,40 @@ namespace UF11027_Aguas_.NET_MAUI_App.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Could not log in: {ex.Message}");
+                _logger.LogError($"Could not update info: {ex.Message}");
+                return new ApiResponse<bool> { ErrorMessage = ex.Message };
+            }
+        }
+
+        public async Task<ApiResponse<bool>> ChangePassword(string oldPassword, string newPassword, string confirmNewPassword)
+        {
+            try
+            {
+                var changePassword = new ChangePassword()
+                {
+                    OldPassword = oldPassword,
+                    NewPassword = newPassword,
+                    ConfirmNewPassword = confirmNewPassword,
+                };
+
+                var json = JsonSerializer.Serialize(changePassword, _serializerOptions);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await PostRequest("api/accountApi/changePassword", content);
+                if (!response.IsSuccessStatusCode)
+                {
+                    _logger.LogError($"Could not process HTTP request: {response.StatusCode}");
+                    return new ApiResponse<bool>
+                    {
+                        ErrorMessage = $"Could not process HTTP request: {response.StatusCode}"
+                    };
+                }
+
+                return new ApiResponse<bool> { Data = true };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Could not update password: {ex.Message}");
                 return new ApiResponse<bool> { ErrorMessage = ex.Message };
             }
         }

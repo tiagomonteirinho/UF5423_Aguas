@@ -3,12 +3,12 @@ using UF11027_Aguas_.NET_MAUI_App.Validations;
 
 namespace UF11027_Aguas_.NET_MAUI_App.Pages;
 
-public partial class RecoverPassword : ContentPage
+public partial class RecoverPasswordPage : ContentPage
 {
     private readonly ApiService _apiService;
     private readonly IValidator _validator;
 
-    public RecoverPassword(ApiService apiService, IValidator validator)
+    public RecoverPasswordPage(ApiService apiService, IValidator validator)
     {
         InitializeComponent();
         _apiService = apiService;

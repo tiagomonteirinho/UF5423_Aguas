@@ -47,7 +47,7 @@ namespace UF11027_Aguas_.NET_MAUI_App.Pages
 
         private async void recoverPassword_tap_Tapped(object sender, TappedEventArgs e)
         {
-            await Navigation.PushAsync(new RecoverPassword(_apiService, _validator));
+            await Navigation.PushAsync(new RecoverPasswordPage(_apiService, _validator));
         }
     }
 }

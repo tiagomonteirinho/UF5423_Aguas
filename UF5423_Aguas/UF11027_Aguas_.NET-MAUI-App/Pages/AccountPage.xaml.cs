@@ -117,5 +117,15 @@ namespace UF11027_Aguas_.NET_MAUI_App.Pages
         {
             Navigation.PushAsync(new AccountSettingsPage(_apiService, _validator));
         }
+
+        private void faq_tap_Tapped(object sender, TappedEventArgs e)
+        {
+            Navigation.PushAsync(new FaqPage(_apiService, _validator));
+        }
+
+        private void about_tap_Tapped(object sender, TappedEventArgs e)
+        {
+            Navigation.PushAsync(new AboutPage(_apiService, _validator));
+        }
     }
 }

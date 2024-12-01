@@ -15,18 +15,6 @@
 
         <VerticalStackLayout Grid.Row="1" Margin="20" Spacing="20">
             <HorizontalStackLayout Spacing="10">
-                <Image Source="water_meter.png" HeightRequest="40"/>
-                <Label Text="Devices" FontSize="Small" FontAttributes="Bold"
-                       VerticalTextAlignment="Center"/>
-
-                <HorizontalStackLayout.GestureRecognizers>
-                    <TapGestureRecognizer x:Name="waterMeters_tap"/>
-                </HorizontalStackLayout.GestureRecognizers>
-            </HorizontalStackLayout>
-
-            <Border HeightRequest="1" BackgroundColor="Gray"/>
-
-            <HorizontalStackLayout Spacing="10">
                 <Image Source="account_settings.png" HeightRequest="40"/>
                 <Label Text="Account Settings" FontSize="Small" FontAttributes="Bold"
                        VerticalTextAlignment="Center"/>
@@ -44,7 +32,7 @@
                        VerticalTextAlignment="Center"/>
 
                 <HorizontalStackLayout.GestureRecognizers>
-                    <TapGestureRecognizer x:Name="faq_tap"/>
+                    <TapGestureRecognizer x:Name="faq_tap" Tapped="faq_tap_Tapped"/>
                 </HorizontalStackLayout.GestureRecognizers>
             </HorizontalStackLayout>
 
@@ -56,7 +44,7 @@
                        VerticalTextAlignment="Center"/>
 
                 <HorizontalStackLayout.GestureRecognizers>
-                    <TapGestureRecognizer x:Name="about_tap"/>
+                    <TapGestureRecognizer x:Name="about_tap" Tapped="about_tap_Tapped"/>
                 </HorizontalStackLayout.GestureRecognizers>
             </HorizontalStackLayout>
         </VerticalStackLayout>

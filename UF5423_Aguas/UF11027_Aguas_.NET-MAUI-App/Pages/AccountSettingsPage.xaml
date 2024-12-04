@@ -4,7 +4,7 @@
              x:Class="UF11027_Aguas_.NET_MAUI_App.Pages.AccountSettingsPage"
              Title="Account Settings">
 
-    <Grid RowDefinitions="Auto,*" RowSpacing="0">
+    <Grid RowDefinitions="Auto,*">
         <VerticalStackLayout Grid.Row="0" Spacing="5" Padding="20"
                              BackgroundColor="Cyan" VerticalOptions="Start">
             <ImageButton x:Name="image_imgBtn" Source="userimage.png"
@@ -15,7 +15,7 @@
 
         <VerticalStackLayout Grid.Row="1" Margin="20" Spacing="20">
             <VerticalStackLayout Spacing="10">
-                <Entry x:Name="name_entry" Placeholder="Name" FontSize="12"/>
+                <Entry x:Name="name_entry" Placeholder="Name" FontSize="Medium"/>
                 <Button Text="Save" x:Name="save_btn" Clicked="save_btn_Clicked"
                         FontSize="Small" FontAttributes="Bold"
                         BackgroundColor="#2ea3f2"/>

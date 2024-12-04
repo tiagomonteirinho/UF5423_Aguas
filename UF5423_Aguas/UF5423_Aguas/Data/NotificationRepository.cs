@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UF5423_Aguas.Data.API;
@@ -36,18 +37,16 @@ namespace UF5423_Aguas.Data
                     .OrderByDescending(n => n.Date);
         }
 
-        public IQueryable<NotificationDto> ConvertToNotificationDtoAsync(IQueryable<Notification> notifications)
+        public List<NotificationDto> ConvertToNotificationDto(IEnumerable<Notification> notifications)
         {
-            var notificationDtos = notifications.Select(m => new NotificationDto
+            return notifications.Select(n => new NotificationDto
             {
-                Id = m.Id,
-                Title = m.Title,
-                Message = m.Message,
-                Date = m.Date,
-                Read = m.Read
-            });
-
-            return notificationDtos;
+                Id = n.Id,
+                Title = n.Title,
+                Message = n.Message,
+                Date = n.Date,
+                Read = n.Read
+            }).ToList();
         }
     }
 }

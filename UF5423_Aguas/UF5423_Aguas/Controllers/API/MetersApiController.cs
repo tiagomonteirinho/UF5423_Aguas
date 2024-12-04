@@ -25,7 +25,7 @@ namespace UF5423_Aguas.Controllers.API
         }
 
         [HttpGet("getmeters")]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> GetMeters()
         {
             var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
             if (string.IsNullOrEmpty(userEmail))
@@ -42,6 +42,32 @@ namespace UF5423_Aguas.Controllers.API
             }
 
             return Ok(meterDtos);
+        }
+
+        [HttpGet("getmeterdetails/{id}")]
+        public async Task<IActionResult> GetMeterDetails(int id)
+        {
+            var meter = await _meterRepository.GetMeterWithConsumptionsAsync(id);
+            if (meter == null)
+            {
+                return NotFound($"Meter not found.");
+            }
+
+            var meterDetailsDto = new MeterDetailsDto
+            {
+                Id = meter.Id,
+                SerialNumber = meter.SerialNumber,
+                Address = meter.Address,
+                Consumptions = meter.Consumptions.Select(c => new ConsumptionDto
+                {
+                    Id = c.Id,
+                    Date = c.Date,
+                    Volume = c.Volume,
+                    Status = c.Status,
+                }).ToList()
+            };
+
+            return Ok(meterDetailsDto);
         }
 
         [HttpPost("requestwatermeter")]

@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -223,7 +222,7 @@ namespace UF5423_Aguas.Controllers.API
             }
 
             var notifications = _notificationRepository.GetNotifications(userEmail, null);
-            var notificationDtos = _notificationRepository.ConvertToNotificationDtoAsync(notifications);
+            var notificationDtos = _notificationRepository.ConvertToNotificationDto(notifications);
 
             if (notificationDtos == null || !notificationDtos.Any())
             {
@@ -239,10 +238,10 @@ namespace UF5423_Aguas.Controllers.API
             var notification = await _notificationRepository.GetByIdAsync(id);
             if (notification == null)
             {
-                return NotFound($"Could not find notification details.");
+                return NotFound($"Notification not found.");
             }
 
-            var notificationDetails = new
+            var notificationDetails = new NotificationDto
             {
                 Id = notification.Id,
                 Title = notification.Title,

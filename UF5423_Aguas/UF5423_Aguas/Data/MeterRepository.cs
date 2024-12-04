@@ -47,17 +47,14 @@ namespace UF5423_Aguas.Data
                 .OrderBy(m => m.User.FullName);
         }
 
-        public IQueryable<MeterDto> ConvertToMeterDtoAsync(IQueryable<Meter> meters)
+        public List<MeterDto> ConvertToMeterDtoAsync(IEnumerable<Meter> meters)
         {
-            var meterDtos = meters.Select(m => new MeterDto
+            return meters.Select(m => new MeterDto
             {
                 Id = m.Id,
                 Address = m.Address,
                 SerialNumber = m.SerialNumber,
-                Consumptions = m.Consumptions,
-            });
-
-            return meterDtos;
+            }).ToList();
         }
 
         public async Task<IQueryable<Consumption>> GetConsumptionsAsync(string email)
@@ -79,13 +76,20 @@ namespace UF5423_Aguas.Data
                     .OrderBy(c => c.Meter.Id);
         }
 
-        public async Task<Meter> GetMeterWithConsumptionsAsync(int id)
+        public async Task<Meter> GetMeterWithAllRelatedDataAsync(int id)
         {
             return await _context.Meters
                 .Include(m => m.Consumptions)
                 .Include(m => m.User)
                 .Where(m => m.Id == id)
                 .FirstOrDefaultAsync();
+        }
+
+        public async Task<Meter> GetMeterWithConsumptionsAsync(int id)
+        {
+            return await _context.Meters
+                .Include(m => m.Consumptions)
+                .FirstOrDefaultAsync(m => m.Id == id);
         }
 
         public async Task<Consumption> GetConsumptionByIdAsync(int id)
@@ -95,7 +99,7 @@ namespace UF5423_Aguas.Data
 
         public async Task<Consumption> AddConsumptionAsync(ConsumptionViewModel model)
         {
-            var meter = await GetMeterWithConsumptionsAsync(model.MeterId);
+            var meter = await GetMeterWithAllRelatedDataAsync(model.MeterId);
             if (meter == null)
             {
                 return null;

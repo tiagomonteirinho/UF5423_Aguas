@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using UF5423_Aguas.Data.API;
 using UF5423_Aguas.Data.Entities;
@@ -11,6 +12,6 @@ namespace UF5423_Aguas.Data
 
         IQueryable<Notification> GetNotifications(string email, string role);
 
-        IQueryable<NotificationDto> ConvertToNotificationDtoAsync(IQueryable<Notification> notifications);
+        List<NotificationDto> ConvertToNotificationDto(IEnumerable<Notification> notifications);
     }
 }

@@ -4,7 +4,7 @@
              x:Class="UF11027_Aguas_.NET_MAUI_App.Pages.AccountPage"
              Title="Account">
 
-    <Grid RowDefinitions="Auto,5*,1*" RowSpacing="0">
+    <Grid RowDefinitions="Auto,5*,1*">
         <VerticalStackLayout Grid.Row="0" Spacing="5" Padding="20"
                              BackgroundColor="Cyan" VerticalOptions="Start">
             <ImageButton x:Name="image_imgBtn" Source="user_image.png" Clicked="image_imgBtn_Clicked"

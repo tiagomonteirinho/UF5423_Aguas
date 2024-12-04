@@ -22,17 +22,7 @@ namespace UF11027_Aguas_.NET_MAUI_App.Pages
         protected override async void OnAppearing()
         {
             base.OnAppearing();
-
-            if (!_isDataLoaded)
-            {
-                await LoadDataAsync();
-                _isDataLoaded = true;
-            }
-        }
-
-        private async Task LoadDataAsync()
-        {
-            await Task.WhenAll(GetMeters());
+            await GetMeters();
         }
 
         private async Task<IEnumerable<Meter>> GetMeters()
@@ -66,6 +56,20 @@ namespace UF11027_Aguas_.NET_MAUI_App.Pages
         {
             _loginPageDisplayed = true;
             await Navigation.PushAsync(new LoginPage(_apiService, _validator));
+        }
+
+        private async void meters_collection_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var currentSelection = e.CurrentSelection.FirstOrDefault() as Meter;
+            if (currentSelection == null) return;
+
+            // Including meter consumptions.
+            var (meterDetails, errorMessage) = await _apiService.GetMeterDetails(currentSelection.Id);
+            if (meterDetails == null) return;
+
+            await Navigation.PushAsync(new MeterDetailsPage(currentSelection.Id, _apiService, _validator));
+
+            ((CollectionView)sender).SelectedItem = null;
         }
     }
 }

@@ -1,8 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace UF5423_Aguas.Data.API
 {
-    public class MeterDto
+    public class MeterDetailsDto
     {
         public int Id { get; set; }
 
@@ -12,5 +13,7 @@ namespace UF5423_Aguas.Data.API
         [Required]
         [MaxLength(99)]
         public string Address { get; set; }
+
+        public ICollection<ConsumptionDto> Consumptions { get; set; } = new List<ConsumptionDto>();
     }
 }

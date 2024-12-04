@@ -63,7 +63,7 @@ namespace UF5423_Aguas.Controllers
                 return RedirectToAction("NotFound404", "Errors", new { entityName = "Meter" });
             }
 
-            var meter = await _meterRepository.GetMeterWithConsumptionsAsync(id.Value);
+            var meter = await _meterRepository.GetMeterWithAllRelatedDataAsync(id.Value);
             if (meter == null)
             {
                 return RedirectToAction("NotFound404", "Errors", new { entityName = "Meter" });
@@ -264,7 +264,7 @@ namespace UF5423_Aguas.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var meter = await _meterRepository.GetMeterWithConsumptionsAsync(id);
+            var meter = await _meterRepository.GetMeterWithAllRelatedDataAsync(id);
             if (meter == null)
             {
                 return RedirectToAction("NotFound404", "Errors", new { entityName = "Meter" });

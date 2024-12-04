@@ -13,9 +13,11 @@ namespace UF5423_Aguas.Data
 
         Task<IQueryable<Meter>> GetMetersAsync(string email);
 
-        List<MeterDto> ConvertToMeterDtoAsync(IEnumerable<Meter> meters);
+        List<MeterDto> ConvertToMeterDto(IEnumerable<Meter> meters);
 
         Task<IQueryable<Consumption>> GetConsumptionsAsync(string email);
+
+        List<ConsumptionDto> ConvertToConsumptionDto(IEnumerable<Consumption> consumptions);
 
         Task<Meter> GetMeterWithAllRelatedDataAsync(int id);
 

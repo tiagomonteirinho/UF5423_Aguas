@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -34,7 +36,7 @@ namespace UF5423_Aguas.Controllers.API
             }
 
             var meters = await _meterRepository.GetMetersAsync(userEmail);
-            var meterDtos = _meterRepository.ConvertToMeterDtoAsync(meters);
+            var meterDtos = _meterRepository.ConvertToMeterDto(meters);
 
             if (meterDtos == null || !meterDtos.Any())
             {
@@ -68,6 +70,26 @@ namespace UF5423_Aguas.Controllers.API
             };
 
             return Ok(meterDetailsDto);
+        }
+
+        [HttpGet("getconsumptions")]
+        public async Task<IActionResult> GetConsumptions()
+        {
+            var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
+            if (string.IsNullOrEmpty(userEmail))
+            {
+                return NotFound("User not found.");
+            }
+
+            var consumptions = await _meterRepository.GetConsumptionsAsync(userEmail);
+            var consumptionDtos = _meterRepository.ConvertToConsumptionDto(consumptions);
+
+            if (consumptionDtos == null || !consumptionDtos.Any())
+            {
+                return NotFound("Consumptions not found.");
+            }
+
+            return Ok(consumptionDtos);
         }
 
         [HttpPost("requestwatermeter")]

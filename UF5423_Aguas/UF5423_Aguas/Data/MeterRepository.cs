@@ -47,7 +47,7 @@ namespace UF5423_Aguas.Data
                 .OrderBy(m => m.User.FullName);
         }
 
-        public List<MeterDto> ConvertToMeterDtoAsync(IEnumerable<Meter> meters)
+        public List<MeterDto> ConvertToMeterDto(IEnumerable<Meter> meters)
         {
             return meters.Select(m => new MeterDto
             {
@@ -74,6 +74,17 @@ namespace UF5423_Aguas.Data
                     .ThenInclude(m => m.User)
                     .Where(c => c.Meter.User.Email == email)
                     .OrderBy(c => c.Meter.Id);
+        }
+
+        public List<ConsumptionDto> ConvertToConsumptionDto(IEnumerable<Consumption> consumptions)
+        {
+            return consumptions.Select(c => new ConsumptionDto
+            {
+                Id = c.Id,
+                Date = c.Date,
+                Volume = c.Volume,
+                Status = c.Status,
+            }).ToList();
         }
 
         public async Task<Meter> GetMeterWithAllRelatedDataAsync(int id)

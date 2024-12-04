@@ -1,9 +1,72 @@
-namespace UF11027_Aguas_.NET_MAUI_App.Pages;
+using UF11027_Aguas_.NET_MAUI_App.Services;
+using UF11027_Aguas_.NET_MAUI_App.Validations;
 
-public partial class ConsumptionsPage : ContentPage
+namespace UF11027_Aguas_.NET_MAUI_App.Pages
 {
-	public ConsumptionsPage()
-	{
-		InitializeComponent();
-	}
+    public partial class ConsumptionsPage : ContentPage
+    {
+        private readonly ApiService _apiService;
+        private readonly IValidator _validator;
+        private bool _loginPageDisplayed = false;
+
+        public ConsumptionsPage(ApiService apiService, IValidator validator)
+        {
+            InitializeComponent();
+            _apiService = apiService;
+            _validator = validator;
+        }
+
+        protected override async void OnAppearing()
+        {
+            base.OnAppearing();
+            await GetConsumptions();
+        }
+
+        private async Task GetConsumptions()
+        {
+            try
+            {
+                consumptionsLoaded_ai.IsRunning = true;
+                consumptionsLoaded_ai.IsVisible = true;
+
+                var (consumptions, errorMessage) = await _apiService.GetConsumptions();
+                if (errorMessage == "Unauthorized" && !_loginPageDisplayed)
+                {
+                    await DisplayLoginPage();
+                    return;
+                }
+
+                if (errorMessage == "NotFound")
+                {
+                    await DisplayAlert("Error", "No existing consumptions.", "OK");
+                    return;
+                }
+
+                if (consumptions == null)
+                {
+                    await DisplayAlert("Error", errorMessage ?? "Could not find consumptions.", "OK");
+                    return;
+                }
+                else
+                {
+                    consumptions_collection.ItemsSource = consumptions;
+                }
+            }
+            catch (Exception ex)
+            {
+                await DisplayAlert("Error", $"Could not process request: {ex.Message}", "OK");
+            }
+            finally
+            {
+                consumptionsLoaded_ai.IsRunning = false;
+                consumptionsLoaded_ai.IsVisible = false;
+            }
+        }
+
+        private async Task DisplayLoginPage()
+        {
+            _loginPageDisplayed = true;
+            await Navigation.PushAsync(new LoginPage(_apiService, _validator));
+        }
+    }
 }

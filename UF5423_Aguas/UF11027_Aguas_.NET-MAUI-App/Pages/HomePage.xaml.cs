@@ -63,7 +63,7 @@ namespace UF11027_Aguas_.NET_MAUI_App.Pages
             var currentSelection = e.CurrentSelection.FirstOrDefault() as Meter;
             if (currentSelection == null) return;
 
-            // Including meter consumptions.
+            // Include meter consumptions.
             var (meterDetails, errorMessage) = await _apiService.GetMeterDetails(currentSelection.Id);
             if (meterDetails == null) return;
 

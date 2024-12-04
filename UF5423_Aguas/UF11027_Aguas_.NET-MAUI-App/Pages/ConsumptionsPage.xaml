@@ -10,7 +10,7 @@
                                IsVisible="false" Color="#0c71c3"
                                HorizontalOptions="Center" VerticalOptions="Center"/>
 
-            <CollectionView x:Name="consumptions_collection"
+            <CollectionView x:Name="consumptions_collection" SelectionChanged="consumptions_collection_SelectionChanged"
                             SelectionMode="Single" Margin="20">
                 <CollectionView.ItemsLayout>
                     <LinearItemsLayout Orientation="Vertical" ItemSpacing="10"/>

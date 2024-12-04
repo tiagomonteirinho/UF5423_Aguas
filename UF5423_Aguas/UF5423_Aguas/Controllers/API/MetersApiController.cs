@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -90,6 +88,26 @@ namespace UF5423_Aguas.Controllers.API
             }
 
             return Ok(consumptionDtos);
+        }
+
+        [HttpGet("getconsumptiondetails/{id}")]
+        public async Task<IActionResult> GetConsumptionDetails(int id)
+        {
+            var consumption = await _meterRepository.GetConsumptionByIdAsync(id);
+            if (consumption == null)
+            {
+                return NotFound($"Consumption not found.");
+            }
+
+            var consumptionDetailsDto = new ConsumptionDto
+            {
+                Id = consumption.Id,
+                Date = consumption.Date,
+                Volume = consumption.Volume,
+                Status = consumption.Status,
+            };
+
+            return Ok(consumptionDetailsDto);
         }
 
         [HttpPost("requestwatermeter")]

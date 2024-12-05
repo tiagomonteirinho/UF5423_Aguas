@@ -7,25 +7,27 @@
     <ScrollView>
         <VerticalStackLayout>
             <ActivityIndicator x:Name="meterDetailsLoaded_ai" IsRunning="false"
-                           IsVisible="false" Color="#0c71c3"
-                           HorizontalOptions="Center" VerticalOptions="Center"/>
+                               IsVisible="false" Color="#0c71c3"
+                               HorizontalOptions="Center" VerticalOptions="Center"/>
 
             <Grid RowDefinitions="3*,Auto,6*" RowSpacing="5">
                 <VerticalStackLayout Grid.Row="0" Padding="10" VerticalOptions="Start">
                     <Image Source="water_meter_blue.png" Aspect="AspectFill" 
-                       WidthRequest="180" HeightRequest="180"
-                       HorizontalOptions="Center"/>
+                           WidthRequest="180" HeightRequest="180"
+                           HorizontalOptions="Center"/>
                     <Label Text="{Binding SerialNumber}" FontSize="Small" 
-                       HorizontalOptions="Center"/>
+                           HorizontalOptions="Center"/>
                     <Label Text="{Binding Address}" FontSize="Small" 
-                       HorizontalOptions="Center"/>
+                           HorizontalOptions="Center"/>
                 </VerticalStackLayout>
 
                 <Label Grid.Row="1" Text="Consumptions" FontSize="Medium"
-                   FontAttributes="Bold" Margin="15,20,0,0"/>
+                       FontAttributes="Bold" Margin="15,20,0,0"/>
 
-                <CollectionView Grid.Row="2" ItemsSource="{Binding Consumptions}"
-                            SelectionMode="Single" Margin="20">
+                <CollectionView Grid.Row="2" x:Name="consumptions_collection" 
+                                SelectionChanged="consumptions_collection_SelectionChanged"
+                                ItemsSource="{Binding Consumptions}"
+                                SelectionMode="Single" Margin="20">
                     <CollectionView.ItemsLayout>
                         <LinearItemsLayout Orientation="Vertical" ItemSpacing="10"/>
                     </CollectionView.ItemsLayout>
@@ -35,21 +37,21 @@
                             <Border Padding="15" Stroke="#87A7AC" StrokeShape="RoundRectangle 10">
                                 <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="2*,8*,1*">
                                     <Label Grid.Row="0" Grid.Column="0" 
-                                       Text="Volume" FontSize="12"/>
+                                           Text="Volume" FontSize="12"/>
                                     <Label Grid.Row="0" Grid.Column="1" 
-                                       Text="{Binding Volume, StringFormat='{0:F2} m³'}"
-                                       FontSize="12" FontAttributes="Bold"/>
+                                           Text="{Binding Volume, StringFormat='{0:F2} m³'}"
+                                           FontSize="12" FontAttributes="Bold"/>
 
                                     <Label Grid.Row="1" Grid.Column="0"
-                                       Text="Date" FontSize="12"/>
+                                           Text="Date" FontSize="12"/>
                                     <Label Grid.Row="1" Grid.Column="1" 
-                                       Text="{Binding Date, StringFormat='{dd.MM.yyyy HH:mm}'}"
-                                       FontSize="12" FontAttributes="Bold"/>
+                                           Text="{Binding Date, StringFormat='{dd.MM.yyyy HH:mm}'}"
+                                           FontSize="12" FontAttributes="Bold"/>
 
                                     <Label Grid.Row="2" Grid.Column="0" 
-                                               Text="Status" FontSize="12"/>
+                                           Text="Status" FontSize="12"/>
                                     <Label Grid.Row="2" Grid.Column="1" Text="{Binding Status}"
-                                               FontSize="12" FontAttributes="Bold"/>
+                                           FontSize="12" FontAttributes="Bold"/>
                                 </Grid>
                             </Border>
                         </DataTemplate>

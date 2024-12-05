@@ -1,10 +1,10 @@
 ﻿@model UF5423_Aguas.Data.Entities.Invoice
 
 @{
-    ViewData["Title"] = "Pay consumption";
+    ViewData["Title"] = "Buy consumption";
 }
 
-<h2>Pay consumption</h2>
+<h2>Buy consumption</h2>
 <hr />
 @if (ViewBag.SuccessMessage != null)
 {
@@ -90,7 +90,7 @@
 
 <div class="wrapper">
     <div class="checkout container">
-        <form id="payment-form" method="post" asp-controller="Meters" asp-action="PayConsumption">
+        <form id="payment-form" method="post" asp-controller="Meters" asp-action="BuyConsumption">
             @Html.HiddenFor(n => n.Id)
             @Html.HiddenFor(n => n.Price)
             <input type="hidden" name="ConsumptionId" value="@Model.ConsumptionId" />

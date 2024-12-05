@@ -1,3 +1,4 @@
+using UF11027_Aguas_.NET_MAUI_App.Models;
 using UF11027_Aguas_.NET_MAUI_App.Services;
 using UF11027_Aguas_.NET_MAUI_App.Validations;
 
@@ -40,6 +41,17 @@ namespace UF11027_Aguas_.NET_MAUI_App.Pages
                 }
 
                 BindingContext = consumptionDetails;
+
+                if (consumptionDetails.Status == "Payment confirmed")
+                {
+                    invoice_btn.IsVisible = true;
+                    invoice_btn.Text = "Invoice";
+                }
+                else if (consumptionDetails.Status == "Awaiting payment")
+                {
+                    invoice_btn.IsVisible = true;
+                    invoice_btn.Text = "Buy consumption";
+                }
             }
             catch (Exception)
             {
@@ -56,6 +68,14 @@ namespace UF11027_Aguas_.NET_MAUI_App.Pages
         {
             _loginPageDisplayed = true;
             await Navigation.PushAsync(new LoginPage(_apiService, _validator));
+        }
+
+        private async void invoice_btn_Clicked(object sender, EventArgs e)
+        {
+            var consumption = BindingContext as Consumption;
+            if (consumption == null) return;
+
+            await Navigation.PushAsync(new InvoicePage(consumption.Id, _apiService, _validator));
         }
     }
 }

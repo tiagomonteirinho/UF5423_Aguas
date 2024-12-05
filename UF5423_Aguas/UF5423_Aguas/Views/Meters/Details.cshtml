@@ -85,7 +85,7 @@ else
                         }
                         else if (item.Status == "Awaiting payment" && User.IsInRole("Customer"))
                         {
-                            <a asp-action="PayConsumption" asp-route-id="@item.Id" class="btn btn-primary"><i class="fa fa-file-invoice"></i></a>
+                            <a asp-action="BuyConsumption" asp-route-id="@item.Id" class="btn btn-primary"><i class="fa fa-file-invoice"></i></a>
                         }
                     </td>
                 </tr>

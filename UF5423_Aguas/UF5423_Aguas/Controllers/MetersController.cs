@@ -632,7 +632,7 @@ namespace UF5423_Aguas.Controllers
         }
 
         [Authorize(Roles = "Customer")]
-        public async Task<IActionResult> PayConsumption(int? id)
+        public async Task<IActionResult> BuyConsumption(int? id)
         {
             if (id == null)
             {
@@ -658,7 +658,7 @@ namespace UF5423_Aguas.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> PayConsumption(Invoice model)
+        public async Task<IActionResult> BuyConsumption(Invoice model)
         {
             var consumption = await _meterRepository.GetConsumptionByIdAsync(model.ConsumptionId);
             var gateway = _paymentHelper.GetGateway();

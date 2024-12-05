@@ -1,3 +1,4 @@
+using UF11027_Aguas_.NET_MAUI_App.Models;
 using UF11027_Aguas_.NET_MAUI_App.Services;
 using UF11027_Aguas_.NET_MAUI_App.Validations;
 
@@ -56,6 +57,16 @@ namespace UF11027_Aguas_.NET_MAUI_App.Pages
         {
             _loginPageDisplayed = true;
             await Navigation.PushAsync(new LoginPage(_apiService, _validator));
+        }
+
+        private void consumptions_collection_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var currentSelection = e.CurrentSelection.FirstOrDefault() as Consumption;
+            if (currentSelection == null) return;
+
+            Navigation.PushAsync(new ConsumptionDetailsPage(currentSelection.Id, _apiService, _validator));
+
+            ((CollectionView)sender).SelectedItem = null;
         }
     }
 }

@@ -110,6 +110,52 @@ namespace UF5423_Aguas.Controllers.API
             return Ok(consumptionDetailsDto);
         }
 
+        [HttpGet("getinvoicedetails/{consumptionId}")]
+        public async Task<IActionResult> GetInvoiceDetails(int consumptionId)
+        {
+            var invoice = await _meterRepository.GetInvoiceByConsumptionIdAsync(consumptionId);
+            if (invoice == null)
+            {
+                return NotFound($"Invoice not found.");
+            }
+
+            var invoiceDto = new InvoiceDto
+            {
+                Id = invoice.Id,
+                Price = invoice.Price,
+                Consumption = new ConsumptionDto
+                {
+                    Id = invoice.Consumption.Id,
+                    Date = invoice.Consumption.Date,
+                    Volume = invoice.Consumption.Volume,
+                    Status = invoice.Consumption.Status,
+                },
+                Meter = new MeterDto
+                {
+                    Id = invoice.Consumption.Meter.Id,
+                    SerialNumber = invoice.Consumption.Meter.SerialNumber,
+                    Address = invoice.Consumption.Meter.Address,
+                },
+            };
+
+            return Ok(invoiceDto);
+        }
+
+        [HttpPut("buyconsumption/{id}")]
+        public async Task<IActionResult> BuyConsumption(int id)
+        {
+            var consumption = await _meterRepository.GetConsumptionByIdAsync(id);
+            if (consumption == null)
+            {
+                return NotFound($"Consumption not found.");
+            }
+
+            consumption.Status = "Payment confirmed";
+            await _meterRepository.UpdateConsumptionAsync(consumption);
+
+            return Ok("Consumption payment successfully confirmed.");
+        }
+
         [HttpPost("requestwatermeter")]
         [AllowAnonymous]
         public async Task<IActionResult> RequestWaterMeter([FromBody] RequestWaterMeterDto model)

@@ -282,6 +282,11 @@ namespace UF11027_Aguas_.NET_MAUI_App.Services
             return await GetAsync<UserImage>(endpoint);
         }
 
+        public async Task<(List<Tier>? tiers, string? errorMessage)> GetTiers()
+        {
+            return await GetUnauthorizedAsync<List<Tier>>("api/tiersApi/getTiers");
+        }
+
         private async Task<(T? data, string? errorMessage)> GetAsync<T>(string endpoint)
         {
             try
@@ -292,7 +297,6 @@ namespace UF11027_Aguas_.NET_MAUI_App.Services
                 {
                     var responseString = await response.Content.ReadAsStringAsync();
                     var data = JsonSerializer.Deserialize<T>(responseString, _serializerOptions);
-
                     return (data ?? Activator.CreateInstance<T>(), null);
                 }
                 else
@@ -307,6 +311,44 @@ namespace UF11027_Aguas_.NET_MAUI_App.Services
                     string generalErrorMessage = $"Could not process HTTP request: {response.ReasonPhrase}";
                     _logger.LogError(generalErrorMessage);
                     return (default, generalErrorMessage);
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                string errorMessage = $"Could not process HTTP request: {ex.Message}";
+                _logger.LogError(ex, errorMessage);
+                return (default, errorMessage);
+            }
+            catch (JsonException ex)
+            {
+                string errorMessage = $"Could not deserialize JSON: {ex.Message}";
+                _logger.LogError(ex, errorMessage);
+                return (default, errorMessage);
+            }
+            catch (Exception ex)
+            {
+                string errorMessage = $"Could not process request: {ex.Message}";
+                _logger.LogError(ex, errorMessage);
+                return (default, errorMessage);
+            }
+        }
+
+        private async Task<(T? data, string? errorMessage)> GetUnauthorizedAsync<T>(string endpoint)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync(AppConfig.BaseUrl + endpoint);
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseString = await response.Content.ReadAsStringAsync();
+                    var data = JsonSerializer.Deserialize<T>(responseString, _serializerOptions);
+                    return (data ?? Activator.CreateInstance<T>(), null);
+                }
+                else
+                {
+                    string errorMessage = $"Could not process HTTP request: {response.ReasonPhrase}";
+                    _logger.LogError(errorMessage);
+                    return (default, errorMessage);
                 }
             }
             catch (HttpRequestException ex)

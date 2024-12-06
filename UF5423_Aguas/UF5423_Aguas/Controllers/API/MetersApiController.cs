@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using UF5423_Aguas.Data;
 using UF5423_Aguas.Data.API;
 using UF5423_Aguas.Data.Entities;
+using UF5423_Aguas.Models;
 
 namespace UF5423_Aguas.Controllers.API
 {
@@ -190,6 +191,35 @@ namespace UF5423_Aguas.Controllers.API
             await _notificationRepository.UpdateAsync(notification);
 
             return Ok("Water meter request successfully submitted.");
+        }
+
+        [HttpPost("addconsumption")]
+        [AllowAnonymous]
+        public async Task<IActionResult> AddConsumption([FromBody] ConsumptionDto model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("Could not process request.");
+            }
+
+            var meter = await _meterRepository.GetByIdAsync(model.MeterId);
+            if (meter == null)
+            {
+                return NotFound($"Meter not found.");
+            }
+
+            var consumption = new ConsumptionViewModel
+            {
+                Volume = model.Volume,
+                Date = model.Date,
+                Status = model.Status,
+                MeterId = model.MeterId,
+                Meter = meter,
+            };
+
+            await _meterRepository.AddConsumptionAsync(consumption);
+
+            return Ok("Consumption successfully added.");
         }
     }
 }

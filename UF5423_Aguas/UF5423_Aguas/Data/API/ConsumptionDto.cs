@@ -13,5 +13,7 @@ namespace UF5423_Aguas.Data.API
         public int Volume { get; set; }
 
         public string Status { get; set; }
+
+        public int MeterId { get; set; }
     }
 }

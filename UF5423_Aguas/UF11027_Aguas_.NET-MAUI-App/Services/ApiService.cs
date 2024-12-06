@@ -107,7 +107,52 @@ namespace UF11027_Aguas_.NET_MAUI_App.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Could not register: {ex.Message}");
+                _logger.LogError($"Could not process request: {ex.Message}");
+                return new ApiResponse<bool> { ErrorMessage = ex.Message };
+            }
+        }
+
+        public async Task<ApiResponse<bool>> AddConsumption(int meterId, string volume)
+        {
+            try
+            {
+                if (!int.TryParse(volume, out int parsedvolume))
+                {
+                    _logger.LogError($"Invalid volume: {volume}");
+                    return new ApiResponse<bool>
+                    {
+                        ErrorMessage = "Invalid volume format."
+                    };
+                }
+
+                var consumption = new Consumption()
+                {
+                    Volume = parsedvolume,
+                    Date = DateTime.Now,
+                    Status = "Awaiting confirmation",
+                    MeterId = meterId,
+                };
+
+                var json = JsonSerializer.Serialize(consumption, _serializerOptions);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await PostRequest($"api/MetersApi/AddConsumption", content);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    _logger.LogError($"Could not process HTTP request: {response.StatusCode}, Content: {errorContent}");
+                    return new ApiResponse<bool>
+                    {
+                        ErrorMessage = $"Could not process HTTP request: {response.StatusCode}, Content: {errorContent}"
+                    };
+                }
+
+                return new ApiResponse<bool> { Data = true };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Could not process request: {ex.Message}");
                 return new ApiResponse<bool> { ErrorMessage = ex.Message };
             }
         }
@@ -134,7 +179,7 @@ namespace UF11027_Aguas_.NET_MAUI_App.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Could not log in: {ex.Message}");
+                _logger.LogError($"Could not process request: {ex.Message}");
                 return new ApiResponse<bool> { ErrorMessage = ex.Message };
             }
         }
@@ -157,7 +202,7 @@ namespace UF11027_Aguas_.NET_MAUI_App.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Could not upload image: {ex.Message}");
+                _logger.LogError($"Could not process request: {ex.Message}");
                 return new ApiResponse<bool> { ErrorMessage = ex.Message };
             }
         }
@@ -184,7 +229,7 @@ namespace UF11027_Aguas_.NET_MAUI_App.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Could not update info: {ex.Message}");
+                _logger.LogError($"Could not process request: {ex.Message}");
                 return new ApiResponse<bool> { ErrorMessage = ex.Message };
             }
         }
@@ -217,7 +262,7 @@ namespace UF11027_Aguas_.NET_MAUI_App.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Could not update password: {ex.Message}");
+                _logger.LogError($"Could not process request: {ex.Message}");
                 return new ApiResponse<bool> { ErrorMessage = ex.Message };
             }
         }

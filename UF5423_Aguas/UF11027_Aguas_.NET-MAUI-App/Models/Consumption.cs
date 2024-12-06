@@ -9,5 +9,7 @@
         public int Volume { get; set; }
 
         public string? Status { get; set; }
+
+        public int MeterId { get; set; }
     }
 }

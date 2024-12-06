@@ -2,6 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="UF11027_Aguas_.NET_MAUI_App.Pages.MeterDetailsPage"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              Title="Water Meter Details">
 
     <ScrollView>
@@ -10,7 +11,7 @@
                                IsVisible="false" Color="#0c71c3"
                                HorizontalOptions="Center" VerticalOptions="Center"/>
 
-            <Grid RowDefinitions="3*,Auto,6*" RowSpacing="5">
+            <Grid RowDefinitions="Auto,Auto,*" RowSpacing="5">
                 <VerticalStackLayout Grid.Row="0" Padding="10" VerticalOptions="Start">
                     <Image Source="water_meter_blue.png" Aspect="AspectFill" 
                            WidthRequest="180" HeightRequest="180"
@@ -22,7 +23,13 @@
                 </VerticalStackLayout>
 
                 <Label Grid.Row="1" Text="Consumptions" FontSize="Medium"
-                       FontAttributes="Bold" Margin="15,20,0,0"/>
+                       FontAttributes="Bold" Margin="15,20"/>
+                
+                <ImageButton Grid.Row="1" x:Name="addConsumption_imgBtn"
+                             Clicked="addConsumption_imgBtn_Clicked"
+                             Source="plus.png" Margin="15"
+                             WidthRequest="30" HeightRequest="30"
+                             HorizontalOptions="End"/>
 
                 <CollectionView Grid.Row="2" x:Name="consumptions_collection" 
                                 SelectionChanged="consumptions_collection_SelectionChanged"

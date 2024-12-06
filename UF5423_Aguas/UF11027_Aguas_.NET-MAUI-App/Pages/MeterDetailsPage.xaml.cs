@@ -10,14 +10,16 @@ namespace UF11027_Aguas_.NET_MAUI_App.Pages
         private readonly IValidator _validator;
         private bool _loginPageDisplayed = false;
         private bool _isDataLoaded = false;
+        private int _meterId;
 
         public MeterDetailsPage(int id, ApiService apiService, IValidator validator)
         {
             InitializeComponent();
             _apiService = apiService;
             _validator = validator;
+            _meterId = id;
 
-            GetMeterDetails(id);
+            GetMeterDetails(_meterId);
         }
 
         private async void GetMeterDetails(int id)
@@ -67,6 +69,11 @@ namespace UF11027_Aguas_.NET_MAUI_App.Pages
             Navigation.PushAsync(new ConsumptionDetailsPage(currentSelection.Id, _apiService, _validator));
 
             ((CollectionView)sender).SelectedItem = null;
+        }
+
+        private void addConsumption_imgBtn_Clicked(object sender, EventArgs e)
+        {
+            Navigation.PushAsync(new AddConsumptionPage(_meterId, _apiService, _validator));
         }
     }
 }

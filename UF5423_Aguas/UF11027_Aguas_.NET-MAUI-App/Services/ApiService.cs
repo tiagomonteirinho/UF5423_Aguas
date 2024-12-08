@@ -78,6 +78,15 @@ namespace UF11027_Aguas_.NET_MAUI_App.Services
                     };
                 }
 
+                if (parsedSerialNumber < 0)
+                {
+                    _logger.LogError($"Invalid serial number: {parsedSerialNumber}");
+                    return new ApiResponse<bool>
+                    {
+                        ErrorMessage = "Invalid serial number format."
+                    };
+                }
+
                 var requestWaterMeter = new RequestWaterMeter()
                 {
                     FullName = name,
@@ -116,7 +125,7 @@ namespace UF11027_Aguas_.NET_MAUI_App.Services
         {
             try
             {
-                if (!int.TryParse(volume, out int parsedvolume))
+                if (!int.TryParse(volume, out int parsedVolume))
                 {
                     _logger.LogError($"Invalid volume: {volume}");
                     return new ApiResponse<bool>
@@ -125,11 +134,19 @@ namespace UF11027_Aguas_.NET_MAUI_App.Services
                     };
                 }
 
+                if (parsedVolume < 0)
+                {
+                    _logger.LogError($"Invalid volume: {parsedVolume}");
+                    return new ApiResponse<bool>
+                    {
+                        ErrorMessage = "Invalid volume format."
+                    };
+                }
+
                 var consumption = new Consumption()
                 {
-                    Volume = parsedvolume,
-                    Date = DateTime.Now,
-                    Status = "Awaiting confirmation",
+                    Volume = parsedVolume,
+                    Date = DateTime.Now.ToString("yyyy-MM-dd"),
                     MeterId = meterId,
                 };
 

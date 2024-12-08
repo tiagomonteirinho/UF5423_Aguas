@@ -66,14 +66,14 @@ namespace UF5423_Aguas.Data
                     .Include(c => c.Meter)
                     .ThenInclude(m => m.User)
                     .OrderBy(c => c.Meter.User.FullName)
-                    .ThenByDescending(c => c.Meter.Id);
+                    .ThenByDescending(c => c.Date);
             }
 
             return _context.Consumptions
                     .Include(c => c.Meter)
                     .ThenInclude(m => m.User)
                     .Where(c => c.Meter.User.Email == email)
-                    .OrderBy(c => c.Meter.Id);
+                    .OrderByDescending(c => c.Date);
         }
 
         public List<ConsumptionDto> ConvertToConsumptionDto(IEnumerable<Consumption> consumptions)
@@ -81,7 +81,7 @@ namespace UF5423_Aguas.Data
             return consumptions.Select(c => new ConsumptionDto
             {
                 Id = c.Id,
-                Date = c.Date,
+                Date = c.Date.ToString("yyyy-MM-dd"),
                 Volume = c.Volume,
                 Status = c.Status,
             }).ToList();
@@ -89,18 +89,35 @@ namespace UF5423_Aguas.Data
 
         public async Task<Meter> GetMeterWithAllRelatedDataAsync(int id)
         {
-            return await _context.Meters
+            var meter = await _context.Meters
                 .Include(m => m.Consumptions)
                 .Include(m => m.User)
-                .Where(m => m.Id == id)
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            if (meter != null)
+            {
+                meter.Consumptions = meter.Consumptions
+                    .OrderByDescending(c => c.Date)
+                    .ToList();
+            }
+
+            return meter;
         }
 
         public async Task<Meter> GetMeterWithConsumptionsAsync(int id)
         {
-            return await _context.Meters
+            var meter = await _context.Meters
                 .Include(m => m.Consumptions)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
+            if (meter != null)
+            {
+                meter.Consumptions = meter.Consumptions
+                    .OrderByDescending(c => c.Date)
+                    .ToList();
+            }
+
+            return meter;
         }
 
         public async Task<Consumption> GetConsumptionByIdAsync(int id)

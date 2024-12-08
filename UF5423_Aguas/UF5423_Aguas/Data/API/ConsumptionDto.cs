@@ -7,7 +7,7 @@ namespace UF5423_Aguas.Data.API
     {
         public int Id { get; set; }
 
-        public DateTime Date { get; set; }
+        public string Date { get; set; }
 
         [Required]
         public int Volume { get; set; }

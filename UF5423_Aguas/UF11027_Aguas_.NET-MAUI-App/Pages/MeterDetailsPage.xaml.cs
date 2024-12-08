@@ -71,9 +71,16 @@ namespace UF11027_Aguas_.NET_MAUI_App.Pages
             ((CollectionView)sender).SelectedItem = null;
         }
 
-        private void addConsumption_imgBtn_Clicked(object sender, EventArgs e)
+        private async void addConsumption_imgBtn_Clicked(object sender, EventArgs e)
         {
-            Navigation.PushAsync(new AddConsumptionPage(_meterId, _apiService, _validator));
+            if (DateTime.Now.Day > 10)
+            {
+                await DisplayAlert("Error", "Consumptions can only be added during the first 10 days of each month.", "OK");
+            }
+            else
+            {
+                await Navigation.PushAsync(new AddConsumptionPage(_meterId, _apiService, _validator));
+            }
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -62,7 +63,7 @@ namespace UF5423_Aguas.Controllers.API
                 Consumptions = meter.Consumptions.Select(c => new ConsumptionDto
                 {
                     Id = c.Id,
-                    Date = c.Date,
+                    Date = c.Date.ToString("yyyy-MM-dd"),
                     Volume = c.Volume,
                     Status = c.Status,
                 }).ToList()
@@ -103,7 +104,7 @@ namespace UF5423_Aguas.Controllers.API
             var consumptionDetailsDto = new ConsumptionDto
             {
                 Id = consumption.Id,
-                Date = consumption.Date,
+                Date = consumption.Date.ToString("yyyy-MM-dd"),
                 Volume = consumption.Volume,
                 Status = consumption.Status,
             };
@@ -127,7 +128,7 @@ namespace UF5423_Aguas.Controllers.API
                 Consumption = new ConsumptionDto
                 {
                     Id = invoice.Consumption.Id,
-                    Date = invoice.Consumption.Date,
+                    Date = invoice.Consumption.Date.ToString("yyyy-MM-dd"),
                     Volume = invoice.Consumption.Volume,
                     Status = invoice.Consumption.Status,
                 },
@@ -211,12 +212,20 @@ namespace UF5423_Aguas.Controllers.API
             var consumption = new ConsumptionViewModel
             {
                 Volume = model.Volume,
-                Date = model.Date,
-                Status = model.Status,
+                Date = DateTime.Parse(model.Date),
                 MeterId = model.MeterId,
                 Meter = meter,
             };
 
+            var meterUrl = Url.Action("Details", "Meters", new { id = model.MeterId }, protocol: HttpContext.Request.Scheme);
+            var notification = new Notification
+            {
+                Title = "Consumption awaiting approval.",
+                Action = $"<a href=\"{meterUrl}\" class=\"btn btn-primary\">Go to meter</a>",
+                ReceiverRole = "Employee"
+            };
+
+            await _notificationRepository.CreateAsync(notification);
             await _meterRepository.AddConsumptionAsync(consumption);
 
             return Ok("Consumption successfully added.");

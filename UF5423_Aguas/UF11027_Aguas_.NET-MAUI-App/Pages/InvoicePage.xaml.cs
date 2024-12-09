@@ -1,90 +1,89 @@
 using UF11027_Aguas_.NET_MAUI_App.Services;
 using UF11027_Aguas_.NET_MAUI_App.Validations;
 
-namespace UF11027_Aguas_.NET_MAUI_App.Pages
+namespace UF11027_Aguas_.NET_MAUI_App.Pages;
+
+public partial class InvoicePage : ContentPage
 {
-    public partial class InvoicePage : ContentPage
+    private readonly ApiService _apiService;
+    private readonly IValidator _validator;
+    private bool _loginPageDisplayed = false;
+    private bool _isDataLoaded = false;
+    private int _consumptionId;
+
+    public InvoicePage(int consumptionId, ApiService apiService, IValidator validator)
     {
-        private readonly ApiService _apiService;
-        private readonly IValidator _validator;
-        private bool _loginPageDisplayed = false;
-        private bool _isDataLoaded = false;
-        private int _consumptionId;
+        InitializeComponent();
+        _apiService = apiService;
+        _validator = validator;
+        _consumptionId = consumptionId;
 
-        public InvoicePage(int consumptionId, ApiService apiService, IValidator validator)
+        GetInvoiceDetails(_consumptionId);
+    }
+    
+    private async void GetInvoiceDetails(int consumptionId)
+    {
+        try
         {
-            InitializeComponent();
-            _apiService = apiService;
-            _validator = validator;
-            _consumptionId = consumptionId;
+            invoiceDetailsLoaded_ai.IsRunning = true;
+            invoiceDetailsLoaded_ai.IsVisible = true;
 
-            GetInvoiceDetails(_consumptionId);
-        }
-        
-        private async void GetInvoiceDetails(int consumptionId)
-        {
-            try
+            var (invoiceDetails, errorMessage) = await _apiService.GetInvoiceDetails(consumptionId);
+            if (errorMessage == "Unauthorized" && !_loginPageDisplayed)
             {
-                invoiceDetailsLoaded_ai.IsRunning = true;
-                invoiceDetailsLoaded_ai.IsVisible = true;
-
-                var (invoiceDetails, errorMessage) = await _apiService.GetInvoiceDetails(consumptionId);
-                if (errorMessage == "Unauthorized" && !_loginPageDisplayed)
-                {
-                    await DisplayLoginPage();
-                    return;
-                }
-
-                if (invoiceDetails == null)
-                {
-                    await DisplayAlert("Error", errorMessage ?? "Could not find consumption details.", "OK");
-                    return;
-                }
-
-                BindingContext = invoiceDetails;
-
-                if (invoiceDetails.Consumption?.Status == "Awaiting payment")
-                {
-                    buyConsumption_btn.IsVisible = true;
-                }
+                await DisplayLoginPage();
+                return;
             }
-            catch (Exception)
+
+            if (invoiceDetails == null)
             {
-                await DisplayAlert("Error", "Could not process request.", "OK");
+                await DisplayAlert("Error", errorMessage ?? "Could not find consumption details.", "OK");
+                return;
             }
-            finally
+
+            BindingContext = invoiceDetails;
+
+            if (invoiceDetails.Consumption?.Status == "Awaiting payment")
             {
-                invoiceDetailsLoaded_ai.IsRunning = false;
-                invoiceDetailsLoaded_ai.IsVisible = false;
+                buyConsumption_btn.IsVisible = true;
             }
         }
-
-        private async Task DisplayLoginPage()
+        catch (Exception)
         {
-            _loginPageDisplayed = true;
-            await Navigation.PushAsync(new LoginPage(_apiService, _validator));
+            await DisplayAlert("Error", "Could not process request.", "OK");
         }
-
-        private async void buyConsumption_btn_Clicked(object sender, EventArgs e)
+        finally
         {
-            try
-            {
-                var errorMessage = await _apiService.BuyConsumption(_consumptionId);
-                if (errorMessage == null)
-                {
-                    await DisplayAlert("Success", "Consumption payment successfully confirmed.", "OK");
-                    buyConsumption_btn.IsVisible = false;
-                }
+            invoiceDetailsLoaded_ai.IsRunning = false;
+            invoiceDetailsLoaded_ai.IsVisible = false;
+        }
+    }
 
-                else
-                {
-                    await DisplayAlert("Error", errorMessage ?? "Could not process request.", "OK");
-                }
-            }
-            catch (Exception ex)
+    private async Task DisplayLoginPage()
+    {
+        _loginPageDisplayed = true;
+        await Navigation.PushAsync(new LoginPage(_apiService, _validator));
+    }
+
+    private async void buyConsumption_btn_Clicked(object sender, EventArgs e)
+    {
+        try
+        {
+            var errorMessage = await _apiService.BuyConsumption(_consumptionId);
+            if (errorMessage == null)
             {
-                await DisplayAlert("Error", $"Could not process request: {ex.Message}", "OK");
+                await DisplayAlert("Success", "Consumption payment successfully confirmed.", "OK");
+                buyConsumption_btn.IsVisible = false;
             }
+
+            else
+            {
+                await DisplayAlert("Error", errorMessage ?? "Could not process request.", "OK");
+            }
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("Error", $"Could not process request: {ex.Message}", "OK");
         }
     }
 }

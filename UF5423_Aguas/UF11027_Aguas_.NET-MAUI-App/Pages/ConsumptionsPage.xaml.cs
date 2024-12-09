@@ -2,82 +2,87 @@ using UF11027_Aguas_.NET_MAUI_App.Models;
 using UF11027_Aguas_.NET_MAUI_App.Services;
 using UF11027_Aguas_.NET_MAUI_App.Validations;
 
-namespace UF11027_Aguas_.NET_MAUI_App.Pages
+namespace UF11027_Aguas_.NET_MAUI_App.Pages;
+
+public partial class ConsumptionsPage : ContentPage
 {
-    public partial class ConsumptionsPage : ContentPage
+    private readonly ApiService _apiService;
+    private readonly IValidator _validator;
+    private bool _loginPageDisplayed = false;
+
+    public ConsumptionsPage(ApiService apiService, IValidator validator)
     {
-        private readonly ApiService _apiService;
-        private readonly IValidator _validator;
-        private bool _loginPageDisplayed = false;
+        InitializeComponent();
+        _apiService = apiService;
+        _validator = validator;
+    }
 
-        public ConsumptionsPage(ApiService apiService, IValidator validator)
-        {
-            InitializeComponent();
-            _apiService = apiService;
-            _validator = validator;
-        }
+    protected override async void OnAppearing()
+    {
+        base.OnAppearing();
+        await GetConsumptions();
+    }
 
-        protected override async void OnAppearing()
+    private async Task GetConsumptions()
+    {
+        try
         {
-            base.OnAppearing();
-            await GetConsumptions();
-        }
+            consumptionsLoaded_ai.IsRunning = true;
+            consumptionsLoaded_ai.IsVisible = true;
 
-        private async Task GetConsumptions()
-        {
-            try
+            var (consumptions, errorMessage) = await _apiService.GetConsumptions();
+            if (errorMessage == "Unauthorized" && !_loginPageDisplayed)
             {
-                consumptionsLoaded_ai.IsRunning = true;
-                consumptionsLoaded_ai.IsVisible = true;
-
-                var (consumptions, errorMessage) = await _apiService.GetConsumptions();
-                if (errorMessage == "Unauthorized" && !_loginPageDisplayed)
-                {
-                    await DisplayLoginPage();
-                    return;
-                }
-
-                if (errorMessage == "NotFound")
-                {
-                    await DisplayAlert("Error", "No existing consumptions.", "OK");
-                    return;
-                }
-
-                if (consumptions == null)
-                {
-                    await DisplayAlert("Error", errorMessage ?? "Could not find consumptions.", "OK");
-                    return;
-                }
-                else
-                {
-                    consumptions_collection.ItemsSource = consumptions;
-                }
+                await DisplayLoginPage();
+                return;
             }
-            catch (Exception ex)
+
+            if (errorMessage == "NotFound")
             {
-                await DisplayAlert("Error", $"Could not process request: {ex.Message}", "OK");
+                await DisplayAlert("Error", "Could not find consumptions.", "OK");
+                return;
             }
-            finally
+
+            if (consumptions == null)
             {
-                consumptionsLoaded_ai.IsRunning = false;
-                consumptionsLoaded_ai.IsVisible = false;
+                await DisplayAlert("Error", errorMessage ?? "Could not find consumptions.", "OK");
+                return;
+            }
+
+            if (consumptions.Count == 0)
+            {
+                noConsumptions_lbl.IsVisible = true;
+                return;
+            }
+            else
+            {
+                consumptions_collection.ItemsSource = consumptions;
             }
         }
-
-        private async Task DisplayLoginPage()
+        catch (Exception ex)
         {
-            _loginPageDisplayed = true;
-            await Navigation.PushAsync(new LoginPage(_apiService, _validator));
+            await DisplayAlert("Error", $"Could not process request: {ex.Message}", "OK");
         }
-
-        private void consumptions_collection_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        finally
         {
-            var currentSelection = e.CurrentSelection.FirstOrDefault() as Consumption;
-            if (currentSelection == null) return;
-
-            Navigation.PushAsync(new ConsumptionDetailsPage(currentSelection.Id, _apiService, _validator));
-
-            ((CollectionView)sender).SelectedItem = null;
+            consumptionsLoaded_ai.IsRunning = false;
+            consumptionsLoaded_ai.IsVisible = false;
         }
+    }
+
+    private async Task DisplayLoginPage()
+    {
+        _loginPageDisplayed = true;
+        await Navigation.PushAsync(new LoginPage(_apiService, _validator));
+    }
+
+    private void consumptions_collection_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        var currentSelection = e.CurrentSelection.FirstOrDefault() as Consumption;
+        if (currentSelection == null) return;
+
+        Navigation.PushAsync(new ConsumptionDetailsPage(currentSelection.Id, _apiService, _validator));
+
+        ((CollectionView)sender).SelectedItem = null;
     }
 }

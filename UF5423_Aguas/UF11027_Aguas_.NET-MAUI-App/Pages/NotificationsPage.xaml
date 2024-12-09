@@ -10,6 +10,9 @@
                                IsVisible="false" Color="#0c71c3"
                                HorizontalOptions="Center" VerticalOptions="Center"/>
 
+            <Label x:Name="noNotifications_lbl" IsVisible="False" Text="No existing notifications"
+                   HorizontalOptions="Center"/>
+
             <CollectionView x:Name="notifications_collection" SelectionChanged="notifications_collection_SelectionChanged"
                             SelectionMode="Single" Margin="20">
                 <CollectionView.ItemsLayout>

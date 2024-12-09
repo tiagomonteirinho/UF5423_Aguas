@@ -50,6 +50,11 @@ namespace UF5423_Aguas.Controllers.API
                 return NotFound("Invalid email or password.");
             }
 
+            if (!await _userHelper.IsUserInRoleAsync(user, "Customer"))
+            {
+                return Unauthorized("Unauthorized access.");
+            }
+
             var result = await _userHelper.ValidatePasswordAsync(user, model.Password);
             if (!result.Succeeded)
             {

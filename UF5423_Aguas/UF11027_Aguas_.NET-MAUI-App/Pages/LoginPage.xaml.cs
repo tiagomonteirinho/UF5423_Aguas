@@ -1,53 +1,52 @@
 using UF11027_Aguas_.NET_MAUI_App.Services;
 using UF11027_Aguas_.NET_MAUI_App.Validations;
 
-namespace UF11027_Aguas_.NET_MAUI_App.Pages
+namespace UF11027_Aguas_.NET_MAUI_App.Pages;
+
+public partial class LoginPage : ContentPage
 {
-    public partial class LoginPage : ContentPage
+    private readonly ApiService _apiService;
+    private readonly IValidator _validator;
+
+    public LoginPage(ApiService apiService, IValidator validator)
     {
-        private readonly ApiService _apiService;
-        private readonly IValidator _validator;
+        InitializeComponent();
+        _apiService = apiService;
+        _validator = validator;
+    }
 
-        public LoginPage(ApiService apiService, IValidator validator)
+    private async void login_button_Clicked(object sender, EventArgs e)
+    {
+        if (string.IsNullOrEmpty(email_entry.Text))
         {
-            InitializeComponent();
-            _apiService = apiService;
-            _validator = validator;
+            await DisplayAlert("Error", "Email is required.", "OK");
+            return;
         }
 
-        private async void login_button_Clicked(object sender, EventArgs e)
+        if (string.IsNullOrEmpty(password_entry.Text))
         {
-            if (string.IsNullOrEmpty(email_entry.Text))
-            {
-                await DisplayAlert("Error", "Email is required.", "OK");
-                return;
-            }
-
-            if (string.IsNullOrEmpty(password_entry.Text))
-            {
-                await DisplayAlert("Error", "Password is required.", "OK");
-                return;
-            }
-
-            var response = await _apiService.Login(email_entry.Text, password_entry.Text);
-            if (!response.HasError)
-            {
-                Application.Current!.MainPage = new AppShell(_apiService, _validator);
-            }
-            else
-            {
-                await DisplayAlert("Error", "Could not sign in.", "OK");
-            }
+            await DisplayAlert("Error", "Password is required.", "OK");
+            return;
         }
 
-        private async void requestWaterMeter_tap_Tapped(object sender, TappedEventArgs e)
+        var response = await _apiService.Login(email_entry.Text, password_entry.Text);
+        if (!response.HasError)
         {
-            await Navigation.PushAsync(new RequestWaterMeterPage(_apiService, _validator));
+            Application.Current!.MainPage = new AppShell(_apiService, _validator);
         }
+        else
+        {
+            await DisplayAlert("Error", "Could not sign in.", "OK");
+        }
+    }
 
-        private async void recoverPassword_tap_Tapped(object sender, TappedEventArgs e)
-        {
-            await Navigation.PushAsync(new RecoverPasswordPage(_apiService, _validator));
-        }
+    private async void requestWaterMeter_tap_Tapped(object sender, TappedEventArgs e)
+    {
+        await Navigation.PushAsync(new RequestWaterMeterPage(_apiService, _validator));
+    }
+
+    private async void recoverPassword_tap_Tapped(object sender, TappedEventArgs e)
+    {
+        await Navigation.PushAsync(new RecoverPasswordPage(_apiService, _validator));
     }
 }

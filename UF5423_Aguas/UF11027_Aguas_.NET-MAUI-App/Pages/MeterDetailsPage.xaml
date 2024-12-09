@@ -31,6 +31,9 @@
                              WidthRequest="30" HeightRequest="30"
                              HorizontalOptions="End"/>
 
+                <Label Grid.Row="2" x:Name="noConsumptions_lbl" IsVisible="False" Text="No existing consumptions"
+                   HorizontalOptions="Center"/>
+                
                 <CollectionView Grid.Row="2" x:Name="consumptions_collection" 
                                 SelectionChanged="consumptions_collection_SelectionChanged"
                                 ItemsSource="{Binding Consumptions}"

@@ -1,11 +1,10 @@
-﻿namespace UF11027_Aguas_.NET_MAUI_App.Models
+﻿namespace UF11027_Aguas_.NET_MAUI_App.Models;
+
+public class Tier
 {
-    public class Tier
-    {
-        public int Id { get; set; }
+    public int Id { get; set; }
 
-        public decimal UnitPrice { get; set; }
+    public decimal UnitPrice { get; set; }
 
-        public int VolumeLimit { get; set; }
-    }
+    public int VolumeLimit { get; set; }
 }

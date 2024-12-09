@@ -10,6 +10,9 @@
                                IsVisible="false" Color="#0c71c3"
                                HorizontalOptions="Center" VerticalOptions="Center"/>
 
+            <Label x:Name="noConsumptions_lbl" IsVisible="False" Text="No existing consumptions"
+                   HorizontalOptions="Center"/>
+
             <CollectionView x:Name="consumptions_collection" 
                             SelectionChanged="consumptions_collection_SelectionChanged"
                             SelectionMode="Single" Margin="20">

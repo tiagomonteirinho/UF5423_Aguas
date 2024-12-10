@@ -36,8 +36,7 @@
 
         <HorizontalStackLayout Grid.Row="5" Spacing="2" 
                                HorizontalOptions="Center" VerticalOptions="EndAndExpand">
-            <Label Text="Don't have an account?"/>
-            <Label Text=" Request a water meter" TextColor="#486AC6" FontAttributes="Bold">
+            <Label Text="Request a water meter contract" TextColor="#486AC6" FontAttributes="Bold">
                 <Label.GestureRecognizers>
                     <TapGestureRecognizer x:Name="requestWaterMeter_tap" Tapped="requestWaterMeter_tap_Tapped"/>
                 </Label.GestureRecognizers>

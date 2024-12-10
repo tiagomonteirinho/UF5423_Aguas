@@ -229,7 +229,7 @@ namespace UF5423_Aguas.Controllers.API
             var notifications = _notificationRepository.GetNotifications(userEmail, null);
             var notificationDtos = _notificationRepository.ConvertToNotificationDto(notifications);
 
-            if (notificationDtos == null || !notificationDtos.Any())
+            if (notificationDtos == null)
             {
                 return NotFound("Notifications not found.");
             }

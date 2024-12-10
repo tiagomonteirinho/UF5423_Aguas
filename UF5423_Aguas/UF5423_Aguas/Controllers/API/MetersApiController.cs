@@ -38,7 +38,7 @@ namespace UF5423_Aguas.Controllers.API
             var meters = await _meterRepository.GetMetersAsync(userEmail);
             var meterDtos = _meterRepository.ConvertToMeterDto(meters);
 
-            if (meterDtos == null || !meterDtos.Any())
+            if (meterDtos == null)
             {
                 return NotFound("Meters not found.");
             }
@@ -84,7 +84,7 @@ namespace UF5423_Aguas.Controllers.API
             var consumptions = await _meterRepository.GetConsumptionsAsync(userEmail);
             var consumptionDtos = _meterRepository.ConvertToConsumptionDto(consumptions);
 
-            if (consumptionDtos == null || !consumptionDtos.Any())
+            if (consumptionDtos == null)
             {
                 return NotFound("Consumptions not found.");
             }
@@ -217,7 +217,17 @@ namespace UF5423_Aguas.Controllers.API
                 Meter = meter,
             };
 
-            var meterUrl = Url.Action("Details", "Meters", new { id = model.MeterId }, protocol: HttpContext.Request.Scheme);
+            await _meterRepository.AddConsumptionAsync(consumption);
+
+            var meterUrl = Url.Action
+            (
+                "Details",
+                "Meters",
+                new { id = model.MeterId },
+                protocol: HttpContext.Request.Scheme,
+                host: AppConfig.Host
+            );
+
             var notification = new Notification
             {
                 Title = "Consumption awaiting approval.",
@@ -226,7 +236,6 @@ namespace UF5423_Aguas.Controllers.API
             };
 
             await _notificationRepository.CreateAsync(notification);
-            await _meterRepository.AddConsumptionAsync(consumption);
 
             return Ok("Consumption successfully added.");
         }

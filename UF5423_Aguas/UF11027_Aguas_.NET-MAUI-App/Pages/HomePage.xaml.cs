@@ -36,9 +36,21 @@ public partial class HomePage : ContentPage
                 return Enumerable.Empty<Meter>();
             }
 
+            if (errorMessage == "NotFound")
+            {
+                await DisplayAlert("Error", "Could not find water meters.", "OK");
+                return Enumerable.Empty<Meter>();
+            }
+
             if (meters == null)
             {
                 await DisplayAlert("Error", errorMessage ?? "Could not find water meters.", "OK");
+                return Enumerable.Empty<Meter>();
+            }
+
+            if (meters.Count == 0)
+            {
+                noMeters_lbl.IsVisible = true;
                 return Enumerable.Empty<Meter>();
             }
 

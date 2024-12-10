@@ -13,7 +13,7 @@
         <Label Grid.Row="1" Text="App Version: 1.0.0" Margin="20,0"
                FontSize="Medium" FontAttributes="Bold"/>
 
-        <Label Grid.Row="2" Text="Release Date: 02/12/2024" Margin="20,0"
+        <Label Grid.Row="2" Text="Release Date: 10/12/2024" Margin="20,0"
                FontSize="Medium" FontAttributes="Bold"/>
 
         <Label Grid.Row="3" Text="Developer: Tiago Monteirinho" Margin="20,0" 

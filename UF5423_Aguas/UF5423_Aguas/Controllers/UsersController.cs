@@ -142,7 +142,8 @@ namespace UF5423_Aguas.Controllers
                 "SetPassword",
                 "Account",
                 new { email = user.Email, passwordToken, confirmationToken },
-                protocol: HttpContext.Request.Scheme
+                protocol: HttpContext.Request.Scheme,
+                host: AppConfig.Host
             );
 
             bool emailSent = _mailHelper.SendEmail(user.Email, "Account confirmation", $"<h2>Account confirmation</h2>"

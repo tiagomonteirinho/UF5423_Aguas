@@ -84,9 +84,9 @@ public partial class MeterDetailsPage : ContentPage
 
     private async void addConsumption_imgBtn_Clicked(object sender, EventArgs e)
     {
-        if (DateTime.Now.Day > 10)
+        if (DateTime.Now.Day > 5)
         {
-            await DisplayAlert("Error", "Consumptions can only be added during the first 10 days of each month.", "OK");
+            await DisplayAlert("Error", "Consumptions can only be added during the first 5 days of each month.", "OK");
         }
         else
         {

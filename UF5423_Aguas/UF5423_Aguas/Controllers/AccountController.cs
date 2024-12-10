@@ -226,7 +226,8 @@ namespace UF5423_Aguas.Controllers
                     "SetPassword",
                     "Account",
                     new { email = user.Email, passwordToken },
-                    protocol: HttpContext.Request.Scheme
+                    protocol: HttpContext.Request.Scheme,
+                    host: AppConfig.Host
                 );
 
                 bool emailSent = _mailHelper.SendEmail(user.Email, "Password recovery", $"<h2>Password recovery</h2>"

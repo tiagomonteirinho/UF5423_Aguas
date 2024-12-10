@@ -12,27 +12,32 @@
             </VerticalStackLayout>
 
             <Label Grid.Row="1" Text="Water Meters" FontSize="Medium"
-               FontAttributes="Bold"/>
+                   FontAttributes="Bold"/>
 
-            <CollectionView Grid.Row="2" x:Name="meters_collection" SelectionChanged="meters_collection_SelectionChanged"
-                SelectionMode="Single" Margin="5">
+            <Label Grid.Row="2" x:Name="noMeters_lbl" IsVisible="False" 
+                   Text="No existing water meters"
+                   HorizontalOptions="Center"/>
+
+            <CollectionView Grid.Row="2" x:Name="meters_collection" 
+                            SelectionChanged="meters_collection_SelectionChanged"
+                            SelectionMode="Single" Margin="5">
 
                 <CollectionView.ItemsLayout>
                     <GridItemsLayout Span="2" Orientation="Vertical"
-                     HorizontalItemSpacing="10" VerticalItemSpacing="10"/>
+                                     HorizontalItemSpacing="10" VerticalItemSpacing="10"/>
                 </CollectionView.ItemsLayout>
 
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
                         <Border Padding="10" StrokeShape="RoundRectangle 10,10,10,10"
-                            VerticalOptions="Start" >
+                                VerticalOptions="Start" >
                             <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="2">
                                 <Image Grid.Row="0" Source="water_meter_blue" Aspect="AspectFill"
-                                   HeightRequest="130"/>
+                                       HeightRequest="130"/>
                                 <Label Grid.Row="1" Text="{Binding SerialNumber}" FontSize="12"
-                                   FontAttributes="Bold" HorizontalTextAlignment="Center"/>
+                                       FontAttributes="Bold" HorizontalTextAlignment="Center"/>
                                 <Label Grid.Row="2" Text="{Binding Address}" FontSize="12"
-                                   FontAttributes="Bold" HorizontalTextAlignment="Center"/>
+                                       FontAttributes="Bold" HorizontalTextAlignment="Center"/>
                             </Grid>
                         </Border>
                     </DataTemplate>

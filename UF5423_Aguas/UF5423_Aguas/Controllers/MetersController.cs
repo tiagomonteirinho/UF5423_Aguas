@@ -156,7 +156,16 @@ namespace UF5423_Aguas.Controllers
             }
 
             user.Meters.Add(meter);
-            var meterUrl = Url.Action("Details", "Meters", new { id = meter.Id }, protocol: HttpContext.Request.Scheme);
+
+            var meterUrl = Url.Action
+            (
+                "Details",
+                "Meters",
+                new { id = meter.Id },
+                protocol: HttpContext.Request.Scheme,
+                host: AppConfig.Host
+            );
+
             var notification = new Notification
             {
                 Title = "New water meter added successfully.",
@@ -343,7 +352,15 @@ namespace UF5423_Aguas.Controllers
 
             var userEmail = User.Identity.Name;
             var user = await _userHelper.GetUserByEmailAsync(userEmail);
-            var meterUrl = Url.Action("Details", "Meters", new { id = meter.Id }, protocol: HttpContext.Request.Scheme);
+            var meterUrl = Url.Action
+            (
+                "Details",
+                "Meters",
+                new { id = meter.Id },
+                protocol: HttpContext.Request.Scheme,
+                host: AppConfig.Host
+            );
+
             if (await _userHelper.IsUserInRoleAsync(user, "Customer"))
             {
                 var roleNotification = new Notification
@@ -588,7 +605,15 @@ namespace UF5423_Aguas.Controllers
                 return RedirectToAction("NotFound404", "Errors", new { entityName = "User" });
             }
 
-            var userUrl = Url.Action("CustomerDetails", "Meters", new { id = user.Id }, protocol: HttpContext.Request.Scheme);
+            var userUrl = Url.Action
+            (
+                "CustomerDetails",
+                "Meters",
+                new { id = user.Id },
+                protocol: HttpContext.Request.Scheme,
+                host: AppConfig.Host
+            );
+
             var forwardedNotification = new Notification
             {
                 Title = "New customer contract confirmed and awaiting water meter addition.",

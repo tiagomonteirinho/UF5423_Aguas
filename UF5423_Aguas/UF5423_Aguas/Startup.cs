@@ -1,17 +1,14 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
+using System.Text.Json;
 using UF5423_Aguas.Data;
 using UF5423_Aguas.Data.Entities;
 using UF5423_Aguas.Helpers;
@@ -46,17 +43,18 @@ namespace UF5423_Aguas
 
             services.AddAuthentication()
                 .AddCookie()
-                .AddJwtBearer(cfg => 
+                .AddJwtBearer(cfg =>
                 {
                     cfg.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidIssuer = this.Configuration["Tokens:Issuer"],
                         ValidAudience = this.Configuration["Tokens:Audience"],
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(this.Configuration["Tokens:Key"]))
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(this.Configuration["Tokens:Key"])),
+                        NameClaimType = ClaimTypes.Email
                     };
                 });
 
-            services.AddDbContext <DataContext>(cfg =>
+            services.AddDbContext<DataContext>(cfg =>
             {
                 cfg.UseSqlServer(this.Configuration.GetConnectionString("LocalConnectionString"));
             });
@@ -70,6 +68,7 @@ namespace UF5423_Aguas
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IMeterRepository, MeterRepository>();
             services.AddScoped<ITierRepository, TierRepository>();
+            services.AddScoped<INotificationRepository, NotificationRepository>();
 
             services.ConfigureApplicationCookie(cfg =>
             {
@@ -77,7 +76,12 @@ namespace UF5423_Aguas
                 cfg.AccessDeniedPath = "/Errors/Unauthorized401";
             });
 
-            services.AddControllersWithViews();
+            services.AddControllersWithViews()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.IgnoreNullValues = true;  // Ignore null values.
+                    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;  // Use camelCase.
+                });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

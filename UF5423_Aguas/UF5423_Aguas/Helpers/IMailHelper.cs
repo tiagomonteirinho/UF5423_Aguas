@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-namespace UF5423_Aguas.Helpers
+﻿namespace UF5423_Aguas.Helpers
 {
     public interface IMailHelper
     {

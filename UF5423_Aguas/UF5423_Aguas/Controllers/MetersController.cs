@@ -1,13 +1,10 @@
 ﻿using Braintree;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualStudio.Web.CodeGeneration.Contracts.Messaging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using UF5423_Aguas.Data;
 using UF5423_Aguas.Data.Entities;
@@ -20,13 +17,15 @@ namespace UF5423_Aguas.Controllers
     public class MetersController : Controller
     {
         private readonly IMeterRepository _meterRepository;
+        private readonly INotificationRepository _notificationRepository;
         private readonly IUserHelper _userHelper;
         private readonly DataContext _context;
         private readonly IPaymentHelper _paymentHelper;
 
-        public MetersController(IMeterRepository meterRepository, IUserHelper userHelper, DataContext context, IPaymentHelper paymentHelper)
+        public MetersController(IMeterRepository meterRepository, INotificationRepository notificationRepository, IUserHelper userHelper, DataContext context, IPaymentHelper paymentHelper)
         {
             _meterRepository = meterRepository;
+            _notificationRepository = notificationRepository;
             _userHelper = userHelper;
             _context = context;
             _paymentHelper = paymentHelper;
@@ -64,7 +63,7 @@ namespace UF5423_Aguas.Controllers
                 return RedirectToAction("NotFound404", "Errors", new { entityName = "Meter" });
             }
 
-            var meter = await _meterRepository.GetMeterWithConsumptionsAsync(id.Value);
+            var meter = await _meterRepository.GetMeterWithAllRelatedDataAsync(id.Value);
             if (meter == null)
             {
                 return RedirectToAction("NotFound404", "Errors", new { entityName = "Meter" });
@@ -157,7 +156,16 @@ namespace UF5423_Aguas.Controllers
             }
 
             user.Meters.Add(meter);
-            var meterUrl = Url.Action("Details", "Meters", new { id = meter.Id }, protocol: HttpContext.Request.Scheme);
+
+            var meterUrl = Url.Action
+            (
+                "Details",
+                "Meters",
+                new { id = meter.Id },
+                protocol: HttpContext.Request.Scheme,
+                host: AppConfig.Host
+            );
+
             var notification = new Notification
             {
                 Title = "New water meter added successfully.",
@@ -265,7 +273,7 @@ namespace UF5423_Aguas.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var meter = await _meterRepository.GetMeterWithConsumptionsAsync(id);
+            var meter = await _meterRepository.GetMeterWithAllRelatedDataAsync(id);
             if (meter == null)
             {
                 return RedirectToAction("NotFound404", "Errors", new { entityName = "Meter" });
@@ -344,7 +352,15 @@ namespace UF5423_Aguas.Controllers
 
             var userEmail = User.Identity.Name;
             var user = await _userHelper.GetUserByEmailAsync(userEmail);
-            var meterUrl = Url.Action("Details", "Meters", new { id = meter.Id }, protocol: HttpContext.Request.Scheme);
+            var meterUrl = Url.Action
+            (
+                "Details",
+                "Meters",
+                new { id = meter.Id },
+                protocol: HttpContext.Request.Scheme,
+                host: AppConfig.Host
+            );
+
             if (await _userHelper.IsUserInRoleAsync(user, "Customer"))
             {
                 var roleNotification = new Notification
@@ -354,7 +370,7 @@ namespace UF5423_Aguas.Controllers
                     ReceiverRole = "Employee"
                 };
 
-                _context.Notifications.Add(roleNotification);
+                await _notificationRepository.CreateAsync(roleNotification);
             }
             else
             {
@@ -367,7 +383,7 @@ namespace UF5423_Aguas.Controllers
                     ReceiverEmail = meter.User.Email,
                 };
 
-                _context.Notifications.Add(userNotification);
+                await _notificationRepository.CreateAsync(userNotification);
             }
 
             await _context.SaveChangesAsync();
@@ -512,7 +528,7 @@ namespace UF5423_Aguas.Controllers
             {
                 Title = "New contract awaiting approval.",
                 Message =
-                $"<h5>Contract holder (full name)</h5>" +
+                $"<h5>Contract holder</h5>" +
                 $"<p>{model.FullName}</p>" +
                 $"<h5>E-mail</h5>" +
                 $"<p>{model.Email}</p>" +
@@ -528,11 +544,9 @@ namespace UF5423_Aguas.Controllers
                 NewAccountEmail = model.Email,
             };
 
-            _context.Notifications.Add(notification);
-            await _context.SaveChangesAsync();
+            await _notificationRepository.CreateAsync(notification);
             notification.Action = $"<a href=\"{Url.Action("ForwardNotificationToAdmin", "Meters", new { id = notification.Id })}\" class=\"btn btn-primary\">Forward to administrator</a>";
-            _context.Notifications.Update(notification);
-            await _context.SaveChangesAsync();
+            await _notificationRepository.UpdateAsync(notification);
 
             ViewBag.SuccessMessage = "Meter contract request submitted successfully!";
             ModelState.Clear();
@@ -559,19 +573,17 @@ namespace UF5423_Aguas.Controllers
                 NewAccountEmail = notification.NewAccountEmail,
             };
 
-            _context.Notifications.Add(forwardedNotification);
-            await _context.SaveChangesAsync();
+            await _notificationRepository.CreateAsync(forwardedNotification);
             forwardedNotification.Action = $"<p style=\"color:gray\">*Forward notification after creating customer account.</p>" +
                 $"<a href=\"{Url.Action("ForwardNotificationToEmployee", "Meters", new { id = forwardedNotification.Id })}\" class=\"btn btn-primary\">Forward to employee</a>";
-            _context.Notifications.Update(forwardedNotification);
+            await _notificationRepository.UpdateAsync(forwardedNotification);
 
             if (!notification.Action.Contains("Notification forwarded successfully!"))
             {
                 notification.Action += "Notification forwarded successfully!";
             }
 
-            _context.Notifications.Update(notification);
-            await _context.SaveChangesAsync();
+            await _notificationRepository.UpdateAsync(notification);
             return RedirectToAction("NotificationDetails", "Users", new { id = notification.Id });
         }
 
@@ -593,7 +605,15 @@ namespace UF5423_Aguas.Controllers
                 return RedirectToAction("NotFound404", "Errors", new { entityName = "User" });
             }
 
-            var userUrl = Url.Action("CustomerDetails", "Meters", new { id = user.Id }, protocol: HttpContext.Request.Scheme);
+            var userUrl = Url.Action
+            (
+                "CustomerDetails",
+                "Meters",
+                new { id = user.Id },
+                protocol: HttpContext.Request.Scheme,
+                host: AppConfig.Host
+            );
+
             var forwardedNotification = new Notification
             {
                 Title = "New customer contract confirmed and awaiting water meter addition.",
@@ -602,16 +622,14 @@ namespace UF5423_Aguas.Controllers
                 ReceiverRole = "Employee",
             };
 
-            _context.Notifications.Add(forwardedNotification);
-            await _context.SaveChangesAsync();
+            await _notificationRepository.CreateAsync(forwardedNotification);
 
             if (!notification.Action.Contains("Notification forwarded successfully!"))
             {
                 notification.Action += "Notification forwarded successfully!";
             }
 
-            _context.Notifications.Update(notification);
-            await _context.SaveChangesAsync();
+            await _notificationRepository.UpdateAsync(notification);
             return RedirectToAction("NotificationDetails", "Users", new { id = notification.Id });
         }
 
@@ -639,7 +657,7 @@ namespace UF5423_Aguas.Controllers
         }
 
         [Authorize(Roles = "Customer")]
-        public async Task<IActionResult> PayConsumption(int? id)
+        public async Task<IActionResult> BuyConsumption(int? id)
         {
             if (id == null)
             {
@@ -665,7 +683,7 @@ namespace UF5423_Aguas.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> PayConsumption(Invoice model)
+        public async Task<IActionResult> BuyConsumption(Invoice model)
         {
             var consumption = await _meterRepository.GetConsumptionByIdAsync(model.ConsumptionId);
             var gateway = _paymentHelper.GetGateway();

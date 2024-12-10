@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="UF11027_Aguas_.NET_MAUI_App.Pages.RequestWaterMeterPage"
+             Title="Request Water Meter"
+             NavigationPage.HasNavigationBar="False">
+
+    <ScrollView>
+        <VerticalStackLayout>
+            <ActivityIndicator x:Name="tiersLoaded_ai" IsRunning="false" 
+                               IsVisible="false" Color="#0c71c3"
+                               HorizontalOptions="Center" VerticalOptions="Center"/>
+
+            <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,*"
+                  RowSpacing="20" Margin="20,40,20,40">
+                
+                <Image Grid.Row="0" Source="water_meter_blue.png" 
+                       Aspect="AspectFit" 
+                       WidthRequest="140" HeightRequest="140"/>
+
+                <Label Grid.Row="1" Text="Available tiers" TextColor="#486AC6"
+                       FontSize="Medium" FontAttributes="Bold" 
+                       HorizontalOptions="Center"/>
+                
+                <CollectionView Grid.Row="2" x:Name="tiers_collection"
+                                ItemsSource="{Binding Tiers}" Margin="20">
+                    <CollectionView.ItemsLayout>
+                        <LinearItemsLayout Orientation="Vertical" ItemSpacing="5"/>
+                    </CollectionView.ItemsLayout>
+
+                    <CollectionView.Header>
+                        <Grid ColumnDefinitions="*,*,*" Padding="10">
+                            <Label Text="Tier" FontSize="Small" FontAttributes="Bold" Grid.Column="0" HorizontalTextAlignment="Center"/>
+                            <Label Text="Volume limit" FontSize="Small" FontAttributes="Bold" Grid.Column="1" HorizontalTextAlignment="Center"/>
+                            <Label Text="Unit price" FontSize="Small" FontAttributes="Bold" Grid.Column="2" HorizontalTextAlignment="Center"/>
+                        </Grid>
+                    </CollectionView.Header>
+
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid ColumnDefinitions="*,*,*">
+                                <Label Text="{Binding Id}" Grid.Column="0" FontSize="Small" HorizontalTextAlignment="Center"/>
+                                <Label Text="{Binding VolumeLimit, StringFormat='{0:F2} m³'}" Grid.Column="1" FontSize="Small" HorizontalTextAlignment="Center"/>
+                                <Label Text="{Binding UnitPrice, StringFormat='{0:F2} €'}" Grid.Column="2" FontSize="Small" HorizontalTextAlignment="Center"/>
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <Label Grid.Row="3" Text="Request a water meter" TextColor="#486AC6"
+                       FontSize="Medium" FontAttributes="Bold" 
+                       HorizontalOptions="Center"/>
+
+                <Frame Grid.Row="4" Padding="15" BackgroundColor="White">
+                    <VerticalStackLayout>
+                        <Entry Placeholder="Name" x:Name="name_entry"/>
+                        <Entry Placeholder="Email" x:Name="email_entry"
+                               Keyboard="Email"/>
+                        <Entry Placeholder="Phone number" x:Name="phoneNumber_entry" 
+                               Keyboard="Telephone"/>
+                        <Entry Placeholder="Address" x:Name="address_entry"/>
+                        <Entry Placeholder="Postal code" x:Name="postalCode_entry"/>
+                        <Entry Placeholder="Serial number" x:Name="serialNumber_entry"/>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <Button Grid.Row="5" x:Name="requestMeter_button" Clicked="requestMeter_button_Clicked"
+                        Text="Request water meter" FontSize="Medium"
+                        BackgroundColor="#486AC6"/>
+
+                <HorizontalStackLayout Grid.Row="6" Spacing="2" 
+                                       HorizontalOptions="Center" VerticalOptions="EndAndExpand">
+                    <Label Text="Already have an account?"/>
+                    <Label Text=" Sign in" TextColor="#486AC6" FontAttributes="Bold">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer x:Name="login_tap" Tapped="login_tap_Tapped"/>
+                        </Label.GestureRecognizers>
+                    </Label>
+                </HorizontalStackLayout>
+            </Grid>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

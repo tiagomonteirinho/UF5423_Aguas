@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="UF11027_Aguas_.NET_MAUI_App.Pages.LoginPage"
+             NavigationPage.HasNavigationBar="False">
+
+    <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,*"
+          RowSpacing="20"
+          Margin="20,150,20,40">
+
+        <Image Grid.Row="0" Source="logo"
+               Aspect="AspectFit"
+               WidthRequest="100" HeightRequest="100"/>
+        <Label Grid.Row="1" Text="Sign in" TextColor="#486AC6"
+               FontAttributes="Bold" HorizontalOptions="Center" />
+
+        <Frame Grid.Row="2" Padding="15" BackgroundColor="White">
+            <VerticalStackLayout>
+                <Entry Placeholder="Email" x:Name="email_entry"
+                       Keyboard="Email"/>
+                <Entry Placeholder="Password" x:Name="password_entry" 
+                       IsPassword="True"/>
+            </VerticalStackLayout>
+        </Frame>
+
+        <Button Grid.Row="3" x:Name="login_button" Clicked="login_button_Clicked"
+                Text="Sign in" FontSize="Medium"
+                BackgroundColor="#486AC6"/>
+
+        <Label Grid.Row="4" Text="Forgot your password?" TextColor="#486AC6" 
+               FontAttributes="Bold" HorizontalOptions="Center">
+            <Label.GestureRecognizers>
+                <TapGestureRecognizer x:Name="recoverPassword_tap" Tapped="recoverPassword_tap_Tapped"/>
+            </Label.GestureRecognizers>
+        </Label>
+
+        <HorizontalStackLayout Grid.Row="5" Spacing="2" 
+                               HorizontalOptions="Center" VerticalOptions="EndAndExpand">
+            <Label Text="Request a water meter contract" TextColor="#486AC6" FontAttributes="Bold">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer x:Name="requestWaterMeter_tap" Tapped="requestWaterMeter_tap_Tapped"/>
+                </Label.GestureRecognizers>
+            </Label>
+        </HorizontalStackLayout>
+    </Grid>
+</ContentPage>

@@ -1,5 +1,7 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using UF5423_Aguas.Data.API;
 using UF5423_Aguas.Data.Entities;
 using UF5423_Aguas.Models;
 
@@ -11,7 +13,13 @@ namespace UF5423_Aguas.Data
 
         Task<IQueryable<Meter>> GetMetersAsync(string email);
 
+        List<MeterDto> ConvertToMeterDto(IEnumerable<Meter> meters);
+
         Task<IQueryable<Consumption>> GetConsumptionsAsync(string email);
+
+        List<ConsumptionDto> ConvertToConsumptionDto(IEnumerable<Consumption> consumptions);
+
+        Task<Meter> GetMeterWithAllRelatedDataAsync(int id);
 
         Task<Meter> GetMeterWithConsumptionsAsync(int id);
 

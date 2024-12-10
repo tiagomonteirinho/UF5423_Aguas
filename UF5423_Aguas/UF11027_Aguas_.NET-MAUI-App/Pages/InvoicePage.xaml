@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="UF11027_Aguas_.NET_MAUI_App.Pages.InvoicePage"
+             Title="Invoice">
+
+    <VerticalStackLayout>
+        <ActivityIndicator x:Name="invoiceDetailsLoaded_ai" IsRunning="false"
+                           IsVisible="false" Color="#0c71c3"
+                           HorizontalOptions="Center" VerticalOptions="Center"/>
+        
+        <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,*" RowSpacing="30"
+              Margin="30,40">
+
+            <Image Grid.Row="0" Source="invoice.png" Aspect="AspectFit"
+                   WidthRequest="100" HeightRequest="100"/>
+
+            <Grid Grid.Row="1" RowDefinitions="Auto,Auto">
+                <Label Text="Invoice number:"
+                       FontSize="Small" FontAttributes="Bold"/>
+                <Label Text="{Binding Id}"
+                       FontSize="Small" FontAttributes="Bold"
+                       HorizontalTextAlignment="End"/>
+            </Grid>
+
+            <Grid Grid.Row="2" RowDefinitions="Auto,Auto,Auto" RowSpacing="15">
+                <Label Grid.Row="0"
+                       Text="Meter"
+                       FontSize="Medium" FontAttributes="Bold"/>
+                <Label Grid.Row="1" 
+                       Text="Serial number:"
+                       FontSize="Small" FontAttributes="Bold"/>
+                <Label Grid.Row="1"
+                       Text="{Binding Meter.SerialNumber}"
+                       FontSize="Small" FontAttributes="Bold"
+                       HorizontalTextAlignment="End"/>
+                <Label Grid.Row="2"   
+                       Text="Address:"
+                       FontSize="Small" FontAttributes="Bold"/>
+                <Label Grid.Row="2" 
+                       Text="{Binding Meter.Address}"
+                       FontSize="Small" FontAttributes="Bold"
+                       HorizontalTextAlignment="End"/>
+            </Grid>
+
+            <Grid Grid.Row="3" RowDefinitions="Auto,Auto,Auto" RowSpacing="15">
+                <Label Grid.Row="0" 
+                       Text="Consumption"
+                       FontSize="Medium" FontAttributes="Bold"/>
+                <Label Grid.Row="1" 
+                       Text="Volume:"
+                       FontSize="Small" FontAttributes="Bold"/>
+                <Label Grid.Row="1"  
+                       Text="{Binding Consumption.Volume, StringFormat='{0:F2} m³'}"
+                       FontSize="Small" FontAttributes="Bold"
+                       HorizontalTextAlignment="End"/>
+                <Label Grid.Row="2" 
+                       Text="Date:"
+                       FontSize="Small" FontAttributes="Bold"/>
+                <Label Grid.Row="2"
+                       Text="{Binding Consumption.Date, StringFormat='Date: {dd.MM.yyyy HH:mm}'}"
+                       FontSize="Small" FontAttributes="Bold"
+                       HorizontalTextAlignment="End"/>
+            </Grid>
+
+            <Grid Grid.Row="4" RowDefinitions="Auto,Auto">
+                <Label Text="Cost:"
+                       FontSize="Small" FontAttributes="Bold"/>
+                <Label Text="{Binding Price, StringFormat='{0:F2}€'}"
+                       FontSize="Small" FontAttributes="Bold"
+                       HorizontalTextAlignment="End"/>
+            </Grid>
+
+            <Button Grid.Row="5" x:Name="buyConsumption_btn" Clicked="buyConsumption_btn_Clicked"
+                    Text="Buy consumption" IsVisible="false" 
+                    FontSize="Small" FontAttributes="Bold"
+                    BackgroundColor="#2ea3f2"/>
+            
+        </Grid>
+    </VerticalStackLayout>
+</ContentPage>

@@ -310,8 +310,8 @@ namespace UF5423_Aguas.Migrations
                         .HasMaxLength(99)
                         .HasColumnType("nvarchar(99)");
 
-                    b.Property<Guid>("ImageId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");

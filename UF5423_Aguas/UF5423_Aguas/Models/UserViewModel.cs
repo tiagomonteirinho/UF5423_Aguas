@@ -1,9 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using UF5423_Aguas.Data.Entities;
-using UF5423_Aguas.Helpers;
 
 namespace UF5423_Aguas.Models
 {

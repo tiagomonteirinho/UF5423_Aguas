@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using UF5423_Aguas.Data.Entities;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace UF5423_Aguas.Models
 {

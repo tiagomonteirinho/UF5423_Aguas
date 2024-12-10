@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="UF11027_Aguas_.NET_MAUI_App.Pages.ConsumptionDetailsPage"
+             Title="Consumption Details">
+
+    <VerticalStackLayout>
+        <ActivityIndicator x:Name="consumptionDetailsLoaded_ai" IsRunning="false"
+                           IsVisible="false" Color="#0c71c3"
+                           HorizontalOptions="Center" VerticalOptions="Center"/>
+
+        <Grid RowDefinitions="Auto,Auto,Auto,Auto,*" RowSpacing="20"
+              Margin="20,40,20,40">
+            <Image Grid.Row="0" Source="logo" Aspect="AspectFit" Margin="0,20"
+                   WidthRequest="140" HeightRequest="140"/>
+
+            <Label Grid.Row="1" Margin="20,0"  
+                   Text="{Binding Volume, StringFormat='{0:F2} m³'}"
+                   FontSize="Medium" FontAttributes="Bold"/>
+
+            <Label Grid.Row="2" Margin="20,0"
+                   Text="{Binding Date, StringFormat='{dd.MM.yyyy HH:mm}'}"
+                   FontSize="Medium" FontAttributes="Bold"/>
+
+            <Label Grid.Row="3" Margin="20,0"  
+                   Text="{Binding Status}"
+                   FontSize="Medium" FontAttributes="Bold"/>
+
+            <Button Grid.Row="4" x:Name="invoice_btn" Clicked="invoice_btn_Clicked"
+                    Margin="0,20" IsVisible="False" 
+                    FontSize="Small" FontAttributes="Bold"
+                    BackgroundColor="#2ea3f2"/>
+        </Grid>
+    </VerticalStackLayout>
+</ContentPage>

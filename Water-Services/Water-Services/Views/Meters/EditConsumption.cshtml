@@ -1,0 +1,46 @@
+﻿@model Water_Services.Models.ConsumptionViewModel
+
+@{
+    ViewData["Title"] = "Edit consumption";
+}
+
+<h2>Edit consumption</h2>
+<hr />
+@if (ViewBag.SuccessMessage != null)
+{
+    <div class="alert alert-success">
+        @ViewBag.SuccessMessage
+    </div>
+}
+@if (ViewBag.ErrorMessage != null)
+{
+    <div class="alert alert-danger">
+        @ViewBag.ErrorMessage
+    </div>
+}
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="EditConsumption">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="MeterId" />
+
+            <div class="form-group">
+                <label asp-for="Volume" class="control-label"></label>
+                <input asp-for="Volume" class="form-control" />
+                <span asp-validation-for="Volume" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <a asp-action="Details" asp-route-id="@Model.MeterId" class="btn btn-success"><i class="fa fa-arrow-alt-circle-left"></i> Go back</a>
+                <button type="submit" value="Add" class="btn btn-primary"><i class="fa fa-save"></i> Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+

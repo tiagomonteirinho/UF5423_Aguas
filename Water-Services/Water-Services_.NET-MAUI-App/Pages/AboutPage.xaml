@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Water_Services_.NET_MAUI_App.Pages.AboutPage"
+             Title="About">
+
+    <Grid RowDefinitions="Auto,Auto,Auto,*" RowSpacing="20"
+          Margin="20,130,20,40">
+
+        <Image Grid.Row="0" Source="logo" Aspect="AspectFit" Margin="0,20"
+               WidthRequest="140" HeightRequest="140"/>
+
+        <Label Grid.Row="1" Text="App Version: 1.0.0" Margin="20,0"
+               FontSize="Medium" FontAttributes="Bold"/>
+
+        <Label Grid.Row="2" Text="Release Date: 10/12/2024" Margin="20,0"
+               FontSize="Medium" FontAttributes="Bold"/>
+
+        <Label Grid.Row="3" Text="Developer: Tiago Monteirinho" Margin="20,0" 
+               FontSize="Medium" FontAttributes="Bold"/>
+        
+    </Grid>
+</ContentPage>

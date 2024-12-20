@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Water_Services_.NET_MAUI_App.Pages.AddConsumptionPage"
+             Title="Add Consumption">
+
+    <VerticalStackLayout>
+        <ActivityIndicator x:Name="consumptionDetailsLoaded_ai" IsRunning="false"
+                           IsVisible="false" Color="#0c71c3"
+                           HorizontalOptions="Center" VerticalOptions="Center"/>
+
+        <Grid RowDefinitions="Auto,Auto,*" RowSpacing="20"
+              Margin="20,100,20,40">
+            <Image Grid.Row="0" Source="logo" Aspect="AspectFit" Margin="0,20"
+                   WidthRequest="140" HeightRequest="140"/>
+
+            <HorizontalStackLayout Grid.Row="1" Spacing="10"
+                                   HorizontalOptions="Center">
+                <Entry Placeholder="Volume" x:Name="volume_entry"
+                       Keyboard="Numeric" FontSize="Medium"
+                       WidthRequest="100"/>
+                <Label Text="m³" FontSize="Medium" Margin="0,10,0,0"/>
+            </HorizontalStackLayout>
+
+            <Button Grid.Row="2" x:Name="addConsumption_btn"
+                    Text="Add consumption" Clicked="addConsumption_btn_Clicked"
+                    Margin="0,20" FontSize="Medium" FontAttributes="Bold"
+                    BackgroundColor="#2ea3f2"/>
+        </Grid>
+    </VerticalStackLayout>
+</ContentPage>

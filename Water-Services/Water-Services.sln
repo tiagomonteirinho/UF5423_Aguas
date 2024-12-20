@@ -1,0 +1,33 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35208.52
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Water-Services", "Water-Services\Water-Services.csproj", "{F9A131D4-0252-4A50-AD09-D88FE354850E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Water-Services_.NET-MAUI-App", "Water-Services_.NET-MAUI-App\Water-Services_.NET-MAUI-App.csproj", "{BD102E42-BB11-4407-8FAF-B4BBBEB1EEE7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F9A131D4-0252-4A50-AD09-D88FE354850E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F9A131D4-0252-4A50-AD09-D88FE354850E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F9A131D4-0252-4A50-AD09-D88FE354850E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F9A131D4-0252-4A50-AD09-D88FE354850E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BD102E42-BB11-4407-8FAF-B4BBBEB1EEE7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BD102E42-BB11-4407-8FAF-B4BBBEB1EEE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BD102E42-BB11-4407-8FAF-B4BBBEB1EEE7}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{BD102E42-BB11-4407-8FAF-B4BBBEB1EEE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BD102E42-BB11-4407-8FAF-B4BBBEB1EEE7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BD102E42-BB11-4407-8FAF-B4BBBEB1EEE7}.Release|Any CPU.Deploy.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {76D4CD11-75CD-44D9-B522-8FBE63BC9623}
+	EndGlobalSection
+EndGlobal

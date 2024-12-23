@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="WaterServices_MauiApp.Pages.HomePage"
+             Title="Home">
+
+    <ScrollView>
+        <Grid RowDefinitions="1*,Auto,6*" RowSpacing="20" Margin="15">
+
+            <VerticalStackLayout Grid.Row="0" Spacing="3">
+                <Label x:Name="greetings_label" FontSize="Large"/>
+            </VerticalStackLayout>
+
+            <Label Grid.Row="1" Text="Water Meters" FontSize="Medium"
+                   FontAttributes="Bold"/>
+
+            <Label Grid.Row="2" x:Name="noMeters_lbl" IsVisible="False" 
+                   Text="No existing water meters"
+                   HorizontalOptions="Center"/>
+
+            <CollectionView Grid.Row="2" x:Name="meters_collection" 
+                            SelectionChanged="meters_collection_SelectionChanged"
+                            SelectionMode="Single" Margin="5">
+
+                <CollectionView.ItemsLayout>
+                    <GridItemsLayout Span="2" Orientation="Vertical"
+                                     HorizontalItemSpacing="10" VerticalItemSpacing="10"/>
+                </CollectionView.ItemsLayout>
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Border Padding="10" StrokeShape="RoundRectangle 10,10,10,10"
+                                VerticalOptions="Start" >
+                            <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="2">
+                                <Image Grid.Row="0" Source="water_meter_blue" Aspect="AspectFill"
+                                       HeightRequest="130"/>
+                                <Label Grid.Row="1" Text="{Binding SerialNumber}" FontSize="12"
+                                       FontAttributes="Bold" HorizontalTextAlignment="Center"/>
+                                <Label Grid.Row="2" Text="{Binding Address}" FontSize="12"
+                                       FontAttributes="Bold" HorizontalTextAlignment="Center"/>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </Grid>
+    </ScrollView>
+</ContentPage>

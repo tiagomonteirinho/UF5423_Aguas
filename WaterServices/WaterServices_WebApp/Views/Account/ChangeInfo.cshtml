@@ -1,0 +1,54 @@
+﻿@model WaterServices_WebApp.Models.ChangeInfoViewModel
+@{
+    ViewData["Title"] = "Change info";
+}
+
+<h2>Edit user info</h2>
+
+@if (ViewBag.SuccessMessage != null)
+{
+    <div class="alert alert-success">
+        @ViewBag.SuccessMessage
+    </div>
+}
+@if (ViewBag.ErrorMessage != null)
+{
+    <div class="alert alert-danger">
+        @ViewBag.ErrorMessage
+    </div>
+}
+
+<div class="row">
+    <div class="col-md-4 offset-md-4">
+        <form method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly"></div>
+
+            <div class="form-group">
+                <label asp-for="FullName">Full name</label>
+                <input asp-for="FullName" class="form-control" />
+                <span asp-validation-for="FullName" class="text-warning"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="ImageFullPath">Image</label>
+                <div class="form-group">
+                    <img src="@Url.Content(Model.ImageFullPath)" alt="Image" width="150" />
+                </div>
+                <label asp-for="ImageFile"></label>
+                <input asp-for="ImageFile" class="form-control" type="file" />
+                <span asp-validation-for="ImageFile" class="text-warning"></span>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Update info" class="btn btn-primary" />
+                <a asp-action="ChangePassword" class="btn btn-success">Change password</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

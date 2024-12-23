@@ -396,5 +396,5 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
-/Water-Services/Water-Services/appsettings.json
-/Water-Services/Water-Services/wwwroot/images/users
+/WaterServices/WaterServices_WebApp/appsettings.json
+/WaterServices/WaterServices_WebApp/wwwroot/images/users

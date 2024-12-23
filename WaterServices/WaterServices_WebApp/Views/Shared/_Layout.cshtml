@@ -1,0 +1,129 @@
+﻿@inject WaterServices_WebApp.Helpers.IUserHelper _userHelper
+@inject WaterServices_WebApp.Data.IUserRepository _userRepository
+@inject WaterServices_WebApp.Data.INotificationRepository _notificationRepository
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - WaterServices</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="~/lib/font-awesome/css/all.min.css" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container">
+                <a class="navbar-brand" asp-controller="Home" asp-action="Index">Water Services Management Platform</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Home" asp-action="Index">Home</a>
+                        </li>
+                        @if (!User.Identity.IsAuthenticated)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Meters" asp-action="RequestMeter">Request water meter</a>
+                            </li>
+                        }
+                        @if (User.IsInRole("Employee"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Meters" asp-action="ListCustomers">Customers</a>
+                            </li>
+                        }
+                        @if (User.IsInRole("Customer"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Meters" asp-action="Index">Meters</a>
+                            </li>
+                        }
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Users" asp-action="Index">Users</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Tiers" asp-action="Index">Tiers</a>
+                            </li>
+                        }
+                    </ul>
+                    <ul class="nav navbar-nav navbar-right">
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            var user = await _userHelper.GetUserByEmailAsync(User.Identity.Name);
+                            if (user != null)
+                            {
+                                <li class="nav-item" style="position: relative;">
+                                    <a class="nav-link text-dark" asp-controller="Users" asp-action="ListNotifications">
+                                        <i class="fa fa-bell"></i>
+                                        @if (await _userHelper.IsUserInRoleAsync(user, "Customer"))
+                                        {
+                                            var userNotifications = _notificationRepository.GetNotifications(User.Identity.Name, null);
+                                            var userUnreadNotifications = userNotifications.Count(n => !n.Read);
+                                            if (userUnreadNotifications > 0)
+                                            {
+                                                <span style="position: absolute; top: 5px; right: -2px; background-color: red; color: white;
+                                                    border-radius: 50%; padding: 3px 6px; font-size: 0.55em; line-height: 1;">@userUnreadNotifications</span>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            var roleNotifications = _notificationRepository.GetNotifications(null, user.RoleName);
+                                            var roleUnreadNotifications = roleNotifications.Count(n => !n.Read);
+                                            if (roleUnreadNotifications > 0)
+                                            {
+                                                <span style="position: absolute; top: 5px; right: -2px; background-color: red; color: white;
+                                                    border-radius: 50%; padding: 3px 6px; font-size: 0.55em; line-height: 1;">@roleUnreadNotifications</span>
+                                            }
+                                        }
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="Account" asp-action="ChangeInfo">
+                                        <img src="@user.ImageFullPath" alt="Image" style="width: 30px; height: 30px; border-radius: 50%;" />
+                                        @{
+                                            var userFullName = user.FullName.Length > 17 ? user.FullName.Substring(0, 17) + "..." : user.FullName; // Reduce full name length.
+                                            @userFullName
+                                        }
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="Account" asp-action="Logout">Logout</a>
+                                </li>
+                            }
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Account" asp-action="Login">Login</a>
+                            </li>
+                        }   
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2024 - Water Services Management Platform by Tiago Monteirinho | All rights reserved - <a asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
